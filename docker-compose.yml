@@ -44,7 +44,7 @@ services:
     env_file:
       - ./env/client.env
     ports:
-      - "${REACT_PORT:-3000}:${REACT_PORT:-3000}"
+      - "${REACT_PORT:-5173}:${REACT_PORT:-5173}"
     volumes:
       - ./client:/app
     depends_on:

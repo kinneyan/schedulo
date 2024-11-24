@@ -4,7 +4,7 @@ FROM node:18
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to install dependencies
+# Copy package.json and package-lock.json (or pnpm/yarn lock files) to install dependencies
 COPY package*.json ./
 
 # Install dependencies
@@ -14,8 +14,8 @@ RUN npm install
 COPY . .
 
 # Default command to switch between development and production
-CMD ["sh", "-c", "if [ \"$REACT_ENV\" = \"production\" ]; then \
-  npm run build && npx serve -s build; \
+CMD ["sh", "-c", "npm install && if [ \"$REACT_ENV\" = \"production\" ]; then \
+  npm run build && npx serve -s dist; \
   else \
-  npm start; \
+  npm run dev -- --host; \
   fi"]
