@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:15
+    container_name: postgres
+    restart: unless-stopped
+    env_file:
+       - ./env/db.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  webserver:
+    image: httpd
+    container_name: apache2
+    restart: unless-stopped
+    ports: 
+      - "80:80"
+      - "443:443"
+    volumes: 
+      - ./client/build:/usr/local/apache2/htdocs/
+    depends_on: 
+      - app
+
+  app:
+    build:
+      context: ./app
+    container_name: django
+    restart: unless-stopped
+    env_file:
+      - ./env/app.env
+    ports: 
+      - "8000:8000"
+    volumes: 
+      - ./app:/app
+    depends_on: 
+      - db
+
+  frontend:
+    build:
+      context: ./client
+    container_name: react
+    restart: unless-stopped
+    env_file:
+      - ./env/client.env
+    ports:
+      - "${REACT_PORT:-3000}:${REACT_PORT:-3000}"
+    volumes:
+      - ./client:/app
+    depends_on:
+      - app
+
+volumes:
+  postgres_data:
