@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Default command to switch between development and production
-CMD ["sh", "-c", "npm install && if [ \"$REACT_ENV\" = \"production\" ]; then \
+CMD ["sh", "-c", "if [ \"$REACT_ENV\" = \"production\" ]; then \
   npm run build && npx serve -s dist; \
   else \
   npm run dev -- --host; \
