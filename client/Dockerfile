@@ -7,14 +7,11 @@ WORKDIR /app
 # Copy package.json and package-lock.json (or pnpm/yarn lock files) to install dependencies
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
-
 # Copy the entire project into the container
 COPY . .
 
 # Default command to switch between development and production
-CMD ["sh", "-c", "if [ \"$REACT_ENV\" = \"production\" ]; then \
+CMD ["sh", "-c", "npm ci && if [ \"$REACT_ENV\" = \"production\" ]; then \
   npm run build && npx serve -s dist; \
   else \
   npm run dev -- --host; \
