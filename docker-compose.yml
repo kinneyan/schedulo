@@ -10,18 +10,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  webserver:
-    image: httpd
-    container_name: apache2
-    restart: unless-stopped
-    ports: 
-      - "80:80"
-      - "443:443"
-    volumes: 
-      - ./client/build:/usr/local/apache2/htdocs/
-    depends_on: 
-      - app
-
   app:
     build:
       context: ./server
@@ -33,7 +21,7 @@ services:
     ports: 
       - "8000:8000"
     volumes: 
-      - ./app:/app
+      - ./server:/app
     depends_on: 
       - db
 
