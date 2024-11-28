@@ -24,7 +24,7 @@ services:
 
   app:
     build:
-      context: ./app
+      context: ./server
     container_name: django
     restart: unless-stopped
     env_file:
