@@ -5,3 +5,5 @@ build
 dist
 .vscode
 .vite/
+__pycache__/
+*.pyc
