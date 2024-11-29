@@ -42,3 +42,11 @@ class Unavailability(models.model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     day_of_week = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(6)])
+
+    class Meta:
+        constrains = [
+            models.CheckConstraint(
+                check=models.Q(day_of_week__gte=0) & models.Q(day_of_week__lte=6),
+                name="day_of_week_valid",
+            )
+        ]
