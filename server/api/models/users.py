@@ -1,4 +1,5 @@
 from django.db import models
+from .roles import WorkspaceRole
 
 class User(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
@@ -22,7 +23,7 @@ class WorkspaceMember(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='workspaces')
     added_by_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='added_members')
     pay_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    # role_id = models.ForeignKey(Role, on_delete=models.CASCADE, null=True)    
+    role_id = models.ForeignKey(WorkspaceRole, on_delete=models.CASCADE, null=True, blank=True)    
 
 class Group(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
