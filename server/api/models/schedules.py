@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 from .users import WorkspaceMember, Workspace
 from .roles import WorkspaceRole
 
@@ -33,3 +34,11 @@ class TimeOffRequest(models.Model):
     approved = models.BooleanField(default=False)
     reason = models.TextField(blank=True)
     approved_by_id = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE, related_name='approved_time_off_requests', null=True, blank=True)
+
+class Unavailability(models.model):
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+    member_id = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    day_of_week = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(6)])
