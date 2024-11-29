@@ -14,7 +14,7 @@ class MessageRecipient(models.Model):
     recipient_id = models.ForeignKey(User, on_delete=models.CASCADE)
     message_id = models.ForeignKey(Message, on_delete=models.CASCADE)
 
-class Accouncement(models.Model):
+class Announcement(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     sender_id = models.ForeignKey(User, on_delete=models.CASCADE)
