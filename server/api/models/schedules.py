@@ -22,3 +22,14 @@ class ShiftRequest(models.model):
     recipient_shift_id = models.ForeignKey(Shift, on_delete=models.CASCADE, null=True, blank=True)
     accepted = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
+
+class TimeOffRequest(models.Model):
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+    member_id = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
+    workspace_id = models.ForeignKey(Workspace, on_delete=models.CASCADE)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    approved = models.BooleanField(default=False)
+    reason = models.TextField(blank=True)
+    approved_by_id = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE, related_name='approved_time_off_requests', null=True, blank=True)
