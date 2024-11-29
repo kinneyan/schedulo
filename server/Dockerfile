@@ -19,10 +19,9 @@ COPY . /server/
 EXPOSE 8000
 
 # Default command for the container
-CMD ["sh", "-c", "if [ \"$DJANGO_ENV\" = \"production\" ]; then \
-  python manage.py migrate && \
+CMD ["sh", "-c", "python manage.py makemigrations && python manage.py migrate && \
+  if [ \"$DJANGO_ENV\" = \"production\" ]; then \
   gunicorn --bind 0.0.0.0:8000 --workers 3 app.wsgi:application; \
   else \
-  python manage.py migrate && \
   python manage.py runserver 0.0.0.0:8000; \
   fi"]
