@@ -1,2 +1,2 @@
-from .users import LoginUserSerializer
+from .users import LoginUserSerializer, RegisterUserSerializer
 from .token import CustomTokenObtainPairSerializer
