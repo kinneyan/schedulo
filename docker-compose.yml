@@ -4,7 +4,7 @@ services:
     container_name: postgres
     restart: unless-stopped
     env_file:
-       - ./.env/db.env
+       - ./env/db.env
     ports:
       - "5432:5432"
     volumes:
@@ -16,8 +16,8 @@ services:
     container_name: django
     restart: unless-stopped
     env_file:
-      - ./.env/app.env
-      - ./.env/db.env
+      - ./env/app.env
+      - ./env/db.env
     ports: 
       - "8000:8000"
     volumes: 
@@ -31,7 +31,7 @@ services:
     container_name: react
     restart: unless-stopped
     env_file:
-      - ./.env/client.env
+      - ./env/client.env
     ports:
       - "${REACT_PORT:-5173}:${REACT_PORT:-5173}"
     volumes:
