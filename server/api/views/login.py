@@ -7,9 +7,13 @@ from ..models import User
 
 class Login(APIView):
     def post(self, request):
+        response = {"error": {}}
+
         serializer = LoginUserSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            response["error"]["code"] = 400
+            response["error"]["message"] = "Invalid request data"
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
         
         email = serializer.validated_data['email']
         password = serializer.validated_data['password']
@@ -23,6 +27,13 @@ class Login(APIView):
             if not serializer.is_valid():
                 raise User.DoesNotExist
             
-            return Response(serializer.validated_data, status=status.HTTP_200_OK)
+            response["access"] = serializer.validated_data["access"]
+            response["refresh"] = serializer.validated_data["refresh"]
+
+            return Response(response, status=status.HTTP_200_OK)
+        
         except User.DoesNotExist:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+            response["error"]["code"] = 401
+            response["error"]["message"] = "Incorrect email or password"
+
+            return Response(response, status=status.HTTP_401_UNAUTHORIZED)
