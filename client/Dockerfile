@@ -5,10 +5,10 @@ FROM node:18
 WORKDIR /app
 
 # Copy package.json and package-lock.json (or pnpm/yarn lock files) to install dependencies
-COPY package*.json .
+COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy the entire project into the container
 COPY . .
