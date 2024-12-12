@@ -1,1 +1,2 @@
-from .login import LoginTests
+from .auth import TestLogin
+from .user import TestGetUser
