@@ -1,12 +1,12 @@
+from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from ..models import User
-from ..views import Login
 
 
-class LoginTests(APITestCase):
+class TestLogin(APITestCase):
     def setUp(self):
-        self.url = '/api/login'
+        self.url = reverse('login')
         self.user = User.objects.create_user(email='test@example.com', password='password123')
 
     def test_login_with_valid_credentials(self):
