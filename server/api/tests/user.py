@@ -3,7 +3,7 @@ from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 from ..models import User
 
-class TestGetUser(APITestCase):
+class GetUserTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(
             email='testuser@example.com',
