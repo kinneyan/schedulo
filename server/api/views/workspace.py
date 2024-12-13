@@ -46,19 +46,22 @@ class AddWorkspaceMember(APIView):
 
         response = {"error": {}}
 
-        workspace_member = WorkspaceMember.objects.create(
-            workspace_id = Workspace.objects.get(pk=request.data['workspace_id']),
-            user_id = User.objects.get(pk=request.data['added_user_id']),
-            added_by_id = request.user
-        )
+        if not (WorkspaceMember.objects.filter(user_id=User.objects.get(pk=request.data['added_user_id']), workspace_id=Workspace.objects.get(pk=request.data['workspace_id'])).exists()): # check if user is already member of workspace
+            workspace_member = WorkspaceMember.objects.create(
+                workspace_id = Workspace.objects.get(pk=request.data['workspace_id']),
+                user_id = User.objects.get(pk=request.data['added_user_id']),
+                added_by_id = request.user
+            )
 
-        if "pay_rate" in request.data:
-            workspace_member.pay_rate = request.data['pay_rate']
-            workspace_member.save()
+            if "pay_rate" in request.data:
+                workspace_member.pay_rate = request.data['pay_rate']
+                workspace_member.save()
 
-        # TODO: Add role to new member once roles implemented
-        
-        return Response(response, status=status.HTTP_200_OK)
-
+            # TODO: Add role to new member once roles implemented
+            
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            response["error"] = "User is already member of this workspace"
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
         
         
