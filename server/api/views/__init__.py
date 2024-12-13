@@ -1,2 +1,2 @@
-from .login import Login
-from .register import Register
+from .auth import Login, Register
+from .user import GetUser
