@@ -27,7 +27,7 @@ class CreateWorkspace(APIView):
             added_by_id = request.user
         )
 
-        return Response(response, status=status.HTTP_200_OK)
+        return Response(response, status=status.HTTP_201_CREATED)
     
 class AddWorkspaceMember(APIView):
     '''
@@ -59,9 +59,9 @@ class AddWorkspaceMember(APIView):
 
             # TODO: Add role to new member once roles implemented
             
-            return Response(response, status=status.HTTP_200_OK)
+            return Response(response, status=status.HTTP_201_CREATED)
         else:
             response["error"] = "User is already member of this workspace"
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            return Response(response, status=status.HTTP_409_CONFLICT)
         
         
