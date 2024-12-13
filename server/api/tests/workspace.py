@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from ..models import Workspace, WorkspaceMember, User
 
-class AddUserTests(APITestCase):
+class AddMemberTests(APITestCase):
     def setUp(self):
         self.url = reverse("create_workspace")
 
