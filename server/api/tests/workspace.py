@@ -56,7 +56,7 @@ class AddMemberTests(APITestCase):
             "workspace_id": 1
         }
         response = self.client.post(self.url, data, format='json')
-        response = self.client.post(self.url, data, format='json')
+        response = self.client.post(self.url, data, format='json') # repreat to force duplicate in database
 
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
