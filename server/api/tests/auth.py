@@ -42,7 +42,7 @@ class LoginTests(APITestCase):
 class RegisterTests(APITestCase):
     
     def setUp(self):
-        self.register_url = reverse('register')
+        self.url = reverse('register')
         self.user_data = {
             "email": "test@example.com",
             "password": "password123",
@@ -60,14 +60,14 @@ class RegisterTests(APITestCase):
             "last_name": "User",
             "phone": "0987654321"
         }
-        response = self.client.post(self.register_url, data, format='json')
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn("access", response.data)
         self.assertIn("refresh", response.data)
 
     def test_register_email_exists(self):
         data = self.user_data
-        response = self.client.post(self.register_url, data, format='json')
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
         self.assertEqual(response.data["error"]["code"], 409)
         self.assertEqual(response.data["error"]["message"], "Account with this email already exists")
@@ -80,7 +80,7 @@ class RegisterTests(APITestCase):
             "last_name": "",
             "phone": ""
         }
-        response = self.client.post(self.register_url, data, format='json')
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["error"]["code"], 400)
         self.assertEqual(response.data["error"]["message"], "Invalid request data")
