@@ -14,14 +14,15 @@ class MemberRole(models.Model):
     workspace_role_id = models.ForeignKey(WorkspaceRole, on_delete=models.CASCADE)
     member_id = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
 
-class Permission(models.Model):
+class MemberPermissions(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=30)
-    description = models.TextField(blank=True)
+    workspace_id = models.ForeignKey(Workspace, on_delete=models.CASCADE, null=True)
+    member_id = models.OneToOneField(WorkspaceMember, on_delete=models.CASCADE)
 
-class RolePermissions(models.Model):
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-    workspace_role_id = models.ForeignKey(WorkspaceRole, on_delete=models.CASCADE)
-    permission_id = models.ForeignKey(Permission, on_delete=models.CASCADE)
+    # Permissions
+    IS_OWNER = models.BooleanField(default=False)
+    MANAGE_WORKSPACE_MEMBERS = models.BooleanField(default=False)
+    MANAGE_WORKSPACE_ROLES = models.BooleanField(default=False)
+    MANAGE_SCHEDULES = models.BooleanField(default=False)
+    MANAGE_TIME_OFF = models.BooleanField(default=False)
