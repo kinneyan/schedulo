@@ -45,6 +45,18 @@ class UpdatePermissions(APIView):
     def put(self, request):
         response = {"error": {}}
 
+        # Verify user has required permissions
+        try:
+            workspace_member = WorkspaceMember.objects.get(user_id=request.user, workspace_id=request.data["workspace_id"])
+            permissions = MemberPermissions.objects.get(
+                workspace_id=request.data["workspace_id"],
+                member_id=workspace_member,
+                MANAGE_WORKSPACE_MEMBERS=True
+            )
+        except MemberPermissions.DoesNotExist:
+            response["error"]["message"] = "You do not have permission to manage permissions for this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+
         if "workspace_id" not in request.data:
             response["error"]["message"] = "Workspace ID is required."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
@@ -73,8 +85,12 @@ class UpdatePermissions(APIView):
             )
         
         # Check if user is owner, cannot update owner permissions as they are fixed (all)
-        if permissions.IS_OWNER or "is_owner" in request.data:
+        if permissions.IS_OWNER:
             response["error"]["message"] = "Cannot update permissions for workspace owner."
+            return Response(response, status=status.HTTP_409_CONFLICT)
+
+        if "is_owner" in request.data:
+            response["error"]["message"] = "Cannot update owner permission."
             return Response(response, status=status.HTTP_409_CONFLICT)
 
         # Update permissions
