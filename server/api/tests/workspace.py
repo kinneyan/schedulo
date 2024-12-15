@@ -54,3 +54,16 @@ class AddMemberTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.data['error'], "You do not have permission to add members to this workspace")
 
+    def test_add_duplicate_workspace_member(self):
+        # Add the user as a workspace member for the first time
+        data = {
+            'added_user_id': self.other_user.id,
+            'workspace_id': self.workspace.id
+        }
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Try to add the same user again
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(response.data["error"], "User is already member of this workspace")
