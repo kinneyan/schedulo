@@ -41,6 +41,17 @@ class CreateWorkspace(APIView):
             added_by_id = request.user
         )
 
+        # create permissions for owner
+        permissions  = MemberPermissions.objects.create(
+            workspace_id = workspace,
+            member_id = workspace_member,
+            IS_OWNER = True,
+            MANAGE_WORKSPACE_MEMBERS = True,
+            MANAGE_WORKSPACE_ROLES = True,
+            MANAGE_SCHEDULES = True,
+            MANAGE_TIME_OFF = True,
+        )
+
         return Response(response, status=status.HTTP_201_CREATED)
     
 class AddWorkspaceMember(APIView):
