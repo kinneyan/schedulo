@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from ..serializers import CreateWorkspaceSerializer
+from ..serializers import WorkspaceSerializer
 from ..models import Workspace, WorkspaceMember, User, MemberPermissions
 
 
@@ -16,7 +16,7 @@ class CreateWorkspace(APIView):
         response = {"error": {}}
 
         # get name from request using serializer
-        serializer = CreateWorkspaceSerializer(data=request.data)
+        serializer = WorkspaceSerializer(data=request.data)
         if not serializer.is_valid():
             response["error"]["code"] = 400
             response["error"]["message"] = "Invalid request data"

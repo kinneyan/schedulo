@@ -1,3 +1,3 @@
 from .users import LoginUserSerializer, RegisterUserSerializer
 from .token import CustomTokenObtainPairSerializer
-from .workspace import CreateWorkspaceSerializer
+from .workspace import WorkspaceSerializer
