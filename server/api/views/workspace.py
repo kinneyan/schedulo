@@ -88,7 +88,10 @@ class AddWorkspaceMember(APIView):
                 workspace_member.pay_rate = request.data['pay_rate']
                 workspace_member.save()
 
-            # TODO: Add role to new member once roles implemented
+            permissions = MemberPermissions.objects.create(
+                workspace_id = Workspace.objects.get(pk=request.data['workspace_id']),
+                member_id = workspace_member
+            )
             
             return Response(response, status=status.HTTP_201_CREATED)
         else:
