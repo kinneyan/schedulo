@@ -2,11 +2,11 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from ..models import Workspace, WorkspaceMember, User
+from ..models import Workspace, WorkspaceMember, User, MemberPermissions
 
 class AddMemberTests(APITestCase):
     def setUp(self):
-        self.url = reverse("create_workspace")
+        self.url = reverse("add_workspace_member")
 
         # add users
         self.user_data = {
@@ -21,42 +21,49 @@ class AddMemberTests(APITestCase):
         self.token = RefreshToken.for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.token.access_token}')
 
-        data = {
+        self.other_user_data = {
             "email": "newuser@example.com",
             "password": "newpassword123",
             "first_name": "New",
             "last_name": "User",
             "phone": "0987654321"
         }
-        other_user = User.objects.create_user(**data)
+        self.other_user = User.objects.create_user(**self.other_user_data)
 
         # add workspace
+        self.workspace = Workspace.objects.create(created_by_id=self.user, owner_id=self.user)
+        self.workspace_member = WorkspaceMember.objects.create(user_id=self.user, workspace_id=self.workspace, added_by_id=self.user)
+        self.permission = MemberPermissions.objects.create(member_id=self.workspace_member, workspace_id=self.workspace, MANAGE_WORKSPACE_MEMBERS=True)
+
+    def test_add_workspace_member_permission(self):
         data = {
-            # put workspace name, ect here once added
+            'added_user_id': self.other_user.id,
+            'workspace_id': self.workspace.id
         }
         response = self.client.post(self.url, data, format='json')
-
-        self.url = reverse("add_workspace_member")
-
-    def test_add_valid(self):
-        data = {
-            "pay_rate": 15,
-            "added_user_id": 2,
-            "workspace_id": 1
-        }
-        response = self.client.post(self.url, data, format='json')
-
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(WorkspaceMember.objects.filter(user_id=User.objects.get(pk=data['added_user_id']), workspace_id=Workspace.objects.get(pk=data['workspace_id'])).exists())
 
-    def test_add_duplicate(self):
+    def test_add_workspace_member_no_permission(self):
+        self.permission.MANAGE_WORKSPACE_MEMBERS = False
+        self.permission.save()
         data = {
-            "pay_rate": 15,
-            "added_user_id": 2,
-            "workspace_id": 1
+            'added_user_id': self.other_user.id,
+            'workspace_id': self.workspace.id
         }
         response = self.client.post(self.url, data, format='json')
-        response = self.client.post(self.url, data, format='json') # repreat to force duplicate in database
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.data['error'], "You do not have permission to add members to this workspace")
 
+    def test_add_duplicate_workspace_member(self):
+        # Add the user as a workspace member for the first time
+        data = {
+            'added_user_id': self.other_user.id,
+            'workspace_id': self.workspace.id
+        }
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Try to add the same user again
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
-
+        self.assertEqual(response.data["error"], "User is already member of this workspace")

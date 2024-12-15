@@ -27,7 +27,7 @@ class UpdatePermissionsTests(APITestCase):
             workspace_id=self.workspace,
             member_id=self.member,
             IS_OWNER=False,
-            MANAGE_WORKSPACE_MEMBERS=False,
+            MANAGE_WORKSPACE_MEMBERS=True,
             MANAGE_WORKSPACE_ROLES=False,
             MANAGE_SCHEDULES=False,
             MANAGE_TIME_OFF=False
@@ -77,3 +77,13 @@ class UpdatePermissionsTests(APITestCase):
         self.assertTrue(self.permissions.MANAGE_WORKSPACE_ROLES)
         self.assertTrue(self.permissions.MANAGE_SCHEDULES)
         self.assertTrue(self.permissions.MANAGE_TIME_OFF)
+
+    def test_member_not_in_workspace(self):
+        # Create a new workspace and a member in that workspace
+        new_workspace = Workspace.objects.create(owner_id=self.user, created_by_id=self.user)
+        new_member = WorkspaceMember.objects.create(user_id=self.user2, workspace_id=new_workspace, added_by_id=self.user)
+
+        # Try to update permissions for the new member in the original workspace
+        response = self.client.put(self.url, {"workspace_id": self.workspace.id, "member_id": new_member.id})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data["error"]["message"], "Member does not belong to provided workspace.")
