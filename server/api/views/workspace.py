@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from ..serializers import CreateWorkspaceSerializer
 from ..models import Workspace, WorkspaceMember, User, MemberPermissions
 
 
@@ -14,13 +15,26 @@ class CreateWorkspace(APIView):
     def post(self, request):
         response = {"error": {}}
 
-        # TODO: get workspace name from request with serializer once name implemented
+        # get name from request using serializer
+        serializer = CreateWorkspaceSerializer(data=request.data)
+        if not serializer.is_valid():
+            response["error"]["code"] = 400
+            response["error"]["message"] = "Invalid request data"
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
+        # create new workspace
         workspace = Workspace.objects.create(
             created_by_id = request.user,
             owner_id = request.user
         )
 
+        # set name if present
+        if not (serializer.data.get('name',None) == None):
+            name = serializer.validated_data['name']
+            workspace.name = name
+            workspace.save()
+
+        # add creator of workspace as owner of the new workspace
         workspace_member = WorkspaceMember.objects.create(
             workspace_id = workspace,
             user_id = request.user,
