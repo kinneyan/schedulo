@@ -54,11 +54,17 @@ class CreateWorkspace(APIView):
 
         return Response(response, status=status.HTTP_201_CREATED)
     
-class ModifyWorkspace(APIView): # only change name and owner, can only be done by owner.
+class ModifyWorkspace(APIView): # change name or owner, can only be done by owner.
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def put(self, request):
+        '''
+        workspace_id
+        new_owner_id (optional)
+        name (optional)
+        '''
+
         response = {"error": {}}
 
         serializer = WorkspaceSerializer(data=request.data)
