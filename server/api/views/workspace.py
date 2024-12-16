@@ -90,6 +90,9 @@ class ModifyWorkspace(APIView): # only change name and owner, can only be done b
         except MemberPermissions.DoesNotExist:
             response["error"]["message"] = "You do not have permission modify this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "You are not a member of this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
               
       
         # Update Workspace
