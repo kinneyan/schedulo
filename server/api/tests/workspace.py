@@ -85,6 +85,13 @@ class ModifyWorkspaceTests(APITestCase):
             last_name='User2',
             phone='1234567890'
         )
+        self.user3 = User.objects.create_user(
+            email='testuser3@example.com',
+            password='testpassword',
+            first_name='Test3',
+            last_name='User3',
+            phone='1234567890'
+        )
 
         self.workspace = Workspace.objects.create(owner_id=self.user, created_by_id=self.user)
         self.member = WorkspaceMember.objects.create(user_id=self.user, workspace_id=self.workspace, added_by_id=self.user)
@@ -124,8 +131,9 @@ class ModifyWorkspaceTests(APITestCase):
         })
 
         self.permissions.refresh_from_db()
-        # TODO: find how to get user2 perms from db
+        perms = MemberPermissions.objects.get(member_id=WorkspaceMember.objects.get(user_id=self.user2, workspace_id=self.workspace), workspace_id=self.workspace)
 
+        self.assertTrue(perms.IS_OWNER)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertFalse(self.permissions.IS_OWNER)
 
@@ -138,7 +146,6 @@ class ModifyWorkspaceTests(APITestCase):
         })
 
         self.permissions.refresh_from_db()
-        # TODO: find how to get user2 perms from db
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(self.permissions.IS_OWNER)
@@ -156,7 +163,34 @@ class ModifyWorkspaceTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
         self.assertTrue(self.permissions.IS_OWNER)
 
-    def test_name_change_valid(self):
+    def test_change_owner_as_not_owner(self):
+         # add user2 to workspace
+        self.url = reverse("add_workspace_member")
+        response = self.client.post(self.url, {"workspace_id": self.workspace.id, "added_user_id": self.user2.id})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+         # add user3 to workspace
+        self.url = reverse("add_workspace_member")
+        response = self.client.post(self.url, {"workspace_id": self.workspace.id, "added_user_id": self.user3.id})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.url = reverse("modify_workspace")
+        self.client.force_authenticate(user=self.user2) # change to send request from user 2
+
+        # try to change user 3 to owner
+        response = self.client.put(self.url, {
+            "workspace_id": self.workspace.id,
+            "new_owner_id": self.user3.id
+        })
+
+        perms = MemberPermissions.objects.get(member_id=WorkspaceMember.objects.get(user_id=self.user3, workspace_id=self.workspace), workspace_id=self.workspace)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(self.permissions.IS_OWNER)
+        self.assertFalse(perms.IS_OWNER)
+
+
+    def test_change_name_valid(self):
         self.url = reverse("modify_workspace")
         response = self.client.put(self.url, {
             "workspace_id": self.workspace.id,
@@ -167,8 +201,9 @@ class ModifyWorkspaceTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.workspace.name, "new name")
 
-    def test_name_change_from_non_owner(self): # TODO: idk how to change the key to be from user2
+    def test_change_name_as_non_member(self):
         self.url = reverse("modify_workspace")
+        self.client.force_authenticate(user=self.user2)
         response = self.client.put(self.url, {
             "workspace_id": self.workspace.id,
             "name": "new name"
@@ -177,3 +212,22 @@ class ModifyWorkspaceTests(APITestCase):
         self.workspace.refresh_from_db()
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(self.workspace.name, "Unnamed Workspace")
+
+    def test_change_name_as_not_owner(self):
+         # add user2 to workspace
+        self.url = reverse("add_workspace_member")
+        response = self.client.post(self.url, {"workspace_id": self.workspace.id, "added_user_id": self.user2.id})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.url = reverse("modify_workspace")
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.put(self.url, {
+            "workspace_id": self.workspace.id,
+            "name": "new name"
+        })
+
+        self.workspace.refresh_from_db()
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(self.workspace.name, "Unnamed Workspace")
+
+
