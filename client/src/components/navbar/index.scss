@@ -1,0 +1,48 @@
+$text-color: #FFFFFF;
+$text-size: 18px;
+$navbar-height: 52px;
+
+.navbar {
+    background-color: #2C2C2C;
+    max-height: $navbar-height;
+
+    .navbar-brand {
+        color: $text-color;
+        font-size: $text-size;
+        img {
+            height: $navbar-height;
+            width: auto;
+            padding-right: 10px;
+        }
+
+        &:hover,
+        &:visited,
+        &:focus,
+        &:active {
+            color: $text-color !important;
+            text-decoration: none;
+        }
+    }
+    
+    #page-links {
+        .nav-link {
+            padding: 0 40px;
+            color: $text-color !important;
+            font-size: $text-size;
+            line-height: $navbar-height;
+        
+            &:hover,
+            &:visited,
+            &:focus,
+            &:active {
+                color: inherit;
+                text-decoration: none;
+            }
+
+            &:hover {
+                background-color: #3C3C3C;
+            }
+        }
+    }
+
+}
