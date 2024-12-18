@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;700&display=swap');
+
+$background-color: rgba(44, 44, 44, 0.85);
+$text-color: #FFFFFF;
+$label-size: 27.21px;
+$form-width: 356.03px;
+
+#login-container {
+    width: 480px;
+    height: 436px;
+    margin: auto;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: $background-color;
+    border-radius: 18.9px;
+    color: $text-color;
+    font-family: 'Roboto Condensed', sans-serif;
+
+    label,
+    input {
+        display: block;
+        width: $form-width;
+        color: $text-color;
+    }
+
+    input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 11.34px;
+        background-color: transparent;
+    }
+
+    label {
+        font-size: $label-size;
+    }
+
+    #login-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    #email-form {
+        margin-bottom: 33px;
+    }
+
+    hr {
+        width: 399px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        margin-top: 40px;
+        margin-bottom: 30px;    
+    }
+
+    p {
+        font-size: 20px;
+    }
+
+    a {
+        text-decoration: none;
+    }
+}
