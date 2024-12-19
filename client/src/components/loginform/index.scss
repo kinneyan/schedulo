@@ -1,13 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;700&display=swap');
-
 $background-color: rgba(44, 44, 44, 0.85);
 $text-color: #FFFFFF;
-$label-size: 27.21px;
-$form-width: 356.03px;
+$label-size: 20px;
+$form-width: 85%;
+$form-height: 70%;
+$line-margin: 30px;
 
 #login-container {
-    width: 480px;
-    height: 436px;
+    width: 25%;
+    height: 40%;
     margin: auto;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -17,7 +17,8 @@ $form-width: 356.03px;
     font-family: 'Roboto Condensed', sans-serif;
 
     label,
-    input {
+    input,
+    #button-item {
         display: block;
         width: $form-width;
         color: $text-color;
@@ -28,6 +29,7 @@ $form-width: 356.03px;
         border: 1px solid #ccc;
         border-radius: 11.34px;
         background-color: transparent;
+        height: 40px;
     }
 
     label {
@@ -42,21 +44,30 @@ $form-width: 356.03px;
     }
 
     #email-form {
-        margin-bottom: 33px;
+        margin-bottom: 15px;
     }
 
     hr {
-        width: 399px;
+        width: 90%;
         border: 1px solid rgba(255, 255, 255, 0.5);
-        margin-top: 40px;
-        margin-bottom: 30px;    
+        margin-top: $line-margin;
+        margin-bottom: $line-margin;    
     }
 
     p {
-        font-size: 20px;
+        font-size: $label-size - 5px;    
     }
 
     a {
         text-decoration: none;
     }
+    
+    #button-item {
+        border-radius: 11.34px;
+        height: $form-height;
+        padding: 10px;
+        margin: auto;
+        margin-top: 20px;
+    }
 }
+
