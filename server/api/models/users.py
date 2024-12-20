@@ -55,5 +55,5 @@ class Group(models.Model):
 class GroupMember(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    group_id = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='members')
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='members')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='messagegroups')

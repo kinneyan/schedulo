@@ -19,7 +19,7 @@ class GetPermissions(APIView):
         try:
             permissions = MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
-                member_id=WorkspaceMember.objects.get(
+                member=WorkspaceMember.objects.get(
                     user=request.user, 
                     workspace=request.data["workspace_id"]
                     )
@@ -59,7 +59,7 @@ class UpdatePermissions(APIView):
             workspace_member = WorkspaceMember.objects.get(user=request.user, workspace=request.data["workspace_id"])
             permissions = MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
-                member_id=workspace_member,
+                member=workspace_member,
                 MANAGE_WORKSPACE_MEMBERS=True
             )
         except MemberPermissions.DoesNotExist:
@@ -78,7 +78,7 @@ class UpdatePermissions(APIView):
             # Check if permissions already exist
             permissions = MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
-                member_id=member
+                member=member
             )
 
         except WorkspaceMember.DoesNotExist:
@@ -89,7 +89,7 @@ class UpdatePermissions(APIView):
             # Create permissions if they do not exist
             permissions = MemberPermissions.objects.create(
                 workspace=Workspace.objects.get(id=request.data["workspace_id"]),
-                member_id=member
+                member=member
             )
         
         # Check if user is owner, cannot update owner permissions as they are fixed (all)

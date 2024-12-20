@@ -44,7 +44,7 @@ class CreateWorkspace(APIView):
         # create permissions for owner
         permissions  = MemberPermissions.objects.create(
             workspace = workspace,
-            member_id = workspace_member,
+            member = workspace_member,
             IS_OWNER = True,
             MANAGE_WORKSPACE_MEMBERS = True,
             MANAGE_WORKSPACE_ROLES = True,
@@ -90,7 +90,7 @@ class ModifyWorkspace(APIView): # change name or owner, can only be done by owne
             old_owner_member = WorkspaceMember.objects.get(user=request.user, workspace=request.data["workspace_id"])
             permissions = MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
-                member_id=old_owner_member,
+                member=old_owner_member,
                 IS_OWNER=True
             )
         except MemberPermissions.DoesNotExist:
@@ -106,10 +106,10 @@ class ModifyWorkspace(APIView): # change name or owner, can only be done by owne
             # Check new owner
             try:
                 new_owner_member = WorkspaceMember.objects.get(user=request.data["new_owner_id"], workspace=workspace)
-                new_owner_perms = MemberPermissions.objects.get(member_id=new_owner_member)
+                new_owner_perms = MemberPermissions.objects.get(member=new_owner_member)
                 
                 # set current owner to no longer be owner
-                old_owner_perms = MemberPermissions.objects.get(member_id=old_owner_member, workspace=request.data["workspace_id"])
+                old_owner_perms = MemberPermissions.objects.get(member=old_owner_member, workspace=request.data["workspace_id"])
 
                 if (new_owner_perms == old_owner_perms): # cannot set new owner to current
                     response["error"]["message"] = "Member is already owner of this workspace."
@@ -161,7 +161,7 @@ class AddWorkspaceMember(APIView):
         # Verify user is permitted to add members to workspace
         try:
             workspace_member = WorkspaceMember.objects.get(user=request.user, workspace=request.data['workspace_id'])
-            MemberPermissions.objects.get(member_id=workspace_member, workspace=request.data['workspace_id'], MANAGE_WORKSPACE_MEMBERS=True)
+            MemberPermissions.objects.get(member=workspace_member, workspace=request.data['workspace_id'], MANAGE_WORKSPACE_MEMBERS=True)
         except MemberPermissions.DoesNotExist:
             response["error"] = "You do not have permission to add members to this workspace"
             return Response(response, status=status.HTTP_403_FORBIDDEN)
@@ -180,7 +180,7 @@ class AddWorkspaceMember(APIView):
 
             permissions = MemberPermissions.objects.create(
                 workspace = Workspace.objects.get(pk=request.data['workspace_id']),
-                member_id = workspace_member
+                member = workspace_member
             )
             
             return Response(response, status=status.HTTP_201_CREATED)

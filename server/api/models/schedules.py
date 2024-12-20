@@ -6,7 +6,7 @@ from .roles import WorkspaceRole
 class Shift(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    member_id = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
+    member = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
@@ -27,7 +27,7 @@ class ShiftRequest(models.Model):
 class TimeOffRequest(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    member_id = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
+    member = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
     start_date = models.DateField()
     end_date = models.DateField()
@@ -38,7 +38,7 @@ class TimeOffRequest(models.Model):
 class Unavailability(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    member_id = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
+    member = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     day_of_week = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(6)])
