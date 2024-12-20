@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import NavigationBar from './components/navbar';
-import LoginForm from './components/loginform';
+import Login from './pages/login';
 
 function App() {
   return (
     <>
-      <LoginForm />
+      <Login />
     </>
   );
 };

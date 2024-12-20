@@ -5,6 +5,7 @@ $navbar-height: 52px;
 .navbar {
     background-color: #2C2C2C;
     max-height: $navbar-height;
+    font-family: 'Roboto Condensed', sans-serif;
 
     .navbar-brand {
         color: $text-color;
