@@ -16,9 +16,9 @@ const NavigationBar = () => {
                     {' '}Schedulo
                 </Navbar.Brand>
                 <Nav id="page-links">
-                    <Nav.Link href="#">Home</Nav.Link>
+                    <Nav.Link href="/">Home</Nav.Link>
                     <Nav.Link href="#">About</Nav.Link>
-                    <Nav.Link href="#">Log in</Nav.Link>
+                    <Nav.Link href="/login">Log in</Nav.Link>
                 </Nav>
             </Container>
         </Navbar>
