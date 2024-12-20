@@ -11,6 +11,7 @@ function App() {
         <Routes>
           <Route index element={<HomePage />} />
           <Route path="login" element={<LoginPage />} />
+          <Route path="dashboard" element={<HomePage />} />
         </Routes>
       </BrowserRouter>
     </>

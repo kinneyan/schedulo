@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import LoginForm from '../../components/loginform';
 import Cookies from 'universal-cookie';
-import { redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 const LoginContainer = () =>{
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [logged_in, setLogged_in] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault(); // stop default form submission
@@ -32,7 +33,7 @@ const LoginContainer = () =>{
                 });
 
                 // redirect
-
+                setLogged_in(true);
             });
 
 
@@ -43,14 +44,17 @@ const LoginContainer = () =>{
     };
 
     return (
-        <LoginForm
-            email={email}
-            setEmail={setEmail}
-            password={password}
-            setPassword={setPassword}
-            error={error}
-            handleSubmit={handleSubmit}
-        />
+        <div>
+            <LoginForm
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+                error={error}
+                handleSubmit={handleSubmit}
+            />
+            {logged_in && <Navigate to="/dashboard" />}
+        </div>
     );
 }
 
