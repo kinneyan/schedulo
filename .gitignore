@@ -7,3 +7,5 @@ dist
 .vite/
 __pycache__/
 *.pyc
+env.dev
+env.prod
