@@ -18,7 +18,7 @@ class GetPermissions(APIView):
         
         try:
             permissions = MemberPermissions.objects.get(
-                workspace=Workspace.objects.get(id=request.data["workspace_id"]),
+                workspace=request.data["workspace_id"],
                 member=WorkspaceMember.objects.get(
                     user=request.user, 
                     workspace=request.data["workspace_id"]
@@ -58,7 +58,7 @@ class UpdatePermissions(APIView):
         try:
             workspace_member = WorkspaceMember.objects.get(user=request.user, workspace=request.data["workspace_id"])
             permissions = MemberPermissions.objects.get(
-                workspace=Workspace.objects.get(id=request.data["workspace_id"]),
+                workspace=request.data["workspace_id"],
                 member=workspace_member,
                 MANAGE_WORKSPACE_MEMBERS=True
             )
@@ -77,7 +77,7 @@ class UpdatePermissions(APIView):
 
             # Check if permissions already exist
             permissions = MemberPermissions.objects.get(
-                workspace=Workspace.objects.get(id=request.data["workspace_id"]),
+                workspace=request.data["workspace_id"],
                 member=member
             )
 
