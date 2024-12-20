@@ -13,32 +13,34 @@ const LoginContainer = () =>{
         e.preventDefault(); // stop default form submission
 
         try {
-            const response = fetch(import.meta.env.VITE_API_URL + '/api/login', { // Update the URL to your login endpoint
+            const response = await fetch(import.meta.env.VITE_API_URL + '/api/login', { // Update the URL to your login endpoint
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
-            }).then((response) => response.json()).then((response) => {
-
-                // save cookie
-                const body = {
-                    'access': response['access'],
-                    'refresh': response['refresh'],
-                }
-
-                const cookies = new Cookies();
-                cookies.set('token', JSON.stringify(body), {
-                    path: '/' , 
-                    sameSite: 'Lax',
-                    expires: new Date(Date.now() + 86400000), // Set to 1 day
-                });
-
-                // redirect
-                setLogged_in(true);
             });
 
+            if (response.status != 200) {
+                throw new Error("Incorrect email or password");
+            }
 
+            // save cookie
+            const data = await response.json();
+            
+            const body = {
+                'access': data['access'],
+                'refresh': data['refresh'],
+            }
+
+            const cookies = new Cookies();
+            cookies.set('token', JSON.stringify(body), {
+                path: '/' , 
+                sameSite: 'Lax',
+                expires: new Date(Date.now() + 86400000), // Set to 1 day
+            });
+
+            // redirect
+            setLogged_in(true);
         } catch (error) {
-            console.log("Error: ", error);
             setError("Incorrect email or password");
         }
     };

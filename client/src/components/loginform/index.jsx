@@ -26,7 +26,9 @@ const LoginForm = ({ email, setEmail, password, setPassword, error, handleSubmit
                     required
                 />
                 <SubmitButton button_text="Log in" />
-                {error && <p>{error}</p>}
+                {error && <div id="error-container">
+                    <p id="error-text">{error}</p>
+                </div>}
                 <hr />
                 <p>Don't have an account? <a href="#">Sign up</a></p>
             </form>
