@@ -31,9 +31,9 @@ class AddMemberTests(APITestCase):
         self.other_user = User.objects.create_user(**self.other_user_data)
 
         # add workspace
-        self.workspace = Workspace.objects.create(created_by_id=self.user, owner_id=self.user)
-        self.workspace_member = WorkspaceMember.objects.create(user_id=self.user, workspace_id=self.workspace, added_by_id=self.user)
-        self.permission = MemberPermissions.objects.create(member_id=self.workspace_member, workspace_id=self.workspace, MANAGE_WORKSPACE_MEMBERS=True)
+        self.workspace = Workspace.objects.create(created_by=self.user, owner=self.user)
+        self.workspace_member = WorkspaceMember.objects.create(user=self.user, workspace=self.workspace, added_by=self.user)
+        self.permission = MemberPermissions.objects.create(member=self.workspace_member, workspace=self.workspace, MANAGE_WORKSPACE_MEMBERS=True)
 
     def test_add_workspace_member_permission(self):
         data = {
@@ -93,18 +93,18 @@ class ModifyWorkspaceTests(APITestCase):
             phone='1234567890'
         )
 
-        self.workspace = Workspace.objects.create(owner_id=self.user, created_by_id=self.user)
-        self.member = WorkspaceMember.objects.create(user_id=self.user, workspace_id=self.workspace, added_by_id=self.user)
+        self.workspace = Workspace.objects.create(owner=self.user, created_by=self.user)
+        self.member = WorkspaceMember.objects.create(user=self.user, workspace=self.workspace, added_by=self.user)
         self.permissions = MemberPermissions.objects.create(
-            workspace_id=self.workspace,
-            member_id=self.member,
+            workspace=self.workspace,
+            member=self.member,
             IS_OWNER=True,
             MANAGE_WORKSPACE_MEMBERS=True,
             MANAGE_WORKSPACE_ROLES=True,
             MANAGE_SCHEDULES=True,
             MANAGE_TIME_OFF=True
         )
-        self.client.force_authenticate(user=self.member.user_id)
+        self.client.force_authenticate(user=self.member.user)
 
     def test_missing_workspace_id(self):
         response = self.client.put(self.url, {"member_id": self.member.id})
@@ -131,7 +131,7 @@ class ModifyWorkspaceTests(APITestCase):
         })
 
         self.permissions.refresh_from_db()
-        perms = MemberPermissions.objects.get(member_id=WorkspaceMember.objects.get(user_id=self.user2, workspace_id=self.workspace), workspace_id=self.workspace)
+        perms = MemberPermissions.objects.get(member=WorkspaceMember.objects.get(user=self.user2, workspace=self.workspace), workspace=self.workspace)
 
         self.assertTrue(perms.IS_OWNER)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -183,7 +183,7 @@ class ModifyWorkspaceTests(APITestCase):
             "new_owner_id": self.user3.id
         })
 
-        perms = MemberPermissions.objects.get(member_id=WorkspaceMember.objects.get(user_id=self.user3, workspace_id=self.workspace), workspace_id=self.workspace)
+        perms = MemberPermissions.objects.get(member=WorkspaceMember.objects.get(user=self.user3, workspace=self.workspace), workspace=self.workspace)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertTrue(self.permissions.IS_OWNER)
