@@ -43,8 +43,8 @@ class WorkspaceMember(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='members')
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='workspaces')
-    added_by_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='added_members')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='workspaces')
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='added_members')
     pay_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True)
 
 class Group(models.Model):
@@ -56,4 +56,4 @@ class GroupMember(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     group_id = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='members')
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='messagegroups')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='messagegroups')

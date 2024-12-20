@@ -20,7 +20,7 @@ class GetPermissions(APIView):
             permissions = MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
                 member_id=WorkspaceMember.objects.get(
-                    user_id=request.user, 
+                    user=request.user, 
                     workspace=request.data["workspace_id"]
                     )
             )
@@ -56,7 +56,7 @@ class UpdatePermissions(APIView):
         
         # Verify user has required permissions
         try:
-            workspace_member = WorkspaceMember.objects.get(user_id=request.user, workspace=request.data["workspace_id"])
+            workspace_member = WorkspaceMember.objects.get(user=request.user, workspace=request.data["workspace_id"])
             permissions = MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
                 member_id=workspace_member,
