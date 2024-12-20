@@ -25,7 +25,7 @@ class CreateWorkspace(APIView):
         # create new workspace
         workspace = Workspace.objects.create(
             created_by_id = request.user,
-            owner_id = request.user
+            owner = request.user
         )
 
         # set name if present
@@ -127,7 +127,7 @@ class ModifyWorkspace(APIView): # change name or owner, can only be done by owne
                 new_owner_perms.save()
 
                 # update owner id in workspace
-                workspace.owner_id = User.objects.get(pk=request.data["new_owner_id"])
+                workspace.owner = User.objects.get(pk=request.data["new_owner_id"])
                 workspace.save()
 
             except MemberPermissions.DoesNotExist:
