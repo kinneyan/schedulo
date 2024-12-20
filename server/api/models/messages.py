@@ -19,4 +19,4 @@ class Announcement(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
     sender_id = models.ForeignKey(User, on_delete=models.CASCADE)
     body = models.TextField()
-    workspace_id = models.ForeignKey(Workspace, on_delete=models.CASCADE)
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)

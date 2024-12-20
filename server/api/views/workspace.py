@@ -36,14 +36,14 @@ class CreateWorkspace(APIView):
 
         # add creator of workspace as owner of the new workspace
         workspace_member = WorkspaceMember.objects.create(
-            workspace_id = workspace,
+            workspace = workspace,
             user_id = request.user,
             added_by_id = request.user
         )
 
         # create permissions for owner
         permissions  = MemberPermissions.objects.create(
-            workspace_id = workspace,
+            workspace = workspace,
             member_id = workspace_member,
             IS_OWNER = True,
             MANAGE_WORKSPACE_MEMBERS = True,
@@ -87,9 +87,9 @@ class ModifyWorkspace(APIView): # change name or owner, can only be done by owne
         
         # Verify user is owner
         try:
-            old_owner_member = WorkspaceMember.objects.get(user_id=request.user, workspace_id=request.data["workspace_id"])
+            old_owner_member = WorkspaceMember.objects.get(user_id=request.user, workspace=request.data["workspace_id"])
             permissions = MemberPermissions.objects.get(
-                workspace_id=request.data["workspace_id"],
+                workspace=request.data["workspace_id"],
                 member_id=old_owner_member,
                 IS_OWNER=True
             )
@@ -105,11 +105,11 @@ class ModifyWorkspace(APIView): # change name or owner, can only be done by owne
         if "new_owner_id" in request.data: # update workspace owner
             # Check new owner
             try:
-                new_owner_member = WorkspaceMember.objects.get(user_id=request.data["new_owner_id"], workspace_id=workspace)
+                new_owner_member = WorkspaceMember.objects.get(user_id=request.data["new_owner_id"], workspace=workspace)
                 new_owner_perms = MemberPermissions.objects.get(member_id=new_owner_member)
                 
                 # set current owner to no longer be owner
-                old_owner_perms = MemberPermissions.objects.get(member_id=old_owner_member, workspace_id=request.data["workspace_id"])
+                old_owner_perms = MemberPermissions.objects.get(member_id=old_owner_member, workspace=request.data["workspace_id"])
 
                 if (new_owner_perms == old_owner_perms): # cannot set new owner to current
                     response["error"]["message"] = "Member is already owner of this workspace."
@@ -160,16 +160,16 @@ class AddWorkspaceMember(APIView):
 
         # Verify user is permitted to add members to workspace
         try:
-            workspace_member = WorkspaceMember.objects.get(user_id=request.user, workspace_id=request.data['workspace_id'])
-            MemberPermissions.objects.get(member_id=workspace_member, workspace_id=request.data['workspace_id'], MANAGE_WORKSPACE_MEMBERS=True)
+            workspace_member = WorkspaceMember.objects.get(user_id=request.user, workspace=request.data['workspace_id'])
+            MemberPermissions.objects.get(member_id=workspace_member, workspace=request.data['workspace_id'], MANAGE_WORKSPACE_MEMBERS=True)
         except MemberPermissions.DoesNotExist:
             response["error"] = "You do not have permission to add members to this workspace"
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
 
-        if not (WorkspaceMember.objects.filter(user_id=User.objects.get(pk=request.data['added_user_id']), workspace_id=Workspace.objects.get(pk=request.data['workspace_id'])).exists()): # check if user is already member of workspace
+        if not (WorkspaceMember.objects.filter(user_id=User.objects.get(pk=request.data['added_user_id']), workspace=Workspace.objects.get(pk=request.data['workspace_id'])).exists()): # check if user is already member of workspace
             workspace_member = WorkspaceMember.objects.create(
-                workspace_id = Workspace.objects.get(pk=request.data['workspace_id']),
+                workspace = Workspace.objects.get(pk=request.data['workspace_id']),
                 user_id = User.objects.get(pk=request.data['added_user_id']),
                 added_by_id = request.user
             )
@@ -179,7 +179,7 @@ class AddWorkspaceMember(APIView):
                 workspace_member.save()
 
             permissions = MemberPermissions.objects.create(
-                workspace_id = Workspace.objects.get(pk=request.data['workspace_id']),
+                workspace = Workspace.objects.get(pk=request.data['workspace_id']),
                 member_id = workspace_member
             )
             
