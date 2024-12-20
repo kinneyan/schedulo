@@ -8,7 +8,7 @@ const NavigationBar = () => {
     return (
         <Navbar fixed="top">
             <Container fluid className="p-0">
-                <Navbar.Brand href="#">
+                <Navbar.Brand href="/">
                     <img 
                         src='/schedulo.png'
                         alt='logo'
