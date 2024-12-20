@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import Login from './pages/login';
+import LoginPage from './pages/login';
 
 function App() {
   return (
     <>
-      <Login />
+      <LoginPage />
     </>
   );
 };

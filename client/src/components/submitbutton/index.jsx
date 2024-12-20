@@ -5,7 +5,7 @@ import './index.scss';
 
 const SubmitButton = ({ button_text }) => {
     return (
-        <Button id="button-item">{button_text}</Button>
+        <Button id="button-item" type="submit">{button_text}</Button>
     );
 };
 

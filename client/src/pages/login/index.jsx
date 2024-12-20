@@ -2,17 +2,17 @@ import React from 'react';
 import './index.scss';
 
 import NavigationBar from '../../components/navbar';
-import LoginForm from '../../components/loginform';
+import LoginContainer from '../../containers/login';
 
-const Login = () => {
+const LoginPage = () => {
     return (
         <div id="login-page">
             <NavigationBar />
             <div id="login-form-container">
-                    <LoginForm />
+                    <LoginContainer />
             </div>
         </div>
     );
 };
 
-export default Login;
+export default LoginPage;
