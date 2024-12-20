@@ -24,7 +24,7 @@ class CreateWorkspace(APIView):
 
         # create new workspace
         workspace = Workspace.objects.create(
-            created_by_id = request.user,
+            created_by = request.user,
             owner = request.user
         )
 

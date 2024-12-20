@@ -35,7 +35,7 @@ class User(AbstractUser):
 class Workspace(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    created_by_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_workspaces')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_workspaces')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_workspaces')
     name = models.CharField(max_length=30, default="Unnamed Workspace")
 
