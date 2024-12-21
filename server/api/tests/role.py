@@ -193,6 +193,46 @@ class GetRolesTests(APITestCase):
             self.assertEqual(data[i]['name'], output[i][1])
             self.assertEqual(data[i]['name'], role.name)
 
+    def test_multiple_workspaces(self):
+        # add another workspace and role to this workspace
+        self.workspace2 = Workspace.objects.create(owner=self.user, created_by=self.user)
+
+        self.member5 = WorkspaceMember.objects.create(user=self.user, workspace=self.workspace2, added_by=self.user)
+        self.permissions5 = MemberPermissions.objects.create(
+            workspace=self.workspace2,
+            member=self.member5,
+            IS_OWNER=True,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True
+        )
+        
+        response = self.client.put(self.url, {'workspace_id': self.workspace2.id, 'name': 'test name4', 'pay_rate': 5.00})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED) 
+
+        data = []
+        data.append({'workspace_id': self.workspace.id, 'name': 'test name1', 'pay_rate': 15.00})
+        data.append({'workspace_id': self.workspace.id, 'name': 'test name2', 'pay_rate': 10.00})
+        data.append({'workspace_id': self.workspace.id, 'name': 'test name3', 'pay_rate': 18.00})
+
+        for i in range(3):
+            response = self.client.put(self.url, data[i], format='json')
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.url = reverse('get_workspace_roles')
+        response = self.client.post(self.url, {'workspace_id': self.workspace.id})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        output = response.data['roles']
+
+        self.assertEqual(len(output), len(data))
+
+        for i in range(len(data)):
+            role = WorkspaceRole.objects.get(id=output[i][0])
+            self.assertEqual(data[i]['name'], output[i][1])
+            self.assertEqual(data[i]['name'], role.name)
+        
 
 
         
