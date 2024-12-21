@@ -27,11 +27,11 @@ class CreateRole(APIView):
             response["error"]["message"] = "Workspace ID is required."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
         
-        # Verify workspace exsists
+        # Verify workspace exists
         try:
             workspace = Workspace.objects.get(pk=request.data["workspace_id"])
         except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exsist."
+            response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
         
         # Verify user has permissions to manage workspace roles
@@ -72,11 +72,11 @@ class GetWorkspaceRoles(APIView): # returns a list of all roles in a workspace, 
             response["error"]["message"] = "Workspace ID is required."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-        # Verify workspace exsists
+        # Verify workspace exists
         try:
             workspace = Workspace.objects.get(pk=request.data["workspace_id"])
         except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exsist."
+            response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
   
         roles = WorkspaceRole.objects.filter(workspace=workspace).values_list("id", "name")
@@ -112,11 +112,11 @@ class AddMemberRole(APIView): # adds a role to a workspace member
             response["error"]["message"] = "Role ID is required"
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
         
-        # Verify workspace exsists
+        # Verify workspace exists
         try:
             workspace = Workspace.objects.get(pk=request.data["workspace_id"])
         except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exsist."
+            response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
         
         # Verify user has permissions to manage workspace roles
@@ -138,14 +138,14 @@ class AddMemberRole(APIView): # adds a role to a workspace member
         try:
             modify_member = WorkspaceMember.objects.get(id=request.data['member_id'], workspace=workspace)
         except WorkspaceMember.DoesNotExist:
-            response["error"]["message"] = "Member is not a member of this workspace or does not exsist." # these could be split to give a more specfic error, but I dont see this error coming up often and would rather minimize the amount of loopups
+            response["error"]["message"] = "Member is not a member of this workspace or does not exist." # these could be split to give a more specfic error, but I dont see this error coming up often and would rather minimize the amount of loopups
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Verify that role exists and is part of workspace
         try:
             workspace_role = WorkspaceRole.objects.get(id=request.data['workspace_role_id'], workspace=workspace)
         except WorkspaceRole.DoesNotExist:
-            response["error"]["message"] = "Role is not part of this workspace or does not exsist."
+            response["error"]["message"] = "Role is not part of this workspace or does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Verify that member does not already have this role
@@ -186,11 +186,11 @@ class RemoveMemberRole(APIView): # removes a role from a workspace member
             response["error"]["message"] = "Role ID is required"
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
         
-        # Verify workspace exsists
+        # Verify workspace exists
         try:
             workspace = Workspace.objects.get(pk=request.data["workspace_id"])
         except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exsist."
+            response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
         
         # Verify user has permissions to manage workspace roles
@@ -212,14 +212,14 @@ class RemoveMemberRole(APIView): # removes a role from a workspace member
         try:
             modify_member = WorkspaceMember.objects.get(id=request.data['member_id'], workspace=workspace)
         except WorkspaceMember.DoesNotExist:
-            response["error"]["message"] = "Member is not a member of this workspace or does not exsist." # these could be split to give a more specfic error, but I dont see this error coming up often and would rather minimize the amount of loopups
+            response["error"]["message"] = "Member is not a member of this workspace or does not exist." # these could be split to give a more specfic error, but I dont see this error coming up often and would rather minimize the amount of loopups
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Verify that role exists and is part of workspace
         try:
             workspace_role = WorkspaceRole.objects.get(id=request.data['workspace_role_id'], workspace=workspace)
         except WorkspaceRole.DoesNotExist:
-            response["error"]["message"] = "Role is not part of this workspace or does not exsist."
+            response["error"]["message"] = "Role is not part of this workspace or does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Verify that member already has this role

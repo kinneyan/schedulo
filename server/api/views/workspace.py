@@ -78,11 +78,11 @@ class ModifyWorkspace(APIView): # change name or owner, can only be done by owne
             response["error"]["message"] = "Workspace ID is required."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
         
-        # Verify workspace exsists
+        # Verify workspace exists
         try:
             workspace = Workspace.objects.get(pk=request.data["workspace_id"])
         except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exsist."
+            response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
         
         # Verify user is owner
