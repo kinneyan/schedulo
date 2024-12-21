@@ -93,7 +93,7 @@ class AddMemberRole(APIView): # adds a role to a workspace member
     '''
     workspace_id
     member_id; the member to have the role added to them
-    role_id
+    workspace_role_id
     '''
 
     def put(self, request):
@@ -108,7 +108,7 @@ class AddMemberRole(APIView): # adds a role to a workspace member
             response["error"]["message"] = "Member ID is required"
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
         
-        if "role_id" not in request.data:
+        if "workspace_role_id" not in request.data:
             response["error"]["message"] = "Role ID is required"
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
         
@@ -143,14 +143,14 @@ class AddMemberRole(APIView): # adds a role to a workspace member
 
         # Verify that role exists and is part of workspace
         try:
-            workspace_role = WorkspaceRole.objects.get(id=request.data['role_id'], workspace=workspace)
+            workspace_role = WorkspaceRole.objects.get(id=request.data['workspace_role_id'], workspace=workspace)
         except WorkspaceRole.DoesNotExist:
             response["error"]["message"] = "Role is not part of this workspace or does not exsist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Verify that member does not already have this role
         try:
-            member_role = MemberRole.objects.get(member=request.data['member_id'], workspace_role=request.data['role_id'])
+            member_role = MemberRole.objects.get(member=request.data['member_id'], workspace_role=request.data['workspace_role_id'])
         except MemberRole.DoesNotExist:
             # add role to member if they did not have it
             member_role = MemberRole.objects.create(member=modify_member, workspace_role=workspace_role)
@@ -167,7 +167,7 @@ class RemoveMemberRole(APIView): # removes a role from a workspace member
     '''
     workspace_id
     member_id; the member to have the role removed from them
-    role_id
+    workspace_role_id
     '''
 
     def delete(self, request):
@@ -182,7 +182,7 @@ class RemoveMemberRole(APIView): # removes a role from a workspace member
             response["error"]["message"] = "Member ID is required"
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
         
-        if "role_id" not in request.data:
+        if "workspace_role_id" not in request.data:
             response["error"]["message"] = "Role ID is required"
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
         
@@ -217,21 +217,21 @@ class RemoveMemberRole(APIView): # removes a role from a workspace member
 
         # Verify that role exists and is part of workspace
         try:
-            workspace_role = WorkspaceRole.objects.get(id=request.data['role_id'], workspace=workspace)
+            workspace_role = WorkspaceRole.objects.get(id=request.data['workspace_role_id'], workspace=workspace)
         except WorkspaceRole.DoesNotExist:
             response["error"]["message"] = "Role is not part of this workspace or does not exsist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Verify that member already has this role
         try:
-            member_role = MemberRole.objects.get(member=request.data['member_id'], workspace_role=request.data['role_id'])
+            member_role = MemberRole.objects.get(member=request.data['member_id'], workspace_role=request.data['workspace_role_id'])
         except MemberRole.DoesNotExist:
             # add role to member if they did not have it
             response["error"]["message"] = "Member does not have this role."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
         
         # remove role
-        MemberRole.objects.get(member=request.data['member_id'], workspace_role=request.data['role_id']).delete()
+        MemberRole.objects.get(member=request.data['member_id'], workspace_role=request.data['workspace_role_id']).delete()
         return Response(response, status=status.HTTP_200_OK)
     
 

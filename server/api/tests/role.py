@@ -301,12 +301,12 @@ class AddMemberRoleTests(APITestCase):
         
 
     def test_no_workspace(self):
-        data = {'role_id': self.role.id, 'member_id': self.member2.id}
+        data = {'workspace_role_id': self.role.id, 'member_id': self.member2.id}
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace(self):
-        data = {'workspace_id': 999,'role_id': self.role.id, 'member_id': self.member2.id}
+        data = {'workspace_id': 999,'workspace_role_id': self.role.id, 'member_id': self.member2.id}
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -316,22 +316,22 @@ class AddMemberRoleTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_role(self):
-        data = {'workspace_id': self.workspace.id,'role_id': 999, 'member_id': self.member2.id}
+        data = {'workspace_id': self.workspace.id,'workspace_role_id': 999, 'member_id': self.member2.id}
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_no_member(self):
-        data = {'workspace_id': self.workspace.id,'role_id': self.role.id}
+        data = {'workspace_id': self.workspace.id,'workspace_role_id': self.role.id}
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_member(self):
-        data = {'workspace_id': self.workspace.id,'role_id': self.role.id, 'member_id': 999}
+        data = {'workspace_id': self.workspace.id,'workspace_role_id': self.role.id, 'member_id': 999}
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_add_single(self):
-        data = {'workspace_id': self.workspace.id,'role_id': self.role.id, 'member_id': self.member2.id}
+        data = {'workspace_id': self.workspace.id,'workspace_role_id': self.role.id, 'member_id': self.member2.id}
 
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -343,9 +343,9 @@ class AddMemberRoleTests(APITestCase):
 
     def test_add_multiple(self):
         data = []
-        data.append({'workspace_id': self.workspace.id,'role_id': self.role.id, 'member_id': self.member2.id})
-        data.append({'workspace_id': self.workspace.id,'role_id': self.role2.id, 'member_id': self.member2.id})
-        data.append({'workspace_id': self.workspace.id,'role_id': self.role3.id, 'member_id': self.member2.id})
+        data.append({'workspace_id': self.workspace.id,'workspace_role_id': self.role.id, 'member_id': self.member2.id})
+        data.append({'workspace_id': self.workspace.id,'workspace_role_id': self.role2.id, 'member_id': self.member2.id})
+        data.append({'workspace_id': self.workspace.id,'workspace_role_id': self.role3.id, 'member_id': self.member2.id})
 
         for i in range(3):
             response = self.client.put(self.url, data[i], format='json')
@@ -369,7 +369,7 @@ class AddMemberRoleTests(APITestCase):
 
     def test_add_without_permissions(self):
         self.client.force_authenticate(user=self.member2.user)
-        data = {'workspace_id': self.workspace.id,'role_id': self.role.id, 'member_id': self.member2.id}
+        data = {'workspace_id': self.workspace.id,'workspace_role_id': self.role.id, 'member_id': self.member2.id}
 
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -438,12 +438,12 @@ class RemoveMemberRoleTests(APITestCase):
         self.member_role2 = MemberRole.objects.create(workspace_role=self.role2, member=self.member2)
 
     def test_no_workspace(self):
-        data = {'role_id': self.role.id, 'member_id': self.member2.id}
+        data = {'workspace_role_id': self.role.id, 'member_id': self.member2.id}
         response = self.client.delete(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace(self):
-        data = {'workspace_id': 999,'role_id': self.role.id, 'member_id': self.member2.id}
+        data = {'workspace_id': 999,'workspace_role_id': self.role.id, 'member_id': self.member2.id}
         response = self.client.delete(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -453,22 +453,22 @@ class RemoveMemberRoleTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_role(self):
-        data = {'workspace_id': self.workspace.id,'role_id': 999, 'member_id': self.member2.id}
+        data = {'workspace_id': self.workspace.id,'workspace_role_id': 999, 'member_id': self.member2.id}
         response = self.client.delete(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_no_member(self):
-        data = {'workspace_id': self.workspace.id,'role_id': self.role.id}
+        data = {'workspace_id': self.workspace.id,'workspace_role_id': self.role.id}
         response = self.client.delete(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_member(self):
-        data = {'workspace_id': self.workspace.id,'role_id': self.role.id, 'member_id': 999}
+        data = {'workspace_id': self.workspace.id,'workspace_role_id': self.role.id, 'member_id': 999}
         response = self.client.delete(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         
     def test_remove_valid(self):
-        data = {'workspace_id': self.workspace.id,'role_id': self.role.id, 'member_id': self.member2.id}
+        data = {'workspace_id': self.workspace.id,'workspace_role_id': self.role.id, 'member_id': self.member2.id}
         response = self.client.delete(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -486,7 +486,7 @@ class RemoveMemberRoleTests(APITestCase):
             self.assertTrue(False)
 
     def test_remove_role_member_doesnt_have(self):
-        data = {'workspace_id': self.workspace.id,'role_id': self.role3.id, 'member_id': self.member2.id}
+        data = {'workspace_id': self.workspace.id,'workspace_role_id': self.role3.id, 'member_id': self.member2.id}
         response = self.client.delete(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
