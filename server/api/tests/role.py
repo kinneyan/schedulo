@@ -6,7 +6,7 @@ from ..models import Workspace, WorkspaceMember, User, MemberPermissions, Worksp
 
 class CreateRoleTests(APITestCase):
     def setUp(self):
-        self.url = reverse('create_role')
+        self.url = reverse('create_workspace_role')
         self.user = User.objects.create_user(
             email='testuser@example.com',
             password='testpassword',
@@ -64,7 +64,7 @@ class CreateRoleTests(APITestCase):
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_create_role_valid(self):
+    def test_create_workspace_role_valid(self):
         data = {'workspace_id': self.workspace.id, 'name': 'test name1', 'pay_rate': 15.00}
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -75,7 +75,7 @@ class CreateRoleTests(APITestCase):
         self.assertEqual(role.name, data['name'])
         self.assertEqual(role.pay_rate, data['pay_rate'])
 
-    def test_create_role_no_name_or_payrate(self):
+    def test_create_workspace_role_no_name_or_payrate(self):
         data = {'workspace_id': self.workspace.id}
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -86,7 +86,7 @@ class CreateRoleTests(APITestCase):
         self.assertEqual(role.name, 'Unnamed Role')
         self.assertEqual(role.pay_rate, None)
 
-    def test_create_role_without_permissions(self):
+    def test_create_workspace_role_without_permissions(self):
         data = {'workspace_id': self.workspace.id, 'name': 'test name1', 'pay_rate': 15.00}
 
         self.client.force_authenticate(user=self.user2) # change to send request from user 2
@@ -95,7 +95,7 @@ class CreateRoleTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_create_role_as_non_member(self):
+    def test_create_workspace_role_as_non_member(self):
         data = {'workspace_id': self.workspace.id, 'name': 'test name1', 'pay_rate': 15.00}
 
         self.client.force_authenticate(user=self.user3) # change to send request from user 2
@@ -106,7 +106,7 @@ class CreateRoleTests(APITestCase):
 
 class GetRolesTests(APITestCase):
     def setUp(self):
-        self.url = reverse('create_role')
+        self.url = reverse('create_workspace_role')
         self.user = User.objects.create_user(
             email='testuser@example.com',
             password='testpassword',
