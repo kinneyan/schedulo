@@ -301,22 +301,22 @@ class AddMemberRoleTests(APITestCase):
         
 
     def test_no_workspace(self):
-        data = {'role_id': self.role.id, 'member_id': self.user2.id}
+        data = {'role_id': self.role.id, 'member_id': self.member2.id}
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace(self):
-        data = {'workspace_id': 999,'role_id': self.role.id, 'member_id': self.user2.id}
+        data = {'workspace_id': 999,'role_id': self.role.id, 'member_id': self.member2.id}
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_no_role(self):
-        data = {'workspace_id': self.workspace.id, 'member_id': self.user2.id}
+        data = {'workspace_id': self.workspace.id, 'member_id': self.member2.id}
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_role(self):
-        data = {'workspace_id': self.workspace.id,'role_id': 999, 'member_id': self.user2.id}
+        data = {'workspace_id': self.workspace.id,'role_id': 999, 'member_id': self.member2.id}
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -325,7 +325,7 @@ class AddMemberRoleTests(APITestCase):
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_no_member(self):
+    def test_invalid_member(self):
         data = {'workspace_id': self.workspace.id,'role_id': self.role.id, 'member_id': 999}
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -380,10 +380,115 @@ class AddMemberRoleTests(APITestCase):
         except MemberRole.DoesNotExist:
             self.assertTrue(True)
 
+class RemoveMemberRoleTests(APITestCase):
+    def setUp(self):
+        self.url = reverse('remove_member_role')
+        self.user = User.objects.create_user(
+            email='testuser@example.com',
+            password='testpassword',
+            first_name='Test',
+            last_name='User',
+            phone='1234567890'
+        )
+        self.user2 = User.objects.create_user(
+            email='testuser2@example.com',
+            password='testpassword',
+            first_name='Test2',
+            last_name='User2',
+            phone='1234567890'
+        )
+        self.user3 = User.objects.create_user(
+            email='testuser3@example.com',
+            password='testpassword',
+            first_name='Test3',
+            last_name='User3',
+            phone='1234567890'
+        )
 
+        self.workspace = Workspace.objects.create(owner=self.user, created_by=self.user)
+
+        self.member = WorkspaceMember.objects.create(user=self.user, workspace=self.workspace, added_by=self.user)
+        self.permissions = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member,
+            IS_OWNER=True,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True
+        )
+
+        self.member2 = WorkspaceMember.objects.create(user=self.user2, workspace=self.workspace, added_by=self.user)
+        self.permissions2 = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member2,
+            IS_OWNER=False,
+            MANAGE_WORKSPACE_MEMBERS=False,
+            MANAGE_WORKSPACE_ROLES=False,
+            MANAGE_SCHEDULES=False,
+            MANAGE_TIME_OFF=False
+        )
+        self.client.force_authenticate(user=self.member.user)
+
+        self.role = WorkspaceRole.objects.create(workspace=self.workspace, name="test role1", pay_rate=10)
+        self.role2 = WorkspaceRole.objects.create(workspace=self.workspace, name="test role2", pay_rate=10)
+        self.role3 = WorkspaceRole.objects.create(workspace=self.workspace, name="test role3", pay_rate=10)
+
+        self.member_role = MemberRole.objects.create(workspace_role=self.role, member=self.member2)
+        self.member_role2 = MemberRole.objects.create(workspace_role=self.role2, member=self.member2)
+
+    def test_no_workspace(self):
+        data = {'role_id': self.role.id, 'member_id': self.member2.id}
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_workspace(self):
+        data = {'workspace_id': 999,'role_id': self.role.id, 'member_id': self.member2.id}
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_no_role(self):
+        data = {'workspace_id': self.workspace.id, 'member_id': self.member2.id}
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_role(self):
+        data = {'workspace_id': self.workspace.id,'role_id': 999, 'member_id': self.member2.id}
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_no_member(self):
+        data = {'workspace_id': self.workspace.id,'role_id': self.role.id}
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_member(self):
+        data = {'workspace_id': self.workspace.id,'role_id': self.role.id, 'member_id': 999}
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         
-  
+    def test_remove_valid(self):
+        data = {'workspace_id': self.workspace.id,'role_id': self.role.id, 'member_id': self.member2.id}
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        # check that member role was deleted
+        try:
+            role = MemberRole.objects.get(member=self.member2, workspace_role=self.role)
+            self.assertTrue(False)
+        except MemberRole.DoesNotExist:
+            self.assertTrue(True)
+
+        # check that member still has other role
+        try:
+            role = MemberRole.objects.get(member=self.member2, workspace_role=self.role2)
+        except MemberRole.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_remove_role_member_doesnt_have(self):
+        data = {'workspace_id': self.workspace.id,'role_id': self.role3.id, 'member_id': self.member2.id}
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 
