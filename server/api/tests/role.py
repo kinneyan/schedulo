@@ -59,6 +59,11 @@ class CreateRoleTests(APITestCase):
         response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_invalid_workspace(self):
+        data = {'workspace_id': 999, 'name': 'test name1', 'pay_rate': 15.00}
+        response = self.client.put(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_create_role_valid(self):
         data = {'workspace_id': self.workspace.id, 'name': 'test name1', 'pay_rate': 15.00}
         response = self.client.put(self.url, data, format='json')
@@ -156,6 +161,13 @@ class GetRolesTests(APITestCase):
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_invalid_workspace(self):
+        data = {'workspace_id': 999, 'name': 'test name1', 'pay_rate': 15.00}
+
+        self.url = reverse('get_workspace_roles')
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_single(self):
         data = {'workspace_id': self.workspace.id, 'name': 'test name1', 'pay_rate': 15.00}
         response = self.client.put(self.url, data, format='json')
@@ -233,6 +245,140 @@ class GetRolesTests(APITestCase):
             self.assertEqual(data[i]['name'], output[i][1])
             self.assertEqual(data[i]['name'], role.name)
         
+class AddMemberRoleTests(APITestCase):
+    def setUp(self):
+        self.url = reverse('add_member_role')
+        self.user = User.objects.create_user(
+            email='testuser@example.com',
+            password='testpassword',
+            first_name='Test',
+            last_name='User',
+            phone='1234567890'
+        )
+        self.user2 = User.objects.create_user(
+            email='testuser2@example.com',
+            password='testpassword',
+            first_name='Test2',
+            last_name='User2',
+            phone='1234567890'
+        )
+        self.user3 = User.objects.create_user(
+            email='testuser3@example.com',
+            password='testpassword',
+            first_name='Test3',
+            last_name='User3',
+            phone='1234567890'
+        )
+
+        self.workspace = Workspace.objects.create(owner=self.user, created_by=self.user)
+
+        self.member = WorkspaceMember.objects.create(user=self.user, workspace=self.workspace, added_by=self.user)
+        self.permissions = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member,
+            IS_OWNER=True,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True
+        )
+
+        self.member2 = WorkspaceMember.objects.create(user=self.user2, workspace=self.workspace, added_by=self.user)
+        self.permissions2 = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member2,
+            IS_OWNER=False,
+            MANAGE_WORKSPACE_MEMBERS=False,
+            MANAGE_WORKSPACE_ROLES=False,
+            MANAGE_SCHEDULES=False,
+            MANAGE_TIME_OFF=False
+        )
+        self.client.force_authenticate(user=self.member.user)
+
+        self.role = WorkspaceRole.objects.create(workspace=self.workspace, name="test role", pay_rate=10)
+        self.role2 = WorkspaceRole.objects.create(workspace=self.workspace, name="test role2", pay_rate=10)
+        self.role3 = WorkspaceRole.objects.create(workspace=self.workspace, name="test role3", pay_rate=10)
+        
+
+    def test_no_workspace(self):
+        data = {'role_id': self.role.id, 'member_id': self.user2.id}
+        response = self.client.put(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_workspace(self):
+        data = {'workspace_id': 999,'role_id': self.role.id, 'member_id': self.user2.id}
+        response = self.client.put(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_no_role(self):
+        data = {'workspace_id': self.workspace.id, 'member_id': self.user2.id}
+        response = self.client.put(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_role(self):
+        data = {'workspace_id': self.workspace.id,'role_id': 999, 'member_id': self.user2.id}
+        response = self.client.put(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_no_member(self):
+        data = {'workspace_id': self.workspace.id,'role_id': self.role.id}
+        response = self.client.put(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_no_member(self):
+        data = {'workspace_id': self.workspace.id,'role_id': self.role.id, 'member_id': 999}
+        response = self.client.put(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_add_single(self):
+        data = {'workspace_id': self.workspace.id,'role_id': self.role.id, 'member_id': self.member2.id}
+
+        response = self.client.put(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        try: # this is probably a bad way to handle this since the fail doesnt give any info but idk :(
+            role = MemberRole.objects.get(workspace_role=self.role, member=self.member2)
+        except MemberRole.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_add_multiple(self):
+        data = []
+        data.append({'workspace_id': self.workspace.id,'role_id': self.role.id, 'member_id': self.member2.id})
+        data.append({'workspace_id': self.workspace.id,'role_id': self.role2.id, 'member_id': self.member2.id})
+        data.append({'workspace_id': self.workspace.id,'role_id': self.role3.id, 'member_id': self.member2.id})
+
+        for i in range(3):
+            response = self.client.put(self.url, data[i], format='json')
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        try: # this is probably a bad way to handle this since the fail doesnt give any info but idk :(
+            roles = list(MemberRole.objects.filter(member=self.member2))
+        except MemberRole.DoesNotExist:
+            self.assertTrue(False)
+
+        role = []
+        for i in range(len(roles)):
+            try:
+                role.append(WorkspaceRole.objects.get(id=roles[i].workspace_role.id))
+            except WorkspaceRole.DoesNotExist:
+                self.assertTrue(False)
+
+        self.assertEqual(self.role, role[0])
+        self.assertEqual(self.role2, role[1])
+        self.assertEqual(self.role3, role[2])
+
+    def test_add_without_permissions(self):
+        self.client.force_authenticate(user=self.member2.user)
+        data = {'workspace_id': self.workspace.id,'role_id': self.role.id, 'member_id': self.member2.id}
+
+        response = self.client.put(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        try: # this is probably a bad way to handle this since the fail doesnt give any info but idk :(
+            role = MemberRole.objects.get(workspace_role=self.role, member=self.member2)
+            self.assertTrue(False)
+        except MemberRole.DoesNotExist:
+            self.assertTrue(True)
 
 
         
