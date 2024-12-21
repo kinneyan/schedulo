@@ -7,6 +7,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from ..serializers import RoleSerializer
 from ..models import Workspace, WorkspaceMember, User, MemberPermissions, WorkspaceRole, MemberRole
 
+### WORKSPACE ROLE ENDPOINTS ###
+
 class CreateRole(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -82,6 +84,7 @@ class GetWorkspaceRoles(APIView): # returns a list of all roles in a workspace, 
         response['roles'] = list(roles)
 
         return Response(response, status=status.HTTP_200_OK)
+### MEMBER ROLE ENDPOINTS ###
     
 class AddMemberRole(APIView): # adds a role to a workspace member
     authentication_classes = [JWTAuthentication]
@@ -156,6 +159,83 @@ class AddMemberRole(APIView): # adds a role to a workspace member
         # member already had role
         response["error"]["message"] = "Member already has this role."
         return Response(response, status=status.HTTP_409_CONFLICT)
+    
+class RemoveMemberRole(APIView): # removes a role from a workspace member
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    '''
+    workspace_id
+    member_id; the member to have the role removed from them
+    role_id
+    '''
+
+    def delete(self, request):
+        response = {"error": {}}
+
+        # Verify body contains required fields
+        if "workspace_id" not in request.data:
+            response["error"]["message"] = "Workspace ID is required."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        
+        if "member_id" not in request.data:
+            response["error"]["message"] = "Member ID is required"
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        
+        if "role_id" not in request.data:
+            response["error"]["message"] = "Role ID is required"
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verify workspace exsists
+        try:
+            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
+        except Workspace.DoesNotExist:
+            response["error"]["message"] = "Workspace does not exsist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        
+        # Verify user has permissions to manage workspace roles
+        try:
+            request_member = WorkspaceMember.objects.get(user=request.user, workspace=request.data["workspace_id"])
+            permissions = MemberPermissions.objects.get(
+                workspace=request.data["workspace_id"],
+                member=request_member,
+                MANAGE_WORKSPACE_ROLES=True
+            )
+        except MemberPermissions.DoesNotExist:
+            response["error"]["message"] = "You do not have permission modify roles in this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "You are not a member of this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        
+        # Verify that member having role removed is part of workspace
+        try:
+            modify_member = WorkspaceMember.objects.get(id=request.data['member_id'], workspace=workspace)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "Member is not a member of this workspace or does not exsist." # these could be split to give a more specfic error, but I dont see this error coming up often and would rather minimize the amount of loopups
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # Verify that role exists and is part of workspace
+        try:
+            workspace_role = WorkspaceRole.objects.get(id=request.data['role_id'], workspace=workspace)
+        except WorkspaceRole.DoesNotExist:
+            response["error"]["message"] = "Role is not part of this workspace or does not exsist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # Verify that member already has this role
+        try:
+            member_role = MemberRole.objects.get(member=request.data['member_id'], workspace_role=request.data['role_id'])
+        except MemberRole.DoesNotExist:
+            # add role to member if they did not have it
+            response["error"]["message"] = "Member does not have this role."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        
+        # remove role
+        MemberRole.objects.get(member=request.data['member_id'], workspace_role=request.data['role_id']).delete()
+        return Response(response, status=status.HTTP_200_OK)
+    
+
+        
 
 
         
