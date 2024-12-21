@@ -11,7 +11,7 @@ class CreateRole(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def put(self, request):
         response = {"error": {}}
 
         serializer = RoleSerializer(data=request.data)

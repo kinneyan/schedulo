@@ -56,12 +56,12 @@ class CreateRoleTests(APITestCase):
 
     def test_no_workspace(self):
         data = {'name': 'test name1', 'pay_rate': 15.00}
-        response = self.client.post(self.url, data, format='json')
+        response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_role_valid(self):
         data = {'workspace_id': self.workspace.id, 'name': 'test name1', 'pay_rate': 15.00}
-        response = self.client.post(self.url, data, format='json')
+        response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
         role = WorkspaceRole.objects.get(workspace=self.workspace, name=data['name'])
@@ -72,7 +72,7 @@ class CreateRoleTests(APITestCase):
 
     def test_create_role_no_name_or_payrate(self):
         data = {'workspace_id': self.workspace.id}
-        response = self.client.post(self.url, data, format='json')
+        response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
         role = WorkspaceRole.objects.get(workspace=self.workspace)
@@ -86,7 +86,7 @@ class CreateRoleTests(APITestCase):
 
         self.client.force_authenticate(user=self.user2) # change to send request from user 2
 
-        response = self.client.post(self.url, data, format='json')
+        response = self.client.put(self.url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -95,7 +95,7 @@ class CreateRoleTests(APITestCase):
 
         self.client.force_authenticate(user=self.user3) # change to send request from user 2
 
-        response = self.client.post(self.url, data, format='json')
+        response = self.client.put(self.url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -158,7 +158,7 @@ class GetRolesTests(APITestCase):
 
     def test_single(self):
         data = {'workspace_id': self.workspace.id, 'name': 'test name1', 'pay_rate': 15.00}
-        response = self.client.post(self.url, data, format='json')
+        response = self.client.put(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.url = reverse('get_workspace_roles')
@@ -177,7 +177,7 @@ class GetRolesTests(APITestCase):
         data.append({'workspace_id': self.workspace.id, 'name': 'test name3', 'pay_rate': 18.00})
 
         for i in range(3):
-            response = self.client.post(self.url, data[i], format='json')
+            response = self.client.put(self.url, data[i], format='json')
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.url = reverse('get_workspace_roles')
