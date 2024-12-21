@@ -9,3 +9,5 @@ __pycache__/
 *.pyc
 env.dev
 env.prod
+.env.dev
+.env.prod
