@@ -77,7 +77,7 @@ class GetWorkspaceRoles(APIView): # returns a list of all roles in a workspace, 
             response["error"]["message"] = "Workspace does not exsist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
   
-        roles = WorkspaceRole.objects.filter().values_list("id", "name")
+        roles = WorkspaceRole.objects.filter(workspace=workspace).values_list("id", "name")
 
         response['roles'] = list(roles)
 
