@@ -57,3 +57,28 @@ class CreateRole(APIView):
         workspace_role.save()
 
         return Response(response, status=status.HTTP_201_CREATED)
+    
+class GetWorkspaceRoles(APIView): # returns a list of all roles in a workspace, reponse[i][0] contains the pk of the role at that index, and response[i][1] contains the name
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        response = {"error": {}}
+
+        # Verify body contains required fields
+        if "workspace_id" not in request.data:
+            response["error"]["message"] = "Workspace ID is required."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verify workspace exsists
+        try:
+            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
+        except Workspace.DoesNotExist:
+            response["error"]["message"] = "Workspace does not exsist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+  
+        roles = WorkspaceRole.objects.filter().values_list("id", "name")
+
+        response['roles'] = list(roles)
+
+        return Response(response, status=status.HTTP_200_OK)
