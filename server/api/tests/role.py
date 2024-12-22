@@ -211,6 +211,91 @@ class DeleteRoleTests(APITestCase):
         except MemberRole.DoesNotExist:
             self.assertTrue(True)
 
+class ModifyWorkspaceRoleTests(APITestCase):
+    def setUp(self):
+        self.url = reverse('modify_workspace_role')
+        self.user = User.objects.create_user(
+            email='testuser@example.com',
+            password='testpassword',
+            first_name='Test',
+            last_name='User',
+            phone='1234567890'
+        )
+        self.user2 = User.objects.create_user(
+            email='testuser2@example.com',
+            password='testpassword',
+            first_name='Test2',
+            last_name='User2',
+            phone='1234567890'
+        )
+        self.user3 = User.objects.create_user(
+            email='testuser3@example.com',
+            password='testpassword',
+            first_name='Test3',
+            last_name='User3',
+            phone='1234567890'
+        )
+
+        self.workspace = Workspace.objects.create(owner=self.user, created_by=self.user)
+
+        self.member = WorkspaceMember.objects.create(user=self.user, workspace=self.workspace, added_by=self.user)
+        self.permissions = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member,
+            IS_OWNER=True,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True
+        )
+
+        self.member2 = WorkspaceMember.objects.create(user=self.user2, workspace=self.workspace, added_by=self.user)
+        self.permissions2 = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member2,
+            IS_OWNER=False,
+            MANAGE_WORKSPACE_MEMBERS=False,
+            MANAGE_WORKSPACE_ROLES=False,
+            MANAGE_SCHEDULES=False,
+            MANAGE_TIME_OFF=False
+        )
+        self.client.force_authenticate(user=self.member.user)
+
+        self.role = WorkspaceRole.objects.create(workspace=self.workspace, name="test role", pay_rate=10)
+        self.role2 = WorkspaceRole.objects.create(workspace=self.workspace, name="test role2", pay_rate=10)
+        self.role3 = WorkspaceRole.objects.create(workspace=self.workspace, name="test role3", pay_rate=10)
+
+    def test_no_workspace_role_id(self):
+        data = {}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_workspace_role_id(self):
+        data = {'workspace_role_id': 999}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_modify_valid(self):
+        data = {'workspace_role_id': self.role.id, 'name': "new name", 'pay_rate': 25}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # check that role was modified
+        role = WorkspaceRole.objects.get(id=self.role.id)
+        self.assertEqual(role.name, data['name'])
+        self.assertEqual(role.pay_rate, data['pay_rate'])
+
+    def test_modify_without_permissions(self):
+        self.client.force_authenticate(user=self.member2.user)
+        data = {'workspace_role_id': self.role.id, 'name': "new name", 'pay_rate': 25}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # check that role did not change
+        role = WorkspaceRole.objects.get(id=self.role.id)
+        self.assertEqual(role.name, self.role.name)
+        self.assertEqual(role.pay_rate, self.role.pay_rate)
+
 class GetRolesTests(APITestCase):
     def setUp(self):
         self.url = reverse('create_workspace_role')
@@ -427,7 +512,7 @@ class GetMemberRoleTests(APITestCase):
         self.assertEqual(len(response.data['roles']), 1)
 
         role = WorkspaceRole.objects.get(id=response.data['roles'][0][0])
-        self.assertEqual(self.role, role)
+        self.assertEqual(self.role.id, role.id)
 
     def test_multiple(self):
         member_role = MemberRole.objects.create(workspace_role=self.role, member=self.member2)
@@ -443,9 +528,9 @@ class GetMemberRoleTests(APITestCase):
         role = WorkspaceRole.objects.get(id=response.data['roles'][0][0])
         role2 = WorkspaceRole.objects.get(id=response.data['roles'][1][0])
         role3 = WorkspaceRole.objects.get(id=response.data['roles'][2][0])
-        self.assertEqual(self.role, role)
-        self.assertEqual(self.role2, role2)
-        self.assertEqual(self.role3, role3)
+        self.assertEqual(self.role.id, role.id)
+        self.assertEqual(self.role2.id, role2.id)
+        self.assertEqual(self.role3.id, role3.id)
       
 class AddMemberRoleTests(APITestCase):
     def setUp(self):
@@ -564,9 +649,9 @@ class AddMemberRoleTests(APITestCase):
             except WorkspaceRole.DoesNotExist:
                 self.assertTrue(False)
 
-        self.assertEqual(self.role, role[0])
-        self.assertEqual(self.role2, role[1])
-        self.assertEqual(self.role3, role[2])
+        self.assertEqual(self.role.id, role[0].id)
+        self.assertEqual(self.role2.id, role[1].id)
+        self.assertEqual(self.role3.id, role[2].id)
 
     def test_add_without_permissions(self):
         self.client.force_authenticate(user=self.member2.user)
