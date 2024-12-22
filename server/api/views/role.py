@@ -112,6 +112,69 @@ class DeleteWorkspaceRole(APIView):
         # delete role
         role = WorkspaceRole.objects.get(id=request.data['workspace_role_id']).delete()
         return Response(response, status=status.HTTP_200_OK)
+    
+class ModifyWorkspaceRole(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        response = {"error": {}}
+
+        '''
+        workspace_role_id
+        name (optional)
+        pay_rate (optional)
+        '''
+
+        if "workspace_role_id" not in request.data:
+            response["error"]["message"] = "Workspace role ID is required."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = RoleSerializer(data=request.data)
+        if not serializer.is_valid():
+            response["error"]["code"] = 400
+            response["error"]["message"] = "Invalid request data"
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verify role exists
+        try:
+            workspace_role = WorkspaceRole.objects.get(pk=request.data["workspace_role_id"])
+        except WorkspaceRole.DoesNotExist:
+            response["error"]["message"] = "Workspace role does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # Verify workspace exists; this shouldnt ever fail but have to get the workspace
+        try:
+            workspace = Workspace.objects.get(pk=workspace_role.workspace.id)
+        except Workspace.DoesNotExist:
+            response["error"]["message"] = "Workspace does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        
+        # Verify user has permissions to manage workspace roles
+        try:
+            member = WorkspaceMember.objects.get(user=request.user, workspace=workspace.id)
+            permissions = MemberPermissions.objects.get(
+                workspace=workspace.id,
+                member=member.id,
+                MANAGE_WORKSPACE_ROLES=True
+            )
+        except MemberPermissions.DoesNotExist:
+            response["error"]["message"] = "You do not have permission modify roles in this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "You are not a member of this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        
+        # modify role
+        if 'name' in serializer.validated_data:
+            workspace_role.name = serializer.validated_data['name']
+        if 'pay_rate' in serializer.validated_data:
+            workspace_role.pay_rate = serializer.validated_data['pay_rate']
+
+        workspace_role.save()
+
+        return Response(response, status=status.HTTP_200_OK)
+    
 class GetWorkspaceRoles(APIView): # returns a list of all roles in a workspace, reponse[i][0] contains the pk of the role at that index, and response[i][1] contains the name
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
