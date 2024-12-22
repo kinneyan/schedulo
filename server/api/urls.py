@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import Login, Register, GetUser, CreateWorkspace, ModifyWorkspace, GetPermissions, UpdatePermissions, AddWorkspaceMember, CreateRole, \
-GetWorkspaceRoles, AddMemberRole, RemoveMemberRole
+GetWorkspaceRoles, AddMemberRole, RemoveMemberRole, DeleteWorkspaceRole
 
 urlpatterns = [
     path('login', Login.as_view(), name='login'),
@@ -14,6 +14,7 @@ urlpatterns = [
     path('workspace/permissions/update/', UpdatePermissions.as_view(), name='update_permissions'),
     path('workspace/add-user/', AddWorkspaceMember.as_view(), name='add_workspace_member'),
     path('workspace/create-role/', CreateRole.as_view(), name='create_workspace_role'),
+    path('workspace/delete-role', DeleteWorkspaceRole.as_view(), name='delete_workspace_role'),
     path('workspace/get-roles/', GetWorkspaceRoles.as_view(), name='get_workspace_roles'),
     path('workspace/add-role/', AddMemberRole.as_view(), name='add_member_role'),
     path('workspace/remove-role', RemoveMemberRole.as_view(), name='remove_member_role'),

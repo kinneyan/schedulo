@@ -60,6 +60,58 @@ class CreateRole(APIView):
 
         return Response(response, status=status.HTTP_201_CREATED)
     
+class DeleteWorkspaceRole(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    '''
+    workspace_id
+    workspace_role_id
+    '''
+
+    def delete(self, request):
+        response = {"error": {}}
+
+        # Verify body contains required fields
+        if "workspace_id" not in request.data:
+            response["error"]["message"] = "Workspace ID is required."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        if "workspace_role_id" not in request.data:
+            response["error"]["message"] = "Workspace role ID is required."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verify workspace exists
+        try:
+            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
+        except Workspace.DoesNotExist:
+            response["error"]["message"] = "Workspace does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        
+        # Verify user has permissions to manage workspace roles
+        try:
+            member = WorkspaceMember.objects.get(user=request.user, workspace=request.data["workspace_id"])
+            permissions = MemberPermissions.objects.get(
+                workspace=request.data["workspace_id"],
+                member=member,
+                MANAGE_WORKSPACE_ROLES=True
+            )
+        except MemberPermissions.DoesNotExist:
+            response["error"]["message"] = "You do not have permission modify roles in this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "You are not a member of this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        
+        # Verify role exists and is part of workspace
+        try:
+            role = WorkspaceRole.objects.get(id=request.data['workspace_role_id'], workspace=workspace)
+        except WorkspaceRole.DoesNotExist:
+            response["error"]["message"] = "Workspace role does not exist or is not part of this workspace."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        
+        # delete role
+        role = WorkspaceRole.objects.get(id=request.data['workspace_role_id']).delete()
+        return Response(response, status=status.HTTP_200_OK)
 class GetWorkspaceRoles(APIView): # returns a list of all roles in a workspace, reponse[i][0] contains the pk of the role at that index, and response[i][1] contains the name
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
