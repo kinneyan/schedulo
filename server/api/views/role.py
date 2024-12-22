@@ -136,6 +136,37 @@ class GetWorkspaceRoles(APIView): # returns a list of all roles in a workspace, 
         response['roles'] = list(roles)
 
         return Response(response, status=status.HTTP_200_OK)
+
+class GetMemberRoles(APIView): # returns of list of the WorkspaceRoles a member has
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        response = {"error": {}}
+
+        ''' 
+        member_id
+        '''
+
+        if "member_id" not in request.data:
+            response["error"]["message"] = "Member ID is required"
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verify that member exists
+        try:
+            member = WorkspaceMember.objects.get(id=request.data['member_id'])
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "Member does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        
+        # get list of roles
+        member_roles = MemberRole.objects.filter(member=member)
+        roles = WorkspaceRole.objects.filter(pk__in=member_roles).values_list("id", "name") # gets all roles who have a key in the list
+
+        response['roles'] = list(roles)
+
+        return Response(response, status=status.HTTP_200_OK)
+    
 ### MEMBER ROLE ENDPOINTS ###
     
 class AddMemberRole(APIView): # adds a role to a workspace member
