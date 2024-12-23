@@ -1,13 +1,11 @@
 .DS_Store
 node_modules
 *env
+.env.dev
+.env.prod
 build
 dist
 .vscode
 .vite/
 __pycache__/
 *.pyc
-env.dev
-env.prod
-.env.dev
-.env.prod
