@@ -782,6 +782,19 @@ class RemoveMemberRoleTests(APITestCase):
         response = self.client.delete(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_remove_without_permissions(self):
+        self.client.force_authenticate(user=self.member2.user)
+        data = {'workspace_role_id': self.role.id, 'member_id': self.member2.id}
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # check that member role wasnt deleted
+        try:
+            role = MemberRole.objects.get(member=self.member2, workspace_role=self.role)
+        except MemberRole.DoesNotExist:
+            self.assertTrue(False)
+
+
 
 
     
