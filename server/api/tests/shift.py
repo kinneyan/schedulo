@@ -137,3 +137,226 @@ class CreateShiftTests(APITestCase):
             self.assertTrue(False)
         except Shift.DoesNotExist:
             self.assertTrue(True)
+
+class ModifyShiftTests(APITestCase):
+    def setUp(self):
+        self.url = reverse('modify_shift')
+        self.user = User.objects.create_user(
+            email='testuser@example.com',
+            password='testpassword',
+            first_name='Test',
+            last_name='User',
+            phone='1234567890'
+        )
+        self.user2 = User.objects.create_user(
+            email='testuser2@example.com',
+            password='testpassword',
+            first_name='Test2',
+            last_name='User2',
+            phone='1234567890'
+        )
+        self.user3 = User.objects.create_user(
+            email='testuser3@example.com',
+            password='testpassword',
+            first_name='Test3',
+            last_name='User3',
+            phone='1234567890'
+        )
+
+        self.workspace = Workspace.objects.create(owner=self.user, created_by=self.user)
+
+        self.member = WorkspaceMember.objects.create(user=self.user, workspace=self.workspace, added_by=self.user)
+        self.permissions = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member,
+            IS_OWNER=True,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True
+        )
+
+        self.member2 = WorkspaceMember.objects.create(user=self.user2, workspace=self.workspace, added_by=self.user)
+        self.permissions2 = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member2,
+            IS_OWNER=False,
+            MANAGE_WORKSPACE_MEMBERS=False,
+            MANAGE_WORKSPACE_ROLES=False,
+            MANAGE_SCHEDULES=False,
+            MANAGE_TIME_OFF=False
+        )
+
+        self.role = WorkspaceRole.objects.create(workspace=self.workspace, name="test name")
+        self.role2 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name2")
+
+        self.time1 = datetime.now(timezone.utc)
+        self.time2 = self.time1 + timedelta(hours=2)
+        self.time3 = self.time1 + timedelta(hours=4)
+        self.time4 = self.time1 - timedelta(hours=2)
+
+        self.shift = Shift.objects.create(
+            workspace=self.workspace,
+            start_time=self.time1,
+            end_time=self.time2,
+            role=self.role,
+            created_by=self.member,
+            open=True,
+        )
+
+        self.client.force_authenticate(user=self.member.user)
+
+    def test_no_shift(self):
+        data = {}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_shift(self):
+        data = {'shift_id': 999}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_without_permissions(self):
+        self.client.force_authenticate(user=self.member2.user)
+
+        data = {'shift_id': self.shift.id, 'start_time': self.time4, 'end_time': self.time3}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # ensure shift was not modified
+        try:
+            shift = Shift.objects.get(pk=self.shift.id, start_time=self.time1, end_time=self.time2)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_invalid_start_and_end(self):
+        data = {'shift_id': self.shift.id, 'start_time': 100, 'end_time': 100}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # ensure shift was not modified
+        try:
+            shift = Shift.objects.get(pk=self.shift.id, start_time=self.time1, end_time=self.time2)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_invalid_start_and_end_order(self):
+        data = {'shift_id': self.shift.id, 'start_time': self.time3, 'end_time': self.time4}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # ensure shift was not modified
+        try:
+            shift = Shift.objects.get(pk=self.shift.id, start_time=self.time1, end_time=self.time2)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_invalid_start(self):
+        data = {'shift_id': self.shift.id, 'start_time': self.time3}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # ensure shift was not modified
+        try:
+            shift = Shift.objects.get(pk=self.shift.id, start_time=self.time1, end_time=self.time2)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
+    
+    def test_invalid_end(self):
+        data = {'shift_id': self.shift.id, 'end_time': self.time4}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # ensure shift was not modified
+        try:
+            shift = Shift.objects.get(pk=self.shift.id, start_time=self.time1, end_time=self.time2)        
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_valid_start_and_end(self):
+        data = {'shift_id': self.shift.id, 'start_time': self.time4, 'end_time': self.time3}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # ensure shift was modified
+        try:
+            shift = Shift.objects.get(pk=self.shift.id, start_time=self.time4, end_time=self.time3)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_valid_start(self):
+        data = {'shift_id': self.shift.id, 'start_time': self.time4}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # ensure shift was modified
+        try:
+            shift = Shift.objects.get(pk=self.shift.id, start_time=self.time4, end_time=self.time2)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_valid_end(self):
+        data = {'shift_id': self.shift.id, 'end_time': self.time3}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # ensure shift was modified
+        try:
+            shift = Shift.objects.get(pk=self.shift.id, start_time=self.time1, end_time=self.time3)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_invalid_member(self):
+        data = {'shift_id': self.shift.id, 'member_id': 999}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        # ensure shift was not modified
+        try:
+            shift = Shift.objects.get(pk=self.shift.id, open=True)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_valid_member(self):
+        data = {'shift_id': self.shift.id, 'member_id': self.member.id}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # ensure shift was modified
+        try:
+            shift = Shift.objects.get(pk=self.shift.id, member=self.member, open=False)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_invalid_role(self):
+        data = {'shift_id': self.shift.id, 'role_id': 999}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        # ensure shift was not modified
+        try:
+            shift = Shift.objects.get(pk=self.shift.id, role=self.role)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_valid_role(self):
+        data = {'shift_id': self.shift.id, 'role_id': self.role2.id}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # ensure shift was modified
+        try:
+            shift = Shift.objects.get(pk=self.shift.id, role=self.role2)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_modify_multiple(self):
+        data = {'shift_id': self.shift.id, 'role_id': self.role2.id, 'member_id': self.member2.id, 'start_time': self.time4, 'end_time': self.time3}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # ensure shift was modified
+        try:
+            shift = Shift.objects.get(pk=self.shift.id, role=self.role2, member=self.member2, start_time=self.time4, end_time=self.time3)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
