@@ -1,0 +1,14 @@
+$background-color: #F0ECE2;
+
+#register-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: $background-color;
+    width: 100vw;
+    height: 100vh;
+}
+
+#register-form-container {
+    width: 100%;
+}
