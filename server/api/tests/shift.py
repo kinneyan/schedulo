@@ -360,3 +360,123 @@ class ModifyShiftTests(APITestCase):
             shift = Shift.objects.get(pk=self.shift.id, role=self.role2, member=self.member2, start_time=self.time4, end_time=self.time3)
         except Shift.DoesNotExist:
             self.assertTrue(False)
+
+class DeleteShiftTests(APITestCase):
+    def setUp(self):
+        self.url = reverse('delete_shift')
+        self.user = User.objects.create_user(
+            email='testuser@example.com',
+            password='testpassword',
+            first_name='Test',
+            last_name='User',
+            phone='1234567890'
+        )
+        self.user2 = User.objects.create_user(
+            email='testuser2@example.com',
+            password='testpassword',
+            first_name='Test2',
+            last_name='User2',
+            phone='1234567890'
+        )
+        self.user3 = User.objects.create_user(
+            email='testuser3@example.com',
+            password='testpassword',
+            first_name='Test3',
+            last_name='User3',
+            phone='1234567890'
+        )
+
+        self.workspace = Workspace.objects.create(owner=self.user, created_by=self.user)
+
+        self.member = WorkspaceMember.objects.create(user=self.user, workspace=self.workspace, added_by=self.user)
+        self.permissions = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member,
+            IS_OWNER=True,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True
+        )
+
+        self.member2 = WorkspaceMember.objects.create(user=self.user2, workspace=self.workspace, added_by=self.user)
+        self.permissions2 = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member2,
+            IS_OWNER=False,
+            MANAGE_WORKSPACE_MEMBERS=False,
+            MANAGE_WORKSPACE_ROLES=False,
+            MANAGE_SCHEDULES=False,
+            MANAGE_TIME_OFF=False
+        )
+
+        self.role = WorkspaceRole.objects.create(workspace=self.workspace, name="test name")
+        self.role2 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name2")
+
+        self.time1 = datetime.now(timezone.utc)
+        self.time2 = self.time1 + timedelta(hours=2)
+        self.time3 = self.time1 + timedelta(hours=4)
+        self.time4 = self.time1 - timedelta(hours=2)
+
+        self.shift1 = Shift.objects.create(
+            workspace=self.workspace,
+            start_time=self.time1,
+            end_time=self.time2,
+            role=self.role,
+            created_by=self.member,
+            open=True,
+        )
+
+        self.shift2 = Shift.objects.create(
+            workspace=self.workspace,
+            start_time=self.time2,
+            end_time=self.time3,
+            role=self.role,
+            created_by=self.member,
+            open=False,
+            member=self.member2,
+        )
+
+        self.client.force_authenticate(user=self.member.user)
+    
+    def test_no_shift(self):
+        data = {}
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_shift(self):
+        data = {'shift_id': 999}
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_without_permissions(self):
+        # change to send from user 2
+        self.client.force_authenticate(user=self.member2.user)
+
+        data = {'shift_id': self.shift1.id}
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # check that shift was not deleted
+        try:
+            shift = Shift.objects.get(pk=self.shift1.id)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_valid(self):
+        data = {'shift_id': self.shift1.id}
+        response = self.client.delete(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # check that shift was deleted
+        try:
+            shift = Shift.objects.get(pk=self.shift1.id)
+            self.assertTrue(False)
+        except Shift.DoesNotExist:
+            self.assertTrue(True)
+
+        # check that other shift was not deleted
+        try:
+            shift = Shift.objects.get(pk=self.shift2.id)
+        except Shift.DoesNotExist:
+            self.assertTrue(False)
