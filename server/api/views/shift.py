@@ -244,3 +244,52 @@ class DeleteShift(APIView):
         # delete shift
         shift = Shift.objects.get(id=request.data['shift_id']).delete()
         return Response(response, status=status.HTTP_200_OK)
+
+class GetShifts(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self,request):
+        '''
+        Will filter by any of the following parameters, all are optional, minimum of 1 must be included. 
+        The more params included the slower the search will be.
+
+        shift_id
+        member_id
+        role_id
+        workspace_id
+        open (T/F)
+        created_by_id
+
+        # TODO: need to do some more thinking on how to support time since search by exact time wont be useful, will want like 'starts_before_time' ect
+        '''
+
+        response = {"error": {}}
+
+        shifts = [] # empty list that will store all query sets, the intersection of which will be taken
+
+        # TODO: add checks for invalid values
+        if 'shift_id' in request.data:
+            shifts.append(Shift.objects.filter(id=request.data['shift_id']))
+        if 'member_id' in request.data:
+            shifts.append(Shift.objects.filter(member=request.data['member_id']))
+        if 'role_id' in request.data:
+            shifts.append(Shift.objects.filter(role=request.data['role_id']))
+        if 'workspace_id' in request.data:
+            shifts.append(Shift.objects.filter(workspace=request.data['workspace_id']))
+        if 'open' in request.data:
+            shifts.append(Shift.objects.filter(open=request.data['open']))
+        if 'created_by_id' in request.data:
+            shifts.append(Shift.objects.filter(created_by=request.data['created_by_id']))
+        
+        if len(shifts) == 0:
+            response["error"]["message"] = "No shifts with these parameters found."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        for i in shifts:
+            #shifts[0].intersection(shifts[0], i)
+            #shifts[0] = shifts[0] & i
+            shifts[0] = shifts[0].intersection(shifts[0], i)
+
+        response["shifts"] = list(shifts[0].values_list("id")) # TODO: add other values
+        return Response(response, status=status.HTTP_200_OK)
