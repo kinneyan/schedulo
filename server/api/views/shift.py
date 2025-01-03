@@ -288,6 +288,9 @@ class GetShifts(APIView):
         elif 'range_end' in request.data and 'range_end' in request.data:
             filters['start_time__date__range'] = (date.min(), datetime.strptime(request.data['range_end'], '%Y-%m-%d').date())
 
+        # add users workspaces to filters
+        filters['workspace__in'] = Workspace.objects.filter(pk__in = WorkspaceMember.objects.filter(user = request.user))
+
         # search by filters
         results = Shift.objects.filter(**filters)
 
