@@ -302,6 +302,8 @@ class GetShifts(APIView):
                 'workspace_id': shift.workspace.id,
                 'open': shift.open,
                 'created_by_id': shift.created_by.id,
+                'start_time': shift.start_time,
+                'end_time': shift.end_time,
             }
             for shift in results
         ]
