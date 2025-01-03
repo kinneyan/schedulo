@@ -1,6 +1,7 @@
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
+import NavDropdown from 'react-bootstrap/NavDropdown';
 import Cookies from 'universal-cookie';
 
 import './index.scss';
@@ -13,9 +14,14 @@ const log_out = () => {
 const AuthButton = ({ logged_in }) => {
     if (!logged_in)
     {
-        return <Nav.Link href="/login">Log in</Nav.Link>;
+        return <NavDropdown.Item href="/login">Log in</NavDropdown.Item>;
     }
-    return <Nav.Link href="/" onClick={log_out()} >Log out</Nav.Link>;
+    return (
+        <div>
+            <NavDropdown.Item href="#">Settings</NavDropdown.Item>
+            <NavDropdown.Item href="/" onClick={log_out()}>Log out</NavDropdown.Item>
+        </div>
+    );
 };
 
 const NavigationBar = ({ logged_in }) => {
@@ -32,7 +38,9 @@ const NavigationBar = ({ logged_in }) => {
                 <Nav id="page-links">
                     <Nav.Link href="/">Home</Nav.Link>
                     <Nav.Link href="#">About</Nav.Link>
-                    <AuthButton logged_in={logged_in} />
+                    <NavDropdown title="Account">
+                        <AuthButton logged_in={logged_in} />    
+                    </NavDropdown>
                 </Nav>
             </Container>
         </Navbar>
