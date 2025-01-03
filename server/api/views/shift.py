@@ -266,30 +266,35 @@ class GetShifts(APIView):
 
         response = {"error": {}}
 
-        shifts = [] # empty list that will store all query sets, the intersection of which will be taken
-
-        # TODO: add checks for invalid values
+        filters = {}
         if 'shift_id' in request.data:
-            shifts.append(Shift.objects.filter(id=request.data['shift_id']))
+            filters['id'] = request.data['shift_id']
         if 'member_id' in request.data:
-            shifts.append(Shift.objects.filter(member=request.data['member_id']))
+            filters['member'] = request.data['member_id']
         if 'role_id' in request.data:
-            shifts.append(Shift.objects.filter(role=request.data['role_id']))
+            filters['role'] = request.data['role_id']
         if 'workspace_id' in request.data:
-            shifts.append(Shift.objects.filter(workspace=request.data['workspace_id']))
+            filters['workspace'] = request.data['workspace_id']
         if 'open' in request.data:
-            shifts.append(Shift.objects.filter(open=request.data['open']))
+            filters['open'] = request.data['open']
         if 'created_by_id' in request.data:
-            shifts.append(Shift.objects.filter(created_by=request.data['created_by_id']))
-        
-        if len(shifts) == 0:
-            response["error"]["message"] = "No shifts with these parameters found."
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
+            filters['created_by'] = request.data['created_by_id']
 
-        for i in shifts:
-            #shifts[0].intersection(shifts[0], i)
-            #shifts[0] = shifts[0] & i
-            shifts[0] = shifts[0].intersection(shifts[0], i)
+        # search by filters
+        results = Shift.objects.filter(**filters)
 
-        response["shifts"] = list(shifts[0].values_list("id")) # TODO: add other values
+        shift_list = [
+            {
+                'id': shift.id,
+                'member_id': getattr(shift.member_id, 'id', None),
+                'role_id': shift.role.id,
+                'workspace_id': shift.workspace.id,
+                'open': shift.open,
+                'created_by_id': shift.created_by.id,
+            }
+            for shift in results
+        ]
+
+        response['shifts'] = shift_list
+
         return Response(response, status=status.HTTP_200_OK)
