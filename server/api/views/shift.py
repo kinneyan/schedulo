@@ -204,10 +204,43 @@ class ModifyShift(APIView):
 
         return Response(response, status=status.HTTP_200_OK)
             
+class DeleteShift(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self,request):
+        '''
+        shift_id
+        '''
+
+        response = {"error": {}}
+
+        # Ensure that shift ID present
+        if "shift_id" not in request.data:
+            response["error"]["message"] = "Shift ID is required."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
         
-            
+        # ensure shift id is valid
+        try:
+            shift = Shift.objects.get(pk=request.data["shift_id"])
+        except Shift.DoesNotExist:
+            response["error"]["message"] = "Shift could not be found."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
         
+        # get workspace from shift
+        workspace = Workspace.objects.get(pk=shift.workspace.id)
+
+        # Verify user is part of workspace and has perms to manage schedules
+        try:
+            creator_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
+            creator_permissions = MemberPermissions.objects.get(member=creator_member, MANAGE_SCHEDULES=True)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "You are not a member of this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        except MemberPermissions.DoesNotExist:
+            response["error"]["message"] = "You do not have permissions to manage schedules in this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
         
-        
-        
-        
+        # delete shift
+        shift = Shift.objects.get(id=request.data['shift_id']).delete()
+        return Response(response, status=status.HTTP_200_OK)
