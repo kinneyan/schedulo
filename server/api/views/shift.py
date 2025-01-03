@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from datetime import datetime
+from datetime import date
 
 from ..serializers import ShiftSerializer, ModifyShiftSerializer
 from ..models import Workspace, WorkspaceMember, User, MemberPermissions, WorkspaceRole, MemberRole, Shift
@@ -260,8 +261,8 @@ class GetShifts(APIView):
         workspace_id
         open (T/F)
         created_by_id
-
-        # TODO: need to do some more thinking on how to support time since search by exact time wont be useful, will want like 'starts_before_time' ect
+        range_start; Y-m-d (ex. 2025-01-05)
+        range_end; Y-m-d (ex. 2025-01-05)
         '''
 
         response = {"error": {}}
@@ -279,6 +280,13 @@ class GetShifts(APIView):
             filters['open'] = request.data['open']
         if 'created_by_id' in request.data:
             filters['created_by'] = request.data['created_by_id']
+
+        if 'range_start' in request.data and 'range_end' in request.data:
+            filters['start_time__date__range'] = (datetime.strptime(request.data['range_start'], '%Y-%m-%d').date(), datetime.strptime(request.data['range_end'], '%Y-%m-%d').date())
+        elif 'range_start' in request.data:
+            filters['start_time__date__range'] = (datetime.strptime(request.data['range_start'], '%Y-%m-%d').date(), date.max())
+        elif 'range_end' in request.data and 'range_end' in request.data:
+            filters['start_time__date__range'] = (date.min(), datetime.strptime(request.data['range_end'], '%Y-%m-%d').date())
 
         # search by filters
         results = Shift.objects.filter(**filters)
