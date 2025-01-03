@@ -555,6 +555,8 @@ class GetShiftsTest(APITestCase):
         self.time2 = self.time1 + timedelta(hours=2)
         self.time3 = self.time1 + timedelta(hours=4)
         self.time4 = self.time1 - timedelta(hours=2)
+        self.time5 = self.time1 + timedelta(days=5)
+        self.time6 = self.time1 + timedelta(days=5) + timedelta(hours=2)
 
         self.shift1 = Shift.objects.create(
             workspace=self.workspace,
@@ -590,14 +592,9 @@ class GetShiftsTest(APITestCase):
             created_by=self.member,
             open=False,
             member=self.member3,
-        ) 
+        )
 
         self.client.force_authenticate(user=self.member.user)
-
-    def test_no_parameters(self):
-        data = {}
-        response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_member(self):
         data = {'member_id': self.member3.id}
@@ -607,8 +604,8 @@ class GetShiftsTest(APITestCase):
         # check that response has correct shifts
         self.assertEqual(len(response.data['shifts']), 2)
         shifts = response.data['shifts']
-        self.assertEqual(shifts[0][0], self.shift3.id)
-        self.assertEqual(shifts[1][0], self.shift4.id)
+        self.assertEqual(shifts[0]['id'], self.shift3.id)
+        self.assertEqual(shifts[1]['id'], self.shift4.id)
 
     def test_member_and_role(self):
         data = {'member_id': self.member3.id, 'role_id': self.role2.id}
@@ -618,4 +615,57 @@ class GetShiftsTest(APITestCase):
         # check that response has correct shifts
         self.assertEqual(len(response.data['shifts']), 1)
         shifts = response.data['shifts']
-        self.assertEqual(shifts[0][0], self.shift4.id)
+        self.assertEqual(shifts[0]['id'], self.shift4.id)
+
+    def test_date_range(self):
+        # add new shift
+        self.shift5 = Shift.objects.create(
+            workspace=self.workspace,
+            start_time=self.time5,
+            end_time=self.time6,
+            role=self.role2,
+            created_by=self.member,
+            open=False,
+            member=self.member3,
+        )
+
+        data = {'range_start': self.time5.date(), 'range_end': self.time5.date()}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # check that response has correct shifts
+        self.assertEqual(len(response.data['shifts']), 1)
+        shifts = response.data['shifts']
+        self.assertEqual(shifts[0]['id'], self.shift5.id)
+    
+    def test_within_user_workspaces(self):
+        self.workspace2 = Workspace.objects.create(owner=self.user4, created_by=self.user4)
+
+        self.member4 = WorkspaceMember.objects.create(user=self.user4, workspace=self.workspace2, added_by=self.user4)
+        self.permissions4 = MemberPermissions.objects.create(
+            workspace=self.workspace2,
+            member=self.member4,
+            IS_OWNER=True,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True
+        )
+
+        self.role3 = WorkspaceRole.objects.create(workspace=self.workspace2, name="test name3")
+
+        self.shift5 = Shift.objects.create(
+            workspace=self.workspace2,
+            start_time=self.time1,
+            end_time=self.time2,
+            role=self.role3,
+            created_by=self.member4,
+            open=True,
+        )
+
+        data = {'member_id': self.member4.id}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # check that response has correct shifts
+        self.assertEqual(len(response.data['shifts']), 0)
