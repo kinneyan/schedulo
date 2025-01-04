@@ -4,12 +4,12 @@ import './index.scss';
 import NavbarContainer from '../../containers/navbar';
 import with_auth from '../../components/auth';
 
-const ProfilePage = () => {
+const DashboardPage = () => {
     return (
-        <div>
+        <div id="dash-page">
             <NavbarContainer />
         </div>
     );
 };
 
-export default with_auth(ProfilePage);
+export default with_auth(DashboardPage);

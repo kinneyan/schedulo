@@ -18,6 +18,7 @@ const AuthButton = ({ logged_in }) => {
     }
     return (
         <div>
+            <NavDropdown.Item href='/dashboard'>Dashboard</NavDropdown.Item>
             <NavDropdown.Item href="/profile">Settings</NavDropdown.Item>
             <NavDropdown.Item href="/" onClick={log_out}>Log out</NavDropdown.Item>
         </div>
