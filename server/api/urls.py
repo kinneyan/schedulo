@@ -1,7 +1,8 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import Login, Register, GetUser, CreateWorkspace, ModifyWorkspace, GetPermissions, UpdatePermissions, AddWorkspaceMember, CreateRole, \
-GetWorkspaceRoles, AddMemberRole, RemoveMemberRole, DeleteWorkspaceRole, GetMemberRoles, ModifyWorkspaceRole, CreateShift, ModifyShift, DeleteShift
+GetWorkspaceRoles, AddMemberRole, RemoveMemberRole, DeleteWorkspaceRole, GetMemberRoles, ModifyWorkspaceRole, CreateShift, ModifyShift, DeleteShift, GetShifts \
+
 
 urlpatterns = [
     path('login', Login.as_view(), name='login'),
@@ -23,4 +24,5 @@ urlpatterns = [
     path('workspace/create-shift', CreateShift.as_view(), name='create_shift'),
     path('workspace/modify-shift', ModifyShift.as_view(), name='modify_shift'),
     path('workspace/delete-shift', DeleteShift.as_view(), name='delete_shift'),
+    path('workspace/get-shifts', GetShifts.as_view(), name='get_shifts'),
 ]
