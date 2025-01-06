@@ -1,0 +1,87 @@
+$background-color: rgba(240,236,226,255);
+$text-color: #494847;
+$label-size: 20px;
+$form-width: 85%;
+$form-height: 50%;
+$line-margin: 30px;
+
+#create-workspace-container {
+    width: 25%;
+    height: 20%;
+    margin: auto;
+    padding: 20px;
+    background-color: $background-color;
+    border-radius: 18.9px;
+    color: $text-color;
+    font-family: 'Roboto Condensed', sans-serif;
+
+    label,
+    input,
+    #button-item {
+        display: block;
+        width: $form-width;
+        color: #FFFFFF;
+    }
+
+    input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 11.34px;
+        background-color: #FFFFFF;
+        height: 40px;
+        color: $text-color
+    }
+
+    label {
+        font-size: $label-size;
+        color: $text-color
+    }
+
+    #create-workspace-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    p {
+        font-size: $label-size - 5px;    
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    h {
+        font-size:32px;
+        font-weight: bold;
+
+    }
+    
+    #button-item {
+        border-radius: 11.34px;
+        height: $form-height;
+        padding: 10px;
+        margin: auto;
+        margin-top: 20px;
+    }
+
+    #error-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 3vh;
+        margin-top: 10px;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        width: 100%;
+    }
+
+    #error-text {
+        text-align: center;
+        margin: 0;
+        padding: 0;
+    }
+}
+

@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/home';
 import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
+import CreateWorkspacePage from './pages/createworkspace';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="dashboard" element={<HomePage />} />
+          <Route path="create-workspace" element={<CreateWorkspacePage />} />
         </Routes>
       </BrowserRouter>
     </>
