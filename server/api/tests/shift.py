@@ -617,6 +617,11 @@ class GetShiftsTest(APITestCase):
         shifts = response.data['shifts']
         self.assertEqual(shifts[0]['id'], self.shift4.id)
 
+    def test_date_range_invalid(self):
+        data = {'range_start': 999, 'range_end': "999"}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_date_range(self):
         # add new shift
         self.shift5 = Shift.objects.create(
@@ -637,6 +642,53 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(len(response.data['shifts']), 1)
         shifts = response.data['shifts']
         self.assertEqual(shifts[0]['id'], self.shift5.id)
+
+    def test_date_range_only_start(self):
+        # add new shift
+        self.shift5 = Shift.objects.create(
+            workspace=self.workspace,
+            start_time=self.time5,
+            end_time=self.time6,
+            role=self.role2,
+            created_by=self.member,
+            open=False,
+            member=self.member3,
+        )
+
+        data = {'range_start': (self.time1 + timedelta(days=1)).date()}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # check that response has correct shifts
+        self.assertEqual(len(response.data['shifts']), 1)
+        shifts = response.data['shifts']
+        self.assertEqual(shifts[0]['id'], self.shift5.id)
+
+    def test_date_range_only_end(self):
+        # add new shift
+        self.shift5 = Shift.objects.create(
+            workspace=self.workspace,
+            start_time=self.time5,
+            end_time=self.time6,
+            role=self.role2,
+            created_by=self.member,
+            open=False,
+            member=self.member3,
+        )
+
+        data = {'range_end': (self.time5 + timedelta(days=1)).date()}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # check that response has correct shifts
+        self.assertEqual(len(response.data['shifts']), 5)       
+        shifts = response.data['shifts']
+        ids = [row['id'] for row in shifts]
+        self.assertTrue(self.shift1.id in ids)
+        self.assertTrue(self.shift2.id in ids)
+        self.assertTrue(self.shift3.id in ids)
+        self.assertTrue(self.shift4.id in ids)
+        self.assertTrue(self.shift5.id in ids)
     
     def test_within_user_workspaces(self):
         self.workspace2 = Workspace.objects.create(owner=self.user4, created_by=self.user4)
