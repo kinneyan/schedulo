@@ -281,15 +281,19 @@ class GetShifts(APIView):
         if 'created_by_id' in request.data:
             filters['created_by'] = request.data['created_by_id']
 
-        if 'range_start' in request.data and 'range_end' in request.data:
-            filters['start_time__date__range'] = (datetime.strptime(request.data['range_start'], '%Y-%m-%d').date(), datetime.strptime(request.data['range_end'], '%Y-%m-%d').date())
-        elif 'range_start' in request.data:
-            filters['start_time__date__range'] = (datetime.strptime(request.data['range_start'], '%Y-%m-%d').date(), date.max())
-        elif 'range_end' in request.data and 'range_end' in request.data:
-            filters['start_time__date__range'] = (date.min(), datetime.strptime(request.data['range_end'], '%Y-%m-%d').date())
+        try:
+            if 'range_start' in request.data and 'range_end' in request.data:
+                filters['start_time__date__range'] = (datetime.strptime(request.data['range_start'], '%Y-%m-%d').date(), datetime.strptime(request.data['range_end'], '%Y-%m-%d').date())
+            elif 'range_start' in request.data:
+                filters['start_time__date__range'] = (datetime.strptime(request.data['range_start'], '%Y-%m-%d').date(), date.max)
+            elif 'range_end' in request.data and 'range_end' in request.data:
+                filters['start_time__date__range'] = (date.min, datetime.strptime(request.data['range_end'], '%Y-%m-%d').date())
+        except:
+            response["error"]["message"] = "Date range value is invalid."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # add users workspaces to filters
-        filters['workspace__in'] = Workspace.objects.filter(pk__in = WorkspaceMember.objects.filter(user = request.user))
+        filters['workspace__in'] = Workspace.objects.filter(pk__in=WorkspaceMember.objects.filter(user=request.user))
 
         # search by filters
         results = Shift.objects.filter(**filters)
