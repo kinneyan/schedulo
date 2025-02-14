@@ -178,7 +178,7 @@ class ModifyWorkspaceRole(APIView):
 
         return Response(response, status=status.HTTP_200_OK)
     
-class GetWorkspaceRoles(APIView): # returns a list of all roles in a workspace, reponse[i][0] contains the pk of the role at that index, and response[i][1] contains the name
+class GetWorkspaceRoles(APIView): # returns a list of all roles in a workspace
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -201,9 +201,18 @@ class GetWorkspaceRoles(APIView): # returns a list of all roles in a workspace, 
             response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
   
-        roles = WorkspaceRole.objects.filter(workspace=workspace).values_list("id", "name")
+        results = WorkspaceRole.objects.filter(workspace=workspace)
 
-        response['roles'] = list(roles)
+        role_list = [
+            {
+                'id': role.id,
+                'name': role.name,
+                'pay_rate': role.pay_rate,
+            }
+            for role in results
+        ]
+
+        response['roles'] = role_list
 
         return Response(response, status=status.HTTP_200_OK)
 
@@ -231,9 +240,18 @@ class GetMemberRoles(APIView): # returns of list of the WorkspaceRoles a member 
         
         # get list of roles
         member_roles = MemberRole.objects.filter(member=member)
-        roles = WorkspaceRole.objects.filter(pk__in=member_roles).values_list("id", "name") # gets all roles who have a key in the list
+        results = WorkspaceRole.objects.filter(pk__in=member_roles)
 
-        response['roles'] = list(roles)
+        role_list = [
+            {
+                'id': role.id,
+                'name': role.name,
+                'pay_rate': role.pay_rate,
+            }
+            for role in results
+        ]
+
+        response['roles'] = role_list
 
         return Response(response, status=status.HTTP_200_OK)
     
