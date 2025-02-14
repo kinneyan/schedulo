@@ -188,4 +188,33 @@ class AddWorkspaceMember(APIView):
             response["error"] = "User is already member of this workspace"
             return Response(response, status=status.HTTP_409_CONFLICT)
         
+class GetWorkspace(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        response = {"error": {}}
+
+        # Verify user exists
+        try:
+            user = User.objects.get(pk=request.user.id)
+        except User.DoesNotExist:
+            response["error"]["message"] = "User does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
         
+        members = WorkspaceMember.objects.filter(user=user).values_list("workspace")
+        results = Workspace.objects.filter(pk__in=members)
+
+        workspace_list = [
+            {
+                'id': workspace.id,
+                'created_by': workspace.created_by.id,
+                'owner': workspace.owner.id,
+                'name': workspace.name,
+            }
+            for workspace in results
+        ]
+
+        response['workspaces'] = workspace_list
+
+        return Response(response, status=status.HTTP_200_OK)
