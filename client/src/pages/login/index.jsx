@@ -4,7 +4,8 @@ import './index.scss';
 import NavbarContainer from '../../containers/navbar';
 import LoginContainer from '../../containers/login';
 
-const LoginPage = () => {
+const LoginPage = () => 
+{
     return (
         <div id="login-page">
             <NavbarContainer />

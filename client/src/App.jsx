@@ -5,7 +5,8 @@ import LoginPage from './pages/login';
 import ProfilePage from './pages/profile';
 import DashboardPage from './pages/dashboard';
 
-function App() {
+function App() 
+{
   return (
     <>
       <BrowserRouter>

@@ -3,7 +3,8 @@ import './index.scss';
 
 import NavbarContainer from '../../containers/navbar';
 
-const HomePage = () => {
+const HomePage = () => 
+{
     return (
         <div id="home-page">
             <NavbarContainer />

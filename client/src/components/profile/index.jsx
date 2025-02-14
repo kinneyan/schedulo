@@ -1,7 +1,8 @@
 import React from 'react';
 import Form from 'react-bootstrap/Form';
 
-const ViewProfile = () => {
+const ViewProfile = () => 
+{
     return (
         <div>
             <div>
@@ -51,7 +52,8 @@ const ViewProfile = () => {
     );
 };
 
-const PageSwitcher = () => {
+const PageSwitcher = () => 
+{
 
 };
 

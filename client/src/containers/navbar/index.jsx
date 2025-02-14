@@ -3,10 +3,12 @@ import Cookies from 'universal-cookie';
 
 import NavigationBar from '../../components/navbar';
 
-const NavbarContainer = () => {
+const NavbarContainer = () => 
+{
     const [logged_in, setLogged_in] = useState(false);
 
-    useEffect(() => {
+    useEffect(() => 
+    {
         const cookies = new Cookies();
         const token = cookies.get('token');
         if (token == undefined)

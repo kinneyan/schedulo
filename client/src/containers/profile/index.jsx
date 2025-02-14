@@ -2,7 +2,8 @@ import React from 'react';
 
 import ViewProfile from '../../components/profile';
 
-const Profile = () => {
+const Profile = () => 
+{
     return (
         <div>
             <ViewProfile />

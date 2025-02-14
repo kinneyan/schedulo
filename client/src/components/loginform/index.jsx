@@ -3,7 +3,8 @@ import Container from 'react-bootstrap/Container';
 import SubmitButton from '../submitbutton';
 import "./index.scss";
 
-const LoginForm = ({ email, setEmail, password, setPassword, error, handleSubmit }) => {
+const LoginForm = ({ email, setEmail, password, setPassword, error, handleSubmit }) => 
+{
     return (
         <Container id="login-container">
             <form id="login-form" onSubmit={handleSubmit}>

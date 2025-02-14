@@ -6,26 +6,28 @@ import Cookies from 'universal-cookie';
 
 import './index.scss';
 
-const log_out = () => {
-    const cookies = new Cookies();
-    cookies.remove('token');
-};
-
-const AuthButton = ({ logged_in }) => {
-    if (!logged_in)
-    {
-        return <NavDropdown.Item href="/login">Log in</NavDropdown.Item>;
-    }
-    return (
-        <div>
-            <NavDropdown.Item href='/dashboard'>Dashboard</NavDropdown.Item>
-            <NavDropdown.Item href="/profile">Settings</NavDropdown.Item>
-            <NavDropdown.Item href="/" onClick={log_out}>Log out</NavDropdown.Item>
-        </div>
-    );
-};
-
-const NavigationBar = ({ logged_in }) => {
+const NavigationBar = ({ logged_in }) => 
+{
+    const AuthButton = ({ logged_in }) => {
+        const log_out = () => 
+        {
+            const cookies = new Cookies();
+            cookies.remove('token');
+        };
+    
+        if (!logged_in)
+        {
+            return <NavDropdown.Item href="/login">Log in</NavDropdown.Item>;
+        }
+    
+        return (
+            <div>
+                <NavDropdown.Item href='/dashboard'>Dashboard</NavDropdown.Item>
+                <NavDropdown.Item href="/profile">Settings</NavDropdown.Item>
+                <NavDropdown.Item href="/" onClick={log_out}>Log out</NavDropdown.Item>
+            </div>
+        );
+    };
     return (
         <Navbar fixed="top">
             <Container fluid className="p-0">

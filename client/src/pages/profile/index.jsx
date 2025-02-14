@@ -5,7 +5,8 @@ import with_auth from '../../components/auth';
 import NavbarContainer from '../../containers/navbar';
 import Profile from '../../containers/profile';
 
-const ProfilePage = () => {
+const ProfilePage = () => 
+{
     return (
         <div>
             <NavbarContainer />
