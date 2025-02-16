@@ -28,10 +28,13 @@ const CreateWorkspaceContainer = () =>{
             const data = await response.json();  
 
             // catch error
-            if (response.status != 201) {     
+            if (response.status == 400) {     
                 console.log(data['error']['message']); 
                 throw new Error(data['error']['message']);
-            };             
+            } else if (response.status != 201) {
+                console.log(response.status); 
+                throw new Error(response.status);
+            };      
 
             // redirect
             setCreated(true);
