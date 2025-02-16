@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from datetime import datetime
+from datetime import date
 
 from ..serializers import ShiftSerializer, ModifyShiftSerializer
 from ..models import Workspace, WorkspaceMember, User, MemberPermissions, WorkspaceRole, MemberRole, Shift
@@ -243,4 +244,74 @@ class DeleteShift(APIView):
         
         # delete shift
         shift = Shift.objects.get(id=request.data['shift_id']).delete()
+        return Response(response, status=status.HTTP_200_OK)
+
+class GetShifts(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self,request):
+        '''
+        Will filter by any of the following parameters, all are optional, minimum of 1 must be included. 
+        The more params included the slower the search will be.
+
+        shift_id
+        member_id
+        role_id
+        workspace_id
+        open (T/F)
+        created_by_id
+        range_start; Y-m-d (ex. 2025-01-05)
+        range_end; Y-m-d (ex. 2025-01-05)
+        '''
+
+        response = {"error": {}}
+
+        filters = {}
+        if 'shift_id' in request.data:
+            filters['id'] = request.data['shift_id']
+        if 'member_id' in request.data:
+            filters['member'] = request.data['member_id']
+        if 'role_id' in request.data:
+            filters['role'] = request.data['role_id']
+        if 'workspace_id' in request.data:
+            filters['workspace'] = request.data['workspace_id']
+        if 'open' in request.data:
+            filters['open'] = request.data['open']
+        if 'created_by_id' in request.data:
+            filters['created_by'] = request.data['created_by_id']
+
+        try:
+            if 'range_start' in request.data and 'range_end' in request.data:
+                filters['start_time__date__range'] = (datetime.strptime(request.data['range_start'], '%Y-%m-%d').date(), datetime.strptime(request.data['range_end'], '%Y-%m-%d').date())
+            elif 'range_start' in request.data:
+                filters['start_time__date__range'] = (datetime.strptime(request.data['range_start'], '%Y-%m-%d').date(), date.max)
+            elif 'range_end' in request.data and 'range_end' in request.data:
+                filters['start_time__date__range'] = (date.min, datetime.strptime(request.data['range_end'], '%Y-%m-%d').date())
+        except:
+            response["error"]["message"] = "Date range value is invalid."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        # add users workspaces to filters
+        filters['workspace__in'] = Workspace.objects.filter(pk__in=WorkspaceMember.objects.filter(user=request.user))
+
+        # search by filters
+        results = Shift.objects.filter(**filters)
+
+        shift_list = [
+            {
+                'id': shift.id,
+                'member_id': getattr(shift.member_id, 'id', None),
+                'role_id': shift.role.id,
+                'workspace_id': shift.workspace.id,
+                'open': shift.open,
+                'created_by_id': shift.created_by.id,
+                'start_time': shift.start_time,
+                'end_time': shift.end_time,
+            }
+            for shift in results
+        ]
+
+        response['shifts'] = shift_list
+
         return Response(response, status=status.HTTP_200_OK)
