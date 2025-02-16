@@ -12,12 +12,16 @@ const CreateWorkspaceContainer = () =>{
         e.preventDefault(); // stop default form submission
 
         try {
-            var bearer = 'Bearer ' + ;
+            // get token from cookies
+            const cookies = new Cookies();
+            const token = cookies.get('token');
+
+            // request
             const response = await fetch(import.meta.env.VITE_API_URL + '/api/workspace/create/', {
                 method: 'POST',
                 withCredentials: true,
                 credentials: 'include',
-                headers: { 'Content-Type': 'application/json', 'Authorization': bearer},
+                headers: { 'Content-Type': 'application/json', 'Authorization': token.access},
                 body: JSON.stringify({ name }),
             });      
             
