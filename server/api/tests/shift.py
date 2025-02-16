@@ -551,7 +551,7 @@ class GetShiftsTest(APITestCase):
         self.role2 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name2")
         self.role3 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name3")
 
-        self.time1 = datetime.now(timezone.utc)
+        self.time1 = datetime(2025, 2, 16, tzinfo=timezone.utc)
         self.time2 = self.time1 + timedelta(hours=2)
         self.time3 = self.time1 + timedelta(hours=4)
         self.time4 = self.time1 - timedelta(hours=2)
@@ -658,7 +658,7 @@ class GetShiftsTest(APITestCase):
         data = {'range_start': (self.time1 + timedelta(days=1)).date()}
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
+        
         # check that response has correct shifts
         self.assertEqual(len(response.data['shifts']), 1)
         shifts = response.data['shifts']
