@@ -7,7 +7,7 @@ const CreateWorkspaceForm = ({ name, setName, error, handleSubmit }) => {
     return (
         <Container id="create-workspace-container">
             <form id="create-workspace-form" onSubmit={handleSubmit}>
-                <h>Create a new workspace</h>
+                <h1>Create a new workspace</h1>
                 <label id="name-label">Workspace Name</label>
                 <input
                     type="text"
