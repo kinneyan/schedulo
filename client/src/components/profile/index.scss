@@ -31,13 +31,20 @@ $text-color: #FFFFFF;
             {
                 font-size: 20px;
                 font-weight: bold;
+                margin-bottom: 0;
             }
     
             Form 
             {
                 width: $form-width;
                 margin: 3vh;
-    
+                margin-top: 0;
+
+                h4 
+                {
+                    margin: 0;
+                    margin-top: 2.5vh;
+                }
             }
     
             .fgroup
