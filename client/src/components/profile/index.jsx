@@ -31,8 +31,7 @@ const ViewProfile = () =>
                             <Form.Label>Last name</Form.Label>
                             <Form.Control type="text" placeholder="Doe"/>
                         </Form.Group>
-                    </Form>
-                    <Form>
+
                         <Form.Label><h4>Contact Information</h4></Form.Label>
                         <Form.Group className="fgroup">
                             <Form.Label>Email</Form.Label>
@@ -42,8 +41,7 @@ const ViewProfile = () =>
                             <Form.Label>Phone</Form.Label>
                             <Form.Control type="phone" placeholder="999-999-9999" />
                         </Form.Group>
-                    </Form>
-                    <Form>
+
                         <Form.Label><h4>Update Password</h4></Form.Label>
                         <Form.Group className="fgroup">
                             <Form.Label>Current Password</Form.Label>
@@ -69,7 +67,7 @@ const ViewProfile = () =>
         if (page === Pages.ACCOUNT)
         {
             return (
-                <div class="settings-form-container">
+                <div className="settings-form-container">
                     <h3>Account Settings</h3>
                     <AccountSettings />
                 </div>
@@ -78,7 +76,7 @@ const ViewProfile = () =>
         else if (page === Pages.WORKSPACES)
         {
             return (
-                <div class="settings-form-container">
+                <div className="settings-form-container">
                     <h3>Workspace Settings</h3>
                     <WorkspaceSettings />
                 </div>
@@ -89,10 +87,20 @@ const ViewProfile = () =>
     return (
         <div id="settings-component">
             <div id="nav-container">
-                <ul id="settings-nav">
-                    <li onClick={() => setPage(Pages.ACCOUNT)}><h1>Account</h1></li>
-                    <li onClick={() => setPage(Pages.WORKSPACES)}><h1>Workspaces</h1></li>
-                </ul>
+            <ul id="settings-nav">
+                <li 
+                    onClick={() => setPage(Pages.ACCOUNT)} 
+                    className={page === Pages.ACCOUNT ? "active" : ""}
+                >
+                    <h1>Account</h1>
+                </li>
+                <li 
+                    onClick={() => setPage(Pages.WORKSPACES)} 
+                    className={page === Pages.WORKSPACES ? "active" : ""}
+                >
+                    <h1>Workspaces</h1>
+                </li>
+            </ul>
             </div>
             <div id="settings-container">
                 <div id="settings-content">

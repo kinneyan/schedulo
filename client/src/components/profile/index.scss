@@ -2,87 +2,114 @@ $form-width: 20vw;
 $background-color: rgba(44, 44, 44, 0.85);
 $text-color: #FFFFFF;
 
-#nav-container 
-{
-    #settings-nav
-    {
-        list-style-type: none;
-        padding: 0;
-        width: 100%;
-        display: flex; // Use flexbox to align items inline
-        flex-direction: row; // Align items in a row
-        justify-content: space-between; // Space items evenly
-        
-        li 
-        {
-            margin-right: 10px;
-        }
-
-        h1 
-        {
-            font-size: 25px;
-        }
-    }
-}
-
-#settings-container
-{
-    
-    width: 30vw;
-
-    background-color: $background-color;
-    padding: 20px;
-    margin: 1vh;
-    padding-bottom: 0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 18.9px;
-    color: $text-color;
-
-    .settings-form-container
-    {  
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        h3 
-        {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        Form 
-        {
-            width: $form-width;
-            margin: 3vh;
-
-        }
-
-        .fgroup
-        {
-            margin: 0.5vh;
-        }
-    }
-
-    #settings-content
-    {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    h4
-    {
-        font-size: 18px;
-    }
-
-    #button-item 
-    {
-        margin-bottom: 10vh;
-        width: $form-width;
-    }
-}
 
 #settings-component
 {
     margin: 2vh;
+
+    #settings-container
+    {
+        width: 30vw;
+    
+        background-color: $background-color;
+        padding: 20px;
+        margin: 1vh;
+        padding-bottom: 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 18.9px;
+        color: $text-color;
+    
+        .settings-form-container
+        {  
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            h3 
+            {
+                font-size: 20px;
+                font-weight: bold;
+            }
+    
+            Form 
+            {
+                width: $form-width;
+                margin: 3vh;
+    
+            }
+    
+            .fgroup
+            {
+                margin: 0.5vh;
+            }
+        }
+    
+        #settings-content
+        {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    
+        h4
+        {
+            font-size: 18px;
+        }
+    
+        #button-item 
+        {
+            margin-bottom: 10vh;
+            width: $form-width;
+        }
+    }
+
+    #nav-container 
+    {
+        display: flex;
+        border-bottom: 2px solid #ccc;
+
+        #settings-nav
+        {
+            list-style-type: none;
+            padding: 0;
+            width: 100%;
+            display: flex; // Use flexbox to align items inline
+            flex-direction: row; // Align items in a row
+            justify-content: space-between; // Space items evenly
+
+            li {
+                margin-right: 10px;
+                background: #D6C7AE; /* Muted taupe */
+                border: 2px solid #B6A385; /* Slightly darker border */
+                border-bottom: none;
+                padding: 12px 20px;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+                cursor: pointer;
+                transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+                font-size: 16px;
+                font-weight: 500;
+                color: #5A4A42; /* Dark brown text */
+                width: 15vw;
+                text-align: center;
+                align-items: center;
+            }
+            
+            li:hover {
+                background: #C4B59E; /* Slightly warmer on hover */
+            }
+            
+            li.active {
+                background: #B6A385; /* Active tab stands out */
+                font-weight: bold;
+                border-bottom: 2px solid #F0ECE2; /* Blends with background */
+                box-shadow: 0px -3px 5px rgba(0, 0, 0, 0.1);
+            }
+    
+            h1 
+            {
+                font-size: 25px;
+            }
+        }
+    }
 }
