@@ -1,6 +1,7 @@
 $form-width: 20vw;
 $background-color: rgba(44, 44, 44, 0.85);
 $text-color: #FFFFFF;
+$field-font-size: 18px;
 
 
 #settings-component
@@ -62,13 +63,14 @@ $text-color: #FFFFFF;
     
         h4
         {
-            font-size: 18px;
+            font-size: $field-font-size;
         }
     
         #button-item 
         {
             width: $form-width;
             margin-bottom: 3vh;
+            font-size: $field-font-size;
         }
     }
 
