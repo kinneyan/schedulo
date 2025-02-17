@@ -31,7 +31,7 @@ const LoginForm = ({ email, setEmail, password, setPassword, error, handleSubmit
                     <p id="error-text">{error}</p>
                 </div>}
                 <hr />
-                <p>Don't have an account? <a href="#">Sign up</a></p>
+                <p>Don't have an account? <a href="register">Sign up</a></p>
             </form>
         </Container>
     );

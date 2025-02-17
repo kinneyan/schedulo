@@ -230,4 +230,192 @@ class ModifyWorkspaceTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(self.workspace.name, "Unnamed Workspace")
 
+class GetWorkspaceTests(APITestCase):
+    def setUp(self):
+        self.url = reverse('get_workspace')
+        self.user = User.objects.create_user(
+            email='testuser@example.com',
+            password='testpassword',
+            first_name='Test',
+            last_name='User',
+            phone='1234567890'
+        )
+        self.user2 = User.objects.create_user(
+            email='testuser2@example.com',
+            password='testpassword',
+            first_name='Test2',
+            last_name='User2',
+            phone='1234567890'
+        )
+        self.user3 = User.objects.create_user(
+            email='testuser3@example.com',
+            password='testpassword',
+            first_name='Test3',
+            last_name='User3',
+            phone='1234567890'
+        )
 
+        self.workspace1 = Workspace.objects.create(owner=self.user, created_by=self.user)
+        self.workspace1_member1 = WorkspaceMember.objects.create(user=self.user, workspace=self.workspace1, added_by=self.user)
+        self.workspace1_permissions1 = MemberPermissions.objects.create(
+            workspace=self.workspace1,
+            member=self.workspace1_member1,
+            IS_OWNER=True,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True
+        )
+        self.workspace1_member2 = WorkspaceMember.objects.create(user=self.user2, workspace=self.workspace1, added_by=self.user)
+        self.workspace1_permissions2 = MemberPermissions.objects.create(
+            workspace=self.workspace1,
+            member=self.workspace1_member2,
+            IS_OWNER=False,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True
+        )
+
+        self.workspace2 = Workspace.objects.create(owner=self.user, created_by=self.user)
+        self.workspace2_member1 = WorkspaceMember.objects.create(user=self.user, workspace=self.workspace2, added_by=self.user)
+        self.workspace2_permissions1 = MemberPermissions.objects.create(
+            workspace=self.workspace2,
+            member=self.workspace2_member1,
+            IS_OWNER=True,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True
+        )
+
+    def test_no_workspaces(self):
+        self.client.force_authenticate(user=self.user3)
+        
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        workspaces = response.data['workspaces']
+
+        self.assertTrue(len(workspaces) == 0)
+
+    def test_one_workspace(self):
+        self.client.force_authenticate(user=self.user2)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        workspaces = response.data['workspaces']
+
+        self.assertEqual(len(workspaces), 1)
+        self.assertEqual(workspaces[0]['id'], self.workspace1.id)
+
+    def test_multiple_workspaces(self):
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        workspaces = response.data['workspaces']
+
+        self.assertEqual(len(workspaces), 2)
+        self.assertEqual(workspaces[0]['id'], self.workspace1.id)
+        self.assertEqual(workspaces[1]['id'], self.workspace2.id)
+
+class DeleteWorkspaceTests(APITestCase):
+    def setUp(self):
+        self.url = reverse('delete_workspace')
+        self.user = User.objects.create_user(
+            email='testuser@example.com',
+            password='testpassword',
+            first_name='Test',
+            last_name='User',
+            phone='1234567890'
+        )
+        self.user2 = User.objects.create_user(
+            email='testuser2@example.com',
+            password='testpassword',
+            first_name='Test2',
+            last_name='User2',
+            phone='1234567890'
+        )
+        self.user3 = User.objects.create_user(
+            email='testuser3@example.com',
+            password='testpassword',
+            first_name='Test3',
+            last_name='User3',
+            phone='1234567890'
+        )
+
+        self.workspace1 = Workspace.objects.create(owner=self.user, created_by=self.user)
+        self.workspace1_member1 = WorkspaceMember.objects.create(user=self.user, workspace=self.workspace1, added_by=self.user)
+        self.workspace1_permissions1 = MemberPermissions.objects.create(
+            workspace=self.workspace1,
+            member=self.workspace1_member1,
+            IS_OWNER=True,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True
+        )
+        self.workspace1_member2 = WorkspaceMember.objects.create(user=self.user2, workspace=self.workspace1, added_by=self.user)
+        self.workspace1_permissions2 = MemberPermissions.objects.create(
+            workspace=self.workspace1,
+            member=self.workspace1_member2,
+            IS_OWNER=False,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True
+        )
+
+        self.workspace2 = Workspace.objects.create(owner=self.user, created_by=self.user)
+        self.workspace2_member1 = WorkspaceMember.objects.create(user=self.user, workspace=self.workspace2, added_by=self.user)
+        self.workspace2_permissions1 = MemberPermissions.objects.create(
+            workspace=self.workspace2,
+            member=self.workspace2_member1,
+            IS_OWNER=True,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_no_workspace_id(self):
+        response = self.client.delete(self.url, {})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_workspace_id(self):
+        response = self.client.delete(self.url, {"workspace_id": 999})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_not_owner(self):
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.delete(self.url, {"workspace_id": self.workspace1.id})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # ensure workspace was not deleted
+        try:
+            workspace = Workspace.objects.get(pk=self.workspace1.id)
+        except Workspace.DoesNotExist:
+            self.assertTrue(False)
+    
+    def test_not_member(self):
+        self.client.force_authenticate(user=self.user3)
+        response = self.client.delete(self.url, {"workspace_id": self.workspace1.id})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # ensure workspace was not deleted
+        try:
+            workspace = Workspace.objects.get(pk=self.workspace1.id)
+        except Workspace.DoesNotExist:
+            self.assertTrue(False)
+
+    def test_valid(self):
+        response = self.client.delete(self.url, {"workspace_id": self.workspace1.id})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # ensure workspace was deleted
+        try:
+            workspace = Workspace.objects.get(pk=self.workspace1.id)
+            self.assertTrue(False)
+        except Workspace.DoesNotExist:
+            self.assertTrue(True)

@@ -4,6 +4,7 @@ import HomePage from './pages/home';
 import LoginPage from './pages/login';
 import ProfilePage from './pages/profile';
 import DashboardPage from './pages/dashboard';
+import RegisterPage from './pages/register';
 
 function App() 
 {
@@ -15,6 +16,7 @@ function App()
           <Route path="login" element={<LoginPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="register" element={<RegisterPage />} />
         </Routes>
       </BrowserRouter>
     </>
