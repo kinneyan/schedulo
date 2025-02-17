@@ -66,10 +66,11 @@ $text-color: #FFFFFF;
     #nav-container 
     {
         display: flex;
-        border-bottom: 2px solid #ccc;
+        border-bottom: 2px solid #ccc;        
 
         #settings-nav
         {
+            margin: 0;
             list-style-type: none;
             padding: 0;
             width: 100%;
@@ -81,8 +82,8 @@ $text-color: #FFFFFF;
                 margin-right: 10px;
                 background: #D6C7AE; /* Muted taupe */
                 border: 2px solid #B6A385; /* Slightly darker border */
-                border-bottom: none;
                 padding: 12px 20px;
+                padding-bottom: 0px;
                 border-top-left-radius: 10px;
                 border-top-right-radius: 10px;
                 cursor: pointer;
@@ -93,6 +94,7 @@ $text-color: #FFFFFF;
                 width: 15vw;
                 text-align: center;
                 align-items: center;
+                border-bottom: 2px solid #F0ECE2; /* Blends with background */
             }
             
             li:hover {
@@ -100,9 +102,9 @@ $text-color: #FFFFFF;
             }
             
             li.active {
+                border-bottom: none;
                 background: #B6A385; /* Active tab stands out */
                 font-weight: bold;
-                border-bottom: 2px solid #F0ECE2; /* Blends with background */
                 box-shadow: 0px -3px 5px rgba(0, 0, 0, 0.1);
             }
     
