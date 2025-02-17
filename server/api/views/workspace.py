@@ -188,4 +188,74 @@ class AddWorkspaceMember(APIView):
             response["error"] = "User is already member of this workspace"
             return Response(response, status=status.HTTP_409_CONFLICT)
         
+class GetWorkspace(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        response = {"error": {}}
+
+        # Verify user exists
+        try:
+            user = User.objects.get(pk=request.user.id)
+        except User.DoesNotExist:
+            response["error"]["message"] = "User does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
         
+        members = WorkspaceMember.objects.filter(user=user).values_list("workspace")
+        results = Workspace.objects.filter(pk__in=members)
+
+        workspace_list = [
+            {
+                'id': workspace.id,
+                'created_by': workspace.created_by.id,
+                'owner': workspace.owner.id,
+                'name': workspace.name,
+            }
+            for workspace in results
+        ]
+
+        response['workspaces'] = workspace_list
+
+        return Response(response, status=status.HTTP_200_OK)
+    
+class DeleteWorkspace(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    '''
+    workspace_id
+    '''
+
+    def delete(self, request):
+        response = {"error": {}}
+
+        # Verify body contains required fields
+        if "workspace_id" not in request.data:
+            response["error"]["message"] = "Workspace ID is required."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verify workspace exists
+        try:
+            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
+        except Workspace.DoesNotExist:
+            response["error"]["message"] = "Workspace does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        
+        # Verify user is owner
+        try:
+            owner_member = WorkspaceMember.objects.get(user=request.user, workspace=request.data["workspace_id"])
+            permissions = MemberPermissions.objects.get(
+                workspace=request.data["workspace_id"],
+                member=owner_member,
+                IS_OWNER=True
+            )
+        except MemberPermissions.DoesNotExist:
+            response["error"]["message"] = "You do not have permission modify this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "You are not a member of this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        
+        workspace = Workspace.objects.get(id=workspace.id).delete()
+        return Response(response, status=status.HTTP_200_OK)
