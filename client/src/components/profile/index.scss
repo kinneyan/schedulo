@@ -6,6 +6,8 @@ $text-color: #FFFFFF;
 #settings-component
 {
     margin: 2vh;
+    display: flex;
+    flex-direction: column;
 
     #settings-container
     {
@@ -76,10 +78,10 @@ $text-color: #FFFFFF;
             width: 100%;
             display: flex; // Use flexbox to align items inline
             flex-direction: row; // Align items in a row
-            justify-content: space-between; // Space items evenly
+            justify-content: center; // Space items evenly
 
-            li {
-                margin-right: 10px;
+            li 
+            {
                 background: #D6C7AE; /* Muted taupe */
                 border: 2px solid #B6A385; /* Slightly darker border */
                 padding: 12px 20px;
@@ -97,11 +99,13 @@ $text-color: #FFFFFF;
                 border-bottom: 2px solid #F0ECE2; /* Blends with background */
             }
             
-            li:hover {
+            li:hover 
+            {
                 background: #C4B59E; /* Slightly warmer on hover */
             }
             
-            li.active {
+            li.active 
+            {
                 border-bottom: none;
                 background: #B6A385; /* Active tab stands out */
                 font-weight: bold;

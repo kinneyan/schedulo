@@ -87,20 +87,20 @@ const ViewProfile = () =>
     return (
         <div id="settings-component">
             <div id="nav-container">
-            <ul id="settings-nav">
-                <li 
-                    onClick={() => setPage(Pages.ACCOUNT)} 
-                    className={page === Pages.ACCOUNT ? "active" : ""}
-                >
-                    <h1>Account</h1>
-                </li>
-                <li 
-                    onClick={() => setPage(Pages.WORKSPACES)} 
-                    className={page === Pages.WORKSPACES ? "active" : ""}
-                >
-                    <h1>Workspaces</h1>
-                </li>
-            </ul>
+                <ul id="settings-nav">
+                    <li 
+                        onClick={() => setPage(Pages.ACCOUNT)} 
+                        className={page === Pages.ACCOUNT ? "active" : ""}
+                    >
+                        <h1>Account</h1>
+                    </li>
+                    <li 
+                        onClick={() => setPage(Pages.WORKSPACES)} 
+                        className={page === Pages.WORKSPACES ? "active" : ""}
+                    >
+                        <h1>Workspaces</h1>
+                    </li>
+                </ul>
             </div>
             <div id="settings-container">
                 <div id="settings-content">
