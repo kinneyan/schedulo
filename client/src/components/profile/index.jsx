@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 
+import './index.scss';
+import '../submitbutton'
+import SubmitButton from '../submitbutton';
+
 const ViewProfile = () => 
 {
     const Pages = 
@@ -13,66 +17,89 @@ const ViewProfile = () =>
 
     const Settings = () =>
     {
-        if (page === Pages.ACCOUNT)
+        const AccountSettings = () => 
         {
             return (
-                <div id="account-settings-container">
-                    <h1>Account Settings</h1>
+                <div>
                     <Form>
-                        <Form.Label>Name</Form.Label>
-                        <Form.Group>
+                        <Form.Label><h4>Name</h4></Form.Label>
+                        <Form.Group className="fgroup">
                             <Form.Label>First name</Form.Label>
-                            <Form.Control type="text" placeholder="First name"/>
+                            <Form.Control type="text" placeholder="John"/>
                         </Form.Group>
-                        <Form.Group>
+                        <Form.Group className="fgroup">
                             <Form.Label>Last name</Form.Label>
-                            <Form.Control type="text" placeholder="Last name"/>
+                            <Form.Control type="text" placeholder="Doe"/>
                         </Form.Group>
                     </Form>
                     <Form>
-                        <Form.Label>Contact Information</Form.Label>
-                        <Form.Group>
+                        <Form.Label><h4>Contact Information</h4></Form.Label>
+                        <Form.Group className="fgroup">
                             <Form.Label>Email</Form.Label>
-                            <Form.Control type="email" placeholder="Email" />
+                            <Form.Control type="email" placeholder="yourname@example.com" />
                         </Form.Group>
-                        <Form.Group>
+                        <Form.Group className="fgroup">
                             <Form.Label>Phone</Form.Label>
                             <Form.Control type="phone" placeholder="999-999-9999" />
                         </Form.Group>
                     </Form>
                     <Form>
-                        <Form.Label>Update Password</Form.Label>
-                        <Form.Group>
-                            <Form.Label>Old Password</Form.Label>
-                            <Form.Control type="password" placeholder="Old password" />
+                        <Form.Label><h4>Update Password</h4></Form.Label>
+                        <Form.Group className="fgroup">
+                            <Form.Label>Current Password</Form.Label>
+                            <Form.Control type="password" />
                         </Form.Group>
-                        <Form.Group>
+                        <Form.Group className="fgroup">
                             <Form.Label>New Password</Form.Label>
-                            <Form.Control type="password" placeholder="New password" />
+                            <Form.Control type="password" />
                         </Form.Group>
                     </Form>
+                </div>
+            );
+        }
+
+        const WorkspaceSettings = () =>
+        {
+            return (
+                <div>
+                </div>
+            );
+        }
+
+        if (page === Pages.ACCOUNT)
+        {
+            return (
+                <div class="settings-form-container">
+                    <h3>Account Settings</h3>
+                    <AccountSettings />
                 </div>
             );
         }
         else if (page === Pages.WORKSPACES)
         {
             return (
-                <div id="workspace-settings-container">
+                <div class="settings-form-container">
+                    <h3>Workspace Settings</h3>
+                    <WorkspaceSettings />
                 </div>
             );
         }
     };
 
     return (
-        <div>
-            <div>
-                <h1>Settings</h1>
-                <ul>
-                    <li onClick={() => setPage(Pages.ACCOUNT)}>Account</li>
-                    <li onClick={() => setPage(Pages.WORKSPACES)}>Workspaces</li>
+        <div id="settings-component">
+            <div id="nav-container">
+                <ul id="settings-nav">
+                    <li onClick={() => setPage(Pages.ACCOUNT)}><h1>Account</h1></li>
+                    <li onClick={() => setPage(Pages.WORKSPACES)}><h1>Workspaces</h1></li>
                 </ul>
             </div>
-            <Settings />
+            <div id="settings-container">
+                <div id="settings-content">
+                    <Settings />
+                    <SubmitButton button_text="Save" />
+                </div>
+            </div>
         </div>
     );
 };

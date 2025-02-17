@@ -1,0 +1,88 @@
+$form-width: 20vw;
+$background-color: rgba(44, 44, 44, 0.85);
+$text-color: #FFFFFF;
+
+#nav-container 
+{
+    #settings-nav
+    {
+        list-style-type: none;
+        padding: 0;
+        width: 100%;
+        display: flex; // Use flexbox to align items inline
+        flex-direction: row; // Align items in a row
+        justify-content: space-between; // Space items evenly
+        
+        li 
+        {
+            margin-right: 10px;
+        }
+
+        h1 
+        {
+            font-size: 25px;
+        }
+    }
+}
+
+#settings-container
+{
+    
+    width: 30vw;
+
+    background-color: $background-color;
+    padding: 20px;
+    margin: 1vh;
+    padding-bottom: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 18.9px;
+    color: $text-color;
+
+    .settings-form-container
+    {  
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        h3 
+        {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        Form 
+        {
+            width: $form-width;
+            margin: 3vh;
+
+        }
+
+        .fgroup
+        {
+            margin: 0.5vh;
+        }
+    }
+
+    #settings-content
+    {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    h4
+    {
+        font-size: 18px;
+    }
+
+    #button-item 
+    {
+        margin-bottom: 10vh;
+        width: $form-width;
+    }
+}
+
+#settings-component
+{
+    margin: 2vh;
+}

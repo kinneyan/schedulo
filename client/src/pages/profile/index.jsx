@@ -8,11 +8,12 @@ import Profile from '../../containers/profile';
 const ProfilePage = () => 
 {
     return (
-        <div>
+        <div id="profile-page">
             <NavbarContainer />
             <Profile />
         </div>
     );
 };
 
-export default with_auth(ProfilePage);
+//export default with_auth(ProfilePage);
+export default ProfilePage; // TESTING
