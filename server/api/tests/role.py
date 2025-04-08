@@ -372,7 +372,7 @@ class GetRolesTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         output = response.data['roles']
-        role = WorkspaceRole.objects.get(id=output[0][0])
+        role = WorkspaceRole.objects.get(id=output[0]['id'])
                
         self.assertEqual(role.name, data['name'])
 
@@ -395,8 +395,8 @@ class GetRolesTests(APITestCase):
         self.assertEqual(len(output), len(data))
 
         for i in range(len(data)):
-            role = WorkspaceRole.objects.get(id=output[i][0])
-            self.assertEqual(data[i]['name'], output[i][1])
+            role = WorkspaceRole.objects.get(id=output[i]['id'])
+            self.assertEqual(data[i]['name'], output[i]['name'])
             self.assertEqual(data[i]['name'], role.name)
 
     def test_multiple_workspaces(self):
@@ -435,8 +435,8 @@ class GetRolesTests(APITestCase):
         self.assertEqual(len(output), len(data))
 
         for i in range(len(data)):
-            role = WorkspaceRole.objects.get(id=output[i][0])
-            self.assertEqual(data[i]['name'], output[i][1])
+            role = WorkspaceRole.objects.get(id=output[i]['id'])
+            self.assertEqual(data[i]['name'], output[i]['name'])
             self.assertEqual(data[i]['name'], role.name)
 
 class GetMemberRoleTests(APITestCase):
@@ -513,7 +513,7 @@ class GetMemberRoleTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['roles']), 1)
 
-        role = WorkspaceRole.objects.get(id=response.data['roles'][0][0])
+        role = WorkspaceRole.objects.get(id=response.data['roles'][0]['id'])
         self.assertEqual(self.role.id, role.id)
 
     def test_multiple(self):
@@ -527,9 +527,9 @@ class GetMemberRoleTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['roles']), 3)
 
-        role = WorkspaceRole.objects.get(id=response.data['roles'][0][0])
-        role2 = WorkspaceRole.objects.get(id=response.data['roles'][1][0])
-        role3 = WorkspaceRole.objects.get(id=response.data['roles'][2][0])
+        role = WorkspaceRole.objects.get(id=response.data['roles'][0]['id'])
+        role2 = WorkspaceRole.objects.get(id=response.data['roles'][1]['id'])
+        role3 = WorkspaceRole.objects.get(id=response.data['roles'][2]['id'])
         self.assertEqual(self.role.id, role.id)
         self.assertEqual(self.role2.id, role2.id)
         self.assertEqual(self.role3.id, role3.id)

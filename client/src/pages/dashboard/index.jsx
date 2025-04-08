@@ -2,14 +2,15 @@ import React from 'react';
 import './index.scss';
 
 import NavbarContainer from '../../containers/navbar';
+import with_auth from '../../components/auth';
 
-const HomePage = () => 
+const DashboardPage = () => 
 {
     return (
-        <div id="home-page">
+        <div id="dash-page">
             <NavbarContainer />
         </div>
     );
 };
 
-export default HomePage;
+export default with_auth(DashboardPage);
