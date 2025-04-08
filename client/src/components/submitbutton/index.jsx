@@ -3,7 +3,8 @@ import Button from 'react-bootstrap/Button';
 
 import './index.scss';
 
-const SubmitButton = ({ button_text }) => {
+const SubmitButton = ({ button_text }) => 
+{
     return (
         <Button id="button-item" type="submit">{button_text}</Button>
     );
