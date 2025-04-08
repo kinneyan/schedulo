@@ -21,7 +21,7 @@ const RegisterContainer = () => {
             if (password == confirmPassword) {
                 const response = await fetch(import.meta.env.VITE_API_URL + '/api/register', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json'},
                     body: JSON.stringify({ email, password, first_name, last_name, phone }),
                 });
 
