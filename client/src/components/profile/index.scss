@@ -3,128 +3,126 @@ $background-color: rgba(44, 44, 44, 0.85);
 $text-color: #FFFFFF;
 $field-font-size: 18px;
 
+#settings-component {
+  margin: 2vh;
+  display: flex;
+  flex-direction: column;
 
-#settings-component
-{
-    margin: 2vh;
+  #settings-container {
+    width: 30vw;
+    background-color: $background-color;
+    padding: 20px;
+    margin: 1vh;
+    padding-bottom: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 18.9px;
+    color: $text-color;
+
+    .settings-form-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+
+      h3 {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 0;
+      }
+
+      Form {
+        width: $form-width;
+        margin: 3vh;
+        margin-top: 0;
+      }
+
+      // Adjust for the h4 inside Form.Group in the new structure
+      .fgroup {
+        margin: 0.5vh;
+        
+        h4 {
+          margin: 0;
+          margin-top: 2.5vh;
+          font-size: $field-font-size;
+          font-weight: normal;
+        }
+      }
+
+      // Handle the second h3 inside the form
+      h3:not(:first-child) {
+        margin-top: 2.5vh;
+        width: 100%;
+        text-align: left;
+        margin-left: 0;
+        padding-left: 0;
+        font-size: $field-font-size;
+        font-weight: normal;
+      }
+    }
+
+    #settings-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #button-item {
+      width: $form-width;
+      margin-bottom: 3vh;
+      font-size: $field-font-size;
+      display: flex;
+      justify-content: center;
+      margin-top: 3vh;
+    }
+  }
+
+  #nav-container {
     display: flex;
-    flex-direction: column;
+    border-bottom: 2px solid #ccc;
 
-    #settings-container
-    {
-        width: 30vw;
-    
-        background-color: $background-color;
-        padding: 20px;
-        margin: 1vh;
-        padding-bottom: 0;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 18.9px;
-        color: $text-color;
-    
-        .settings-form-container
-        {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            h3 
-            {
-                font-size: 20px;
-                font-weight: bold;
-                margin-bottom: 0;
-            }
-    
-            Form 
-            {
-                width: $form-width;
-                margin: 3vh;
-                margin-top: 0;
+    #settings-nav {
+      margin: 0;
+      list-style-type: none;
+      padding: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
 
-                h4 
-                {
-                    margin: 0;
-                    margin-top: 2.5vh;
-                }
-            }
-    
-            .fgroup
-            {
-                margin: 0.5vh;
-            }
-        }
-    
-        #settings-content
-        {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-    
-        h4
-        {
-            font-size: $field-font-size;
-        }
-    
-        #button-item 
-        {
-            width: $form-width;
-            margin-bottom: 3vh;
-            font-size: $field-font-size;
-        }
+      li {
+        background: #D6C7AE; /* Muted taupe */
+        border: 2px solid #B6A385; /* Slightly darker border */
+        padding: 12px 20px;
+        padding-bottom: 0px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        cursor: pointer;
+        transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+        font-size: 16px;
+        font-weight: 500;
+        color: #5A4A42; /* Dark brown text */
+        width: 15vw;
+        text-align: center;
+        align-items: center;
+        border-bottom: 2px solid #F0ECE2; /* Blends with background */
+      }
+      
+      li:hover {
+        background: #C4B59E; /* Slightly warmer on hover */
+      }
+      
+      li.active {
+        border-bottom: none;
+        background: #B6A385; /* Active tab stands out */
+        font-weight: bold;
+        box-shadow: 0px -3px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        font-size: 25px;
+        margin: 0;
+        padding: 0;
+      }
     }
-
-    #nav-container 
-    {
-        display: flex;
-        border-bottom: 2px solid #ccc;        
-
-        #settings-nav
-        {
-            margin: 0;
-            list-style-type: none;
-            padding: 0;
-            width: 100%;
-            display: flex; // Use flexbox to align items inline
-            flex-direction: row; // Align items in a row
-            justify-content: center; // Space items evenly
-
-            li 
-            {
-                background: #D6C7AE; /* Muted taupe */
-                border: 2px solid #B6A385; /* Slightly darker border */
-                padding: 12px 20px;
-                padding-bottom: 0px;
-                border-top-left-radius: 10px;
-                border-top-right-radius: 10px;
-                cursor: pointer;
-                transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
-                font-size: 16px;
-                font-weight: 500;
-                color: #5A4A42; /* Dark brown text */
-                width: 15vw;
-                text-align: center;
-                align-items: center;
-                border-bottom: 2px solid #F0ECE2; /* Blends with background */
-            }
-            
-            li:hover 
-            {
-                background: #C4B59E; /* Slightly warmer on hover */
-            }
-            
-            li.active 
-            {
-                border-bottom: none;
-                background: #B6A385; /* Active tab stands out */
-                font-weight: bold;
-                box-shadow: 0px -3px 5px rgba(0, 0, 0, 0.1);
-            }
-    
-            h1 
-            {
-                font-size: 25px;
-            }
-        }
-    }
+  }
 }
