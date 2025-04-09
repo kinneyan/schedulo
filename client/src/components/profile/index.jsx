@@ -5,7 +5,7 @@ import './index.scss';
 import '../submitbutton'
 import SubmitButton from '../submitbutton';
 
-const ViewProfile = ({ states }) => {
+const ViewProfile = ({states, handleSubmit}) => {
   const [activeTab, setActiveTab] = useState('account'); // Default to account tab
 
   const {
@@ -16,12 +16,6 @@ const ViewProfile = ({ states }) => {
     oldPassword, setOldPassword,
     newPassword, setNewPassword
   } = states;
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission logic here
-    console.log('Form submitted:', { fname, lname, email, phone, oldPassword, newPassword });
-  };
 
   return (
     <div id="settings-component">
@@ -46,7 +40,7 @@ const ViewProfile = ({ states }) => {
         <div id="settings-content">
           {activeTab === 'account' ? (
             <div className="settings-form-container">
-              <h3>Your Account Information</h3>
+              <h3>Account Information</h3>
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="fgroup">
                   <h4>First Name</h4>
