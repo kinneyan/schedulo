@@ -41,6 +41,7 @@ class UpdateUserTests(APITestCase):
         update_data = {
             'email': 'updateduser@example.com',
             'password': 'newpassword',
+            'current_password': 'testpassword',
             'phone': '0987654321',
             'first_name': 'Updated',
             'last_name': 'User'
