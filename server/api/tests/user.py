@@ -87,3 +87,16 @@ class UpdateUserTests(APITestCase):
         }
         response = self.client.put(self.url, update_data, format='json')
         self.assertEqual(response.status_code, 401)  # Assuming the view returns 401 for unauthenticated requests
+
+    def test_incorrect_current_password(self):
+        update_data = {
+            'password': 'newpassword',
+            'current_password': 'incorrectpassword',
+        }
+        response = self.client.put(self.url, update_data, format='json')
+        self.assertEqual(response.status_code, 400)
+
+        # Refresh the user instance to get the updated data
+        self.user.refresh_from_db()
+
+        self.assertTrue(self.user.check_password('testpassword')) # ensure password was not changed
