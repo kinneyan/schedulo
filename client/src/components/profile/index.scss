@@ -8,6 +8,24 @@ $field-font-size: 18px;
   display: flex;
   flex-direction: column;
 
+  #error-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 3vh;
+    margin-top: 10px;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    width: 100%;
+  }
+
+  #error-text {
+      text-align: center;
+      margin: 0;
+      padding: 0;
+  }
+
   #settings-container {
     width: 30vw;
     background-color: $background-color;

@@ -16,6 +16,7 @@ const Profile = () =>
     const [phone, setPhone] = useState("");
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
+    const [error, setError] = useState("");
     const states = {
         fname,
         setFname,
@@ -28,7 +29,9 @@ const Profile = () =>
         oldPassword,
         setOldPassword,
         newPassword,
-        setNewPassword
+        setNewPassword,
+        error, 
+        setError,
     }
 
     useEffect(() => 
@@ -114,9 +117,8 @@ const Profile = () =>
         }
         catch (error)
         {
-            console.log("Error: " + error);
+            setError(error);
         }
-
     };
 
     return (

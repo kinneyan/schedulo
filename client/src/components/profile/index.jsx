@@ -14,9 +14,10 @@ const ViewProfile = ({states, handleSubmit}) => {
     email, setEmail,
     phone, setPhone,
     oldPassword, setOldPassword,
-    newPassword, setNewPassword
+    newPassword, setNewPassword,
+    error, setError,
   } = states;
-
+  
   return (
     <div id="settings-component">
       <div id="nav-container">
@@ -112,6 +113,7 @@ const ViewProfile = ({states, handleSubmit}) => {
           )}
         </div>
       </div>
+      { error && <div id="error-container"><p id="error-text">{error.toString()}</p></div> }
     </div>
   );
 };
