@@ -82,8 +82,8 @@ const Profile = () =>
 
         if (newPassword !== "")
         {
-            requestBody.old_password = oldPassword;
-            requestBody.new_password = newPassword;
+            requestBody.current_password = oldPassword;
+            requestBody.password = newPassword;
         }
 
         // make request
