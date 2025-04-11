@@ -97,13 +97,18 @@ const Profile = () =>
                 headers: {"Content-Type": "application/json", "Authorization": "Bearer " + token.access},
                 body: JSON.stringify(requestBody),
             });
+            
+            const data = await response.json();
+
+            if (response.status === 400 && data.error.message == "Current password is incorrect.")
+            {
+                throw new Error("Current password is incorrect.");
+            }
 
             if (response.status != 200)
             {
                 throw new Error("Failed to update user information.");
             }
-
-            const data = await response.json();
 
             window.location.reload();   // refresh page
         }
