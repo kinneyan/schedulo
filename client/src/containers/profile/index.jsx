@@ -84,7 +84,6 @@ const Profile = () =>
         {
             requestBody.old_password = oldPassword;
             requestBody.new_password = newPassword;
-
         }
 
         // make request
@@ -96,19 +95,21 @@ const Profile = () =>
                 withCredentials: true,
                 credentials: "include",
                 headers: {"Content-Type": "application/json", "Authorization": "Bearer " + token.access},
-                body: JSON.stringify({requestBody}),
+                body: JSON.stringify(requestBody),
             });
+
+            if (response.status != 200)
+            {
+                throw new Error("Failed to update user information.");
+            }
 
             const data = await response.json();
 
-            if (response.status == 400)
-            {
-                throw new Error(data["error"]);
-            }
+            window.location.reload();   // refresh page
         }
         catch (error)
         {
-            console.log(error);
+            console.log("Error: " + error);
         }
 
     };
