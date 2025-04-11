@@ -15,5 +15,5 @@ const ProfilePage = () =>
     );
 };
 
-//export default with_auth(ProfilePage);
-export default ProfilePage; // TESTING
+//export default ProfilePage; // TESTING
+export default with_auth(ProfilePage);

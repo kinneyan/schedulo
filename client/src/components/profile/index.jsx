@@ -5,111 +5,117 @@ import './index.scss';
 import '../submitbutton'
 import SubmitButton from '../submitbutton';
 
-const ViewProfile = () => 
-{
-    const Pages = 
-    {
-        ACCOUNT: "account",
-        WORKSPACES: "workspaces"
-    }
-    
-    const [page, setPage] = useState(Pages.ACCOUNT);
+const ViewProfile = ({states, handleSubmit}) => {
+  const [activeTab, setActiveTab] = useState('account'); // Default to account tab
 
-    const Settings = () =>
-    {
-        const AccountSettings = () => 
-        {
-            return (
-                <div>
-                    <Form>
-                        <Form.Label><h4>Name</h4></Form.Label>
-                        <Form.Group className="fgroup">
-                            <Form.Label>First name</Form.Label>
-                            <Form.Control type="text" placeholder="John"/>
-                        </Form.Group>
-                        <Form.Group className="fgroup">
-                            <Form.Label>Last name</Form.Label>
-                            <Form.Control type="text" placeholder="Doe"/>
-                        </Form.Group>
+  const {
+    fname, setFname,
+    lname, setLname,
+    email, setEmail,
+    phone, setPhone,
+    oldPassword, setOldPassword,
+    newPassword, setNewPassword,
+    error, setError,
+  } = states;
+  
+  return (
+    <div id="settings-component">
+      <div id="nav-container">
+        <ul id="settings-nav">
+          <li 
+            className={activeTab === 'account' ? 'active' : ''} 
+            onClick={() => setActiveTab('account')}
+          >
+            <h1>Account Settings</h1>
+          </li>
+          <li 
+            className={activeTab === 'workspace' ? 'active' : ''} 
+            onClick={() => setActiveTab('workspace')}
+          >
+            <h1>Workspace Settings</h1>
+          </li>
+        </ul>
+      </div>
 
-                        <Form.Label><h4>Contact Information</h4></Form.Label>
-                        <Form.Group className="fgroup">
-                            <Form.Label>Email</Form.Label>
-                            <Form.Control type="email" placeholder="yourname@example.com" />
-                        </Form.Group>
-                        <Form.Group className="fgroup">
-                            <Form.Label>Phone</Form.Label>
-                            <Form.Control type="phone" placeholder="999-999-9999" />
-                        </Form.Group>
+      <div id="settings-container">
+        <div id="settings-content">
+          {activeTab === 'account' ? (
+            <div className="settings-form-container">
+              <h3>Account Information</h3>
+              <Form onSubmit={handleSubmit}>
+                <Form.Group className="fgroup">
+                  <h4>First Name</h4>
+                  <Form.Control 
+                    type="text" 
+                    value={fname} 
+                    onChange={(e) => setFname(e.target.value)} 
+                  />
+                </Form.Group>
 
-                        <Form.Label><h4>Update Password</h4></Form.Label>
-                        <Form.Group className="fgroup">
-                            <Form.Label>Current Password</Form.Label>
-                            <Form.Control type="password" />
-                        </Form.Group>
-                        <Form.Group className="fgroup">
-                            <Form.Label>New Password</Form.Label>
-                            <Form.Control type="password" />
-                        </Form.Group>
-                    </Form>
+                <Form.Group className="fgroup">
+                  <h4>Last Name</h4>
+                  <Form.Control 
+                    type="text" 
+                    value={lname} 
+                    onChange={(e) => setLname(e.target.value)} 
+                  />
+                </Form.Group>
+
+                <Form.Group className="fgroup">
+                  <h4>Email</h4>
+                  <Form.Control 
+                    type="email" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                  />
+                </Form.Group>
+
+                <Form.Group className="fgroup">
+                  <h4>Phone</h4>
+                  <Form.Control 
+                    type="tel" 
+                    value={phone} 
+                    onChange={(e) => setPhone(e.target.value)} 
+                  />
+                </Form.Group>
+
+                <h3>Change Password</h3>
+                
+                <Form.Group className="fgroup">
+                  <h4>Current Password</h4>
+                  <Form.Control 
+                    type="password" 
+                    value={oldPassword} 
+                    onChange={(e) => setOldPassword(e.target.value)} 
+                  />
+                </Form.Group>
+
+                <Form.Group className="fgroup">
+                  <h4>New Password</h4>
+                  <Form.Control 
+                    type="password" 
+                    value={newPassword} 
+                    onChange={(e) => setNewPassword(e.target.value)} 
+                  />
+                </Form.Group>
+
+                <div id="button-item">
+                  <SubmitButton button_text="Save" onClick={handleSubmit} />
                 </div>
-            );
-        }
-
-        const WorkspaceSettings = () =>
-        {
-            return (
-                <div>
-                </div>
-            );
-        }
-
-        if (page === Pages.ACCOUNT)
-        {
-            return (
-                <div className="settings-form-container">
-                    <h3>Account Settings</h3>
-                    <AccountSettings />
-                </div>
-            );
-        }
-        else if (page === Pages.WORKSPACES)
-        {
-            return (
-                <div className="settings-form-container">
-                    <h3>Workspace Settings</h3>
-                    <WorkspaceSettings />
-                </div>
-            );
-        }
-    };
-
-    return (
-        <div id="settings-component">
-            <div id="nav-container">
-                <ul id="settings-nav">
-                    <li 
-                        onClick={() => setPage(Pages.ACCOUNT)} 
-                        className={page === Pages.ACCOUNT ? "active" : ""}
-                    >
-                        <h1>Account</h1>
-                    </li>
-                    <li 
-                        onClick={() => setPage(Pages.WORKSPACES)} 
-                        className={page === Pages.WORKSPACES ? "active" : ""}
-                    >
-                        <h1>Workspaces</h1>
-                    </li>
-                </ul>
+              </Form>
             </div>
-            <div id="settings-container">
-                <div id="settings-content">
-                    <Settings />
-                    <SubmitButton button_text="Save" />
-                </div>
+          ) : (
+            <div className="settings-form-container">
+              <h3>Workspace Settings</h3>
+              {/* Workspace settings content will be added later */}
+              <p>Workspace settings will be implemented later.</p>
             </div>
+          )}
         </div>
-    );
+      </div>
+      { error && <div id="error-container"><p id="error-text">{error.toString()}</p></div> }
+    </div>
+  );
 };
 
 export default ViewProfile;
