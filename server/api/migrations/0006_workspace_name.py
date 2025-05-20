@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0005_remove_memberpermissions_workspace_role_id_and_more'),
+        ("api", "0005_remove_memberpermissions_workspace_role_id_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='workspace',
-            name='name',
-            field=models.CharField(default='Unnamed Workspace', max_length=30),
+            model_name="workspace",
+            name="name",
+            field=models.CharField(default="Unnamed Workspace", max_length=30),
         ),
     ]

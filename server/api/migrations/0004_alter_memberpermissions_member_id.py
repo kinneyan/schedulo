@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0003_remove_rolepermissions_permission_id_and_more'),
+        ("api", "0003_remove_rolepermissions_permission_id_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='memberpermissions',
-            name='member_id',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='api.workspacemember'),
+            model_name="memberpermissions",
+            name="member_id",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE, to="api.workspacemember"
+            ),
         ),
     ]

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0007_rename_id_rows'),
+        ("api", "0007_rename_id_rows"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='workspacerole',
-            name='name',
-            field=models.CharField(default='Unnamed Role', max_length=30),
+            model_name="workspacerole",
+            name="name",
+            field=models.CharField(default="Unnamed Role", max_length=30),
         ),
     ]

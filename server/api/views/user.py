@@ -7,6 +7,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
 
+
 class GetUser(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -14,15 +15,15 @@ class GetUser(APIView):
     def get(self, request):
         response = {"error": {}}
 
-        response['email'] = request.user.email
-        response['phone'] = request.user.phone
-        response['first_name'] = request.user.first_name
-        response['last_name'] = request.user.last_name
+        response["email"] = request.user.email
+        response["phone"] = request.user.phone
+        response["first_name"] = request.user.first_name
+        response["last_name"] = request.user.last_name
 
         return Response(response, status=status.HTTP_200_OK)
-    
+
     def put(self, request):
-        '''
+        """
         email
         phone
         first_name
@@ -30,7 +31,7 @@ class GetUser(APIView):
         last_name
         password
         current_password
-        '''
+        """
         response = {"error": {}}
 
         if "email" in request.data:
@@ -43,12 +44,16 @@ class GetUser(APIView):
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         if "password" in request.data:
-            if 'current_password' not in request.data:
-                response["error"]["message"] = "Current password required when changing password."
+            if "current_password" not in request.data:
+                response["error"][
+                    "message"
+                ] = "Current password required when changing password."
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
-            
-            auth = authenticate(email=request.user, password=request.data["current_password"]) 
-            if (auth == request.user):
+
+            auth = authenticate(
+                email=request.user, password=request.data["current_password"]
+            )
+            if auth == request.user:
                 request.user.set_password(request.data["password"])
                 request.user.save()
             else:
