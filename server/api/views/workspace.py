@@ -215,9 +215,9 @@ class GetWorkspace(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        '''
+        """
         workspace_id (required)
-        '''
+        """
         response = {"error": {}}
 
         # Verify parameters contains required fields
@@ -228,35 +228,37 @@ class GetWorkspace(APIView):
         # Verify workspace exists
         try:
             workspace = Workspace.objects.get(pk=request.GET.get("workspace_id"))
-        except(Workspace.DoesNotExist):
+        except Workspace.DoesNotExist:
             response["error"]["message"] = "Workspace does not exists."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
-        
+
         # Verify user is member of workspace
         try:
             member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
-        except(WorkspaceMember.DoesNotExist):
+        except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "User is not a member of this workspace."
             return Response(response, status=status.HTTP_401_UNAUTHORIZED)
 
         # Get user's perms
         permissions = MemberPermissions.objects.get(workspace=workspace, member=member)
 
-        if (permissions.IS_OWNER):
+        if permissions.IS_OWNER:
             response["membership"] = "owner"
         # UNCOMMENT WHEN MANAGER MEMBERSHIP ADDED!!
-        #elif (permissions.IS_MANAGER): 
-         #   response["membership"] = "manager"
+        # elif (permissions.IS_MANAGER):
+        #   response["membership"] = "manager"
         else:
             response["membership"] = "employee"
-        
-        response["owner_name"] = workspace.owner.first_name + " " + workspace.owner.last_name
+
+        response["owner_name"] = (
+            workspace.owner.first_name + " " + workspace.owner.last_name
+        )
         response["owner_id"] = workspace.owner.id
         response["name"] = workspace.name
         response["workspace_id"] = workspace.id
 
         return Response(response, status=status.HTTP_200_OK)
-        '''
+        """
         DECPRICATED
         # Verify user exists
         try:
@@ -281,9 +283,9 @@ class GetWorkspace(APIView):
         response["workspaces"] = workspace_list
 
         return Response(response, status=status.HTTP_200_OK)
-        '''
-        
-        
+        """
+
+
 class DeleteWorkspace(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]

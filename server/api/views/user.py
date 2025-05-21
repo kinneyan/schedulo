@@ -22,20 +22,22 @@ class GetUser(APIView):
         response["last_name"] = request.user.last_name
 
         # get list of workspaces user is in
-        members = WorkspaceMember.objects.filter(user=request.user).values_list("workspace")
+        members = WorkspaceMember.objects.filter(user=request.user).values_list(
+            "workspace"
+        )
         results = Workspace.objects.filter(pk__in=members)
 
         workspace_list = [
             {
-                'id': workspace.id,
-                'created_by': workspace.created_by.id,
-                'owner': workspace.owner.id,
-                'name': workspace.name,
+                "id": workspace.id,
+                "created_by": workspace.created_by.id,
+                "owner": workspace.owner.id,
+                "name": workspace.name,
             }
             for workspace in results
         ]
 
-        response['workspaces'] = workspace_list
+        response["workspaces"] = workspace_list
 
         return Response(response, status=status.HTTP_200_OK)
 

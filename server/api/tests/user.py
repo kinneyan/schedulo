@@ -15,22 +15,26 @@ class GetUserTests(APITestCase):
             phone="1234567890",
         )
         self.user2 = User.objects.create_user(
-            email='testuser2@example.com',
-            password='testpassword',
-            first_name='Test2',
-            last_name='User2',
-            phone='1234567890'
+            email="testuser2@example.com",
+            password="testpassword",
+            first_name="Test2",
+            last_name="User2",
+            phone="1234567890",
         )
         self.user3 = User.objects.create_user(
-            email='testuser3@example.com',
-            password='testpassword',
-            first_name='Test3',
-            last_name='User3',
-            phone='1234567890'
+            email="testuser3@example.com",
+            password="testpassword",
+            first_name="Test3",
+            last_name="User3",
+            phone="1234567890",
         )
 
-        self.workspace = Workspace.objects.create(owner=self.user, created_by=self.user, name="workspace name")
-        self.member = WorkspaceMember.objects.create(user=self.user, workspace=self.workspace, added_by=self.user)
+        self.workspace = Workspace.objects.create(
+            owner=self.user, created_by=self.user, name="workspace name"
+        )
+        self.member = WorkspaceMember.objects.create(
+            user=self.user, workspace=self.workspace, added_by=self.user
+        )
         self.permissions = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member,
@@ -38,7 +42,7 @@ class GetUserTests(APITestCase):
             MANAGE_WORKSPACE_MEMBERS=True,
             MANAGE_WORKSPACE_ROLES=True,
             MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True
+            MANAGE_TIME_OFF=True,
         )
 
         self.token = RefreshToken.for_user(self.user)
@@ -52,22 +56,22 @@ class GetUserTests(APITestCase):
         self.assertEqual(response.data["first_name"], self.user.first_name)
         self.assertEqual(response.data["last_name"], self.user.last_name)
 
-
-        workspaces = response.data['workspaces']
+        workspaces = response.data["workspaces"]
         self.assertEqual(len(workspaces), 1)
-        self.assertEqual(workspaces[0]['name'], self.workspace.name)
+        self.assertEqual(workspaces[0]["name"], self.workspace.name)
 
     def test_get_user_no_workspaces(self):
-        self.client.force_authenticate(user=self.user2) # send request as user2
+        self.client.force_authenticate(user=self.user2)  # send request as user2
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['email'], self.user2.email)
-        self.assertEqual(response.data['phone'], self.user2.phone)
-        self.assertEqual(response.data['first_name'], self.user2.first_name)
-        self.assertEqual(response.data['last_name'], self.user2.last_name)
+        self.assertEqual(response.data["email"], self.user2.email)
+        self.assertEqual(response.data["phone"], self.user2.phone)
+        self.assertEqual(response.data["first_name"], self.user2.first_name)
+        self.assertEqual(response.data["last_name"], self.user2.last_name)
 
-        workspaces = response.data['workspaces']
+        workspaces = response.data["workspaces"]
         self.assertEqual(len(workspaces), 0)
+
 
 class UpdateUserTests(APITestCase):
     def setUp(self):
