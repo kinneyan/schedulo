@@ -1,4 +1,4 @@
-name: Code linter
+name: Python linter
 
 on:
   push:
