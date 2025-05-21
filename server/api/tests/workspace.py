@@ -333,20 +333,37 @@ class GetWorkspaceTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         workspaces = response.data["workspaces"]
 
-        self.assertTrue(len(workspaces) == 0)
+        self.assertEqual(len(workspaces), 0)
 
-    def test_one_workspace(self):
+    def test_as_owner(self):
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.get(self.url, {"workspace_id": self.workspace1.id})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["name"], self.workspace1.name)
+        self.assertEqual(
+            response.data["owner_name"],
+            self.workspace1.owner.first_name + " " + self.workspace1.owner.last_name,
+        )
+        self.assertEqual(response.data["membership"], "owner")
+
+    def test_as_employee(self):
         self.client.force_authenticate(user=self.user2)
 
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, {"workspace_id": self.workspace1.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        workspaces = response.data["workspaces"]
+        self.assertEqual(response.data["name"], self.workspace1.name)
+        self.assertEqual(
+            response.data["owner_name"],
+            self.workspace1.owner.first_name + " " + self.workspace1.owner.last_name,
+        )
+        self.assertEqual(response.data["membership"], "employee")
 
-        self.assertEqual(len(workspaces), 1)
-        self.assertEqual(workspaces[0]["id"], self.workspace1.id)
-
-    def test_multiple_workspaces(self):
+    def test_no_workspace(self):
         self.client.force_authenticate(user=self.user)
+
+        response = self.client.get(self.url, {})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -355,6 +372,12 @@ class GetWorkspaceTests(APITestCase):
         self.assertEqual(len(workspaces), 2)
         self.assertEqual(workspaces[0]["id"], self.workspace1.id)
         self.assertEqual(workspaces[1]["id"], self.workspace2.id)
+
+    def test_invalid_workspace(self):
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.get(self.url, {"workspace_id": 999})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class DeleteWorkspaceTests(APITestCase):
