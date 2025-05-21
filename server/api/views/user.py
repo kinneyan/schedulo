@@ -6,6 +6,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
+from ..models import Workspace, WorkspaceMember
 
 class GetUser(APIView):
     authentication_classes = [JWTAuthentication]
@@ -18,6 +19,22 @@ class GetUser(APIView):
         response['phone'] = request.user.phone
         response['first_name'] = request.user.first_name
         response['last_name'] = request.user.last_name
+
+        # get list of workspaces user is in
+        members = WorkspaceMember.objects.filter(user=request.user).values_list("workspace")
+        results = Workspace.objects.filter(pk__in=members)
+
+        workspace_list = [
+            {
+                'id': workspace.id,
+                'created_by': workspace.created_by.id,
+                'owner': workspace.owner.id,
+                'name': workspace.name,
+            }
+            for workspace in results
+        ]
+
+        response['workspaces'] = workspace_list
 
         return Response(response, status=status.HTTP_200_OK)
     
