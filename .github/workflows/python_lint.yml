@@ -32,4 +32,4 @@ jobs:
     - name: Linting
       run: |
         cd server
-        flake8 --exit-zero .
+        flake8 .
