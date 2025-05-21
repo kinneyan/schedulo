@@ -19,7 +19,7 @@ Make sure that the following steps are completed before requesting a review.
 
 - [ ] All existing tests pass locally.
 - [ ] Any new features have tests.
-- [ ] Code follows the [style standards](../CONTRIBUTING.md).
+- [ ] Code follows the [style standards](https://github.com/kinneyan/schedulo/blob/dev/CONTRIBUTING.md).
 - [ ] Code passes all formatting/linting checks.
 
 ## Additional Notes

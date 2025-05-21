@@ -7,37 +7,57 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0002_alter_user_managers'),
+        ("api", "0002_alter_user_managers"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='rolepermissions',
-            name='permission_id',
+            model_name="rolepermissions",
+            name="permission_id",
         ),
         migrations.RemoveField(
-            model_name='rolepermissions',
-            name='workspace_role_id',
+            model_name="rolepermissions",
+            name="workspace_role_id",
         ),
         migrations.CreateModel(
-            name='MemberPermissions',
+            name="MemberPermissions",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('date_modified', models.DateTimeField(auto_now=True)),
-                ('IS_OWNER', models.BooleanField(default=False)),
-                ('MANAGE_WORKSPACE_MEMBERS', models.BooleanField(default=False)),
-                ('MANAGE_WORKSPACE_ROLES', models.BooleanField(default=False)),
-                ('MANAGE_SCHEDULES', models.BooleanField(default=False)),
-                ('MANAGE_TIME_OFF', models.BooleanField(default=False)),
-                ('member_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.workspacemember')),
-                ('workspace_role_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.workspacerole')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date_created", models.DateTimeField(auto_now_add=True)),
+                ("date_modified", models.DateTimeField(auto_now=True)),
+                ("IS_OWNER", models.BooleanField(default=False)),
+                ("MANAGE_WORKSPACE_MEMBERS", models.BooleanField(default=False)),
+                ("MANAGE_WORKSPACE_ROLES", models.BooleanField(default=False)),
+                ("MANAGE_SCHEDULES", models.BooleanField(default=False)),
+                ("MANAGE_TIME_OFF", models.BooleanField(default=False)),
+                (
+                    "member_id",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.workspacemember",
+                    ),
+                ),
+                (
+                    "workspace_role_id",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.workspacerole",
+                    ),
+                ),
             ],
         ),
         migrations.DeleteModel(
-            name='Permission',
+            name="Permission",
         ),
         migrations.DeleteModel(
-            name='RolePermissions',
+            name="RolePermissions",
         ),
     ]
