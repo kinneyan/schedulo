@@ -20,16 +20,11 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd server
         python -m pip install --upgrade pip
         python -m pip install black flake8
 
     - name: Formatting
-      run: |
-        cd server
-        black --check .
+      run: black --check .
 
     - name: Linting
-      run: |
-        cd server
-        flake8 .
+      run: flake8 .
