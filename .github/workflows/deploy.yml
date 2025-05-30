@@ -1,0 +1,26 @@
+name: Deploy to production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Cloudflared
+        uses: AnimMouse/setup-cloudflared@v2
+
+      - name: update-server
+        uses: matheusvanzan/sshpass-action@v2
+        with:
+          host: ${{ secrets.SSH_IP }}
+          user: ${{ secrets.SSH_USER }}
+          pass: ${{ secrets.SSH_PASSWORD }}
+          run: |
+            cd schedulo || git clone https://github.com/kinneyan/schedulo.git && cd schedulo
+            git fetch
+            git reset --hard origin/main
+            docker compose -f docker-compose-prod.yml down
+            docker compose -f docker-compose-prod.yml up -d --build
