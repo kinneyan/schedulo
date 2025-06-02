@@ -15,7 +15,7 @@ COPY . .
 
 # Default command to switch between development and production
 CMD ["sh", "-c", "if [ \"$REACT_ENV\" = \"production\" ]; then \
-  npm run build && npx serve -s dist; \
+  npm run build && cp -r dist/* /usr/share/nginx/html; \
   else \
   npm run dev -- --host; \
   fi"]
