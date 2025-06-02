@@ -9,6 +9,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - webnet
 
   app:
     build:
@@ -17,24 +19,34 @@ services:
     restart: unless-stopped
     env_file:
       - ./.env.prod
-    ports: 
-      - "8000:8000"
+    expose:
+      - "8000"
     volumes: 
       - ./server:/app
     depends_on: 
       - db
+    networks:
+      - webnet
 
   frontend:
     build:
       context: ./client
     container_name: react
-    restart: unless-stopped
+    restart: "no"  # only builds once and exits
     env_file:
       - ./.env.prod
-    ports:
-      - "${REACT_PORT:-5173}:${REACT_PORT:-5173}"
     depends_on:
       - app
+    volumes:
+      - schedulo_frontend:/usr/share/nginx/html
+    networks:
+      - webnet
 
 volumes:
   postgres_data:
+  schedulo_frontend:
+    external: true
+
+networks:
+  webnet:
+    external: true
