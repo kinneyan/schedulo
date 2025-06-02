@@ -25,7 +25,9 @@ SECRET_KEY = "django-insecure-2wz8w^3)xnssg7z#5f@u8%05mr+z(8ale^xfm=qe7e6l%sma=w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "schedulo.kinneyan.com"
+]
 
 
 # Application definition
