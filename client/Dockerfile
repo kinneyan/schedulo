@@ -15,6 +15,7 @@ COPY . .
 
 # Default command to switch between development and production
 CMD ["sh", "-c", "\
+  set -e && \
   echo 'Running frontend container...' && \
   if [ \"$REACT_ENV\" = \"production\" ]; then \
     echo 'Building for production...' && \
@@ -26,4 +27,3 @@ CMD ["sh", "-c", "\
     echo 'Starting development server...' && \
     npm run dev -- --host; \
   fi"]
-
