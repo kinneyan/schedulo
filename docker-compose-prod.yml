@@ -45,6 +45,7 @@ services:
 volumes:
   postgres_data:
   schedulo_frontend:
+    external: true
 
 networks:
   webnet:
