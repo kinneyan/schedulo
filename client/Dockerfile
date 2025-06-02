@@ -14,8 +14,16 @@ RUN npm install
 COPY . .
 
 # Default command to switch between development and production
-CMD ["sh", "-c", "if [ \"$REACT_ENV\" = \"production\" ]; then \
-  npm run build && cp -r dist/* /usr/share/nginx/html; \
+CMD ["sh", "-c", "\
+  echo 'Running frontend container...' && \
+  if [ \"$REACT_ENV\" = \"production\" ]; then \
+    echo 'Building for production...' && \
+    npm run build && \
+    echo 'Copying built files to /usr/share/nginx/html...' && \
+    cp -vr dist/* /usr/share/nginx/html && \
+    echo 'Frontend build and copy complete.'; \
   else \
-  npm run dev -- --host; \
+    echo 'Starting development server...' && \
+    npm run dev -- --host; \
   fi"]
+
