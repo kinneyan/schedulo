@@ -21,7 +21,7 @@ EXPOSE 8000
 # Default command for the container
 CMD ["sh", "-c", "python manage.py migrate && \
   if [ \"$DJANGO_ENV\" = \"production\" ]; then \
-  gunicorn --bind 0.0.0.0:8000 --workers 3 app.wsgi:application; \
+  gunicorn --bind 0.0.0.0:8000 --workers 3 server.wsgi:application; \
   else \
   python manage.py runserver 0.0.0.0:8000; \
   fi"]
