@@ -1,0 +1,5 @@
+[flake8]
+exclude = venv,*env,build,docs,dist,.eggs,.git,.github,.idea,debug.py,.vscode,.vite,__pycache__,node_modules,
+ignore = E203, E266, E501, W503, F403, F401, DOC404, F811, F821, F824, F722
+max-line-length = 88
+extend-ignore = E203, W503

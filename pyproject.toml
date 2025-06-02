@@ -1,0 +1,16 @@
+[tool.black]
+line-length = 88
+exclude = '''
+/(
+      \.eggs
+      | build
+      | venv
+      | \.venv
+      | \.git
+      | node_modules
+      | __pycache__
+      | \.vscode
+      | \.vite
+      | dist
+)/
+'''

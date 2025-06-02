@@ -1,0 +1,88 @@
+$background-color: rgba(44, 44, 44, 0.85);
+$text-color: #FFFFFF;
+$label-size: 20px;
+$form-width: 85%;
+$form-height: 70%;
+$line-margin: 30px;
+
+#register-container {
+    width: 25%;
+    height: 40%;
+    margin: auto;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: $background-color;
+    border-radius: 18.9px;
+    color: $text-color;
+    font-family: 'Roboto Condensed', sans-serif;
+
+    label,
+    input,
+    #button-item {
+        display: block;
+        width: $form-width;
+        color: $text-color;
+    }
+
+    input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 11.34px;
+        background-color: transparent;
+        height: 40px;
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-size: $label-size;
+    }
+
+    #register-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    hr {
+        width: 90%;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        margin-top: $line-margin;
+        margin-bottom: $line-margin;    
+    }
+
+    p {
+        font-size: $label-size - 5px;    
+    }
+
+    a {
+        text-decoration: none;
+    }
+    
+    #button-item {
+        border-radius: 11.34px;
+        height: $form-height;
+        padding: 10px;
+        margin: auto;
+        margin-top: 15px;
+    }
+
+    #error-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 3vh;
+        margin-top: 10px;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        width: 100%;
+    }
+
+    #error-text {
+        text-align: center;
+        margin: 0;
+        padding: 0;
+    }
+}
+

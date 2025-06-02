@@ -1,0 +1,13 @@
+@import 'bootstrap/scss/bootstrap';
+@import "bootstrap";
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;700&display=swap');
+
+$background-color: #F0ECE2;
+$navbar-height: 52px;
+
+body 
+{
+    background-color: $background-color;
+    padding-top: $navbar-height;
+}

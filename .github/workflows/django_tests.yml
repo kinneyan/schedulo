@@ -1,0 +1,38 @@
+name: Django Tests
+
+on:
+  push:
+    branches:
+      - '**'
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        cd server
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run migrations
+      run: |
+        cd server
+        python manage.py migrate --settings=server.settings.tests
+
+    - name: Run tests
+      run: |
+        cd server
+        python manage.py test --settings=server.settings.tests
