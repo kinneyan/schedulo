@@ -1,7 +1,7 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
-from ...models import User, Workspace, WorkspaceMember, WorkspaceRole, MemberPermissions
+from ....models import User, Workspace, WorkspaceMember, WorkspaceRole, MemberPermissions
 
 
 class GetUserTests(APITestCase):
