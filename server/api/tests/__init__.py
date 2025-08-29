@@ -27,7 +27,35 @@ from .integration.shifts.test_shift_crud import (
 )
 from .integration.shifts.test_shift_queries import GetShiftsTest
 
-# Unit tests will be imported here as they are added
-# from .unit.models.test_user_model import UserModelTests
-# from .unit.serializers.test_user_serializer import UserSerializerTests
-# etc...
+# Import from unit tests
+from .unit.models.test_user_models import (
+    CustomUserManagerTest,
+    UserModelTest,
+    WorkspaceModelTest,
+    WorkspaceMemberModelTest,
+)
+from .unit.models.test_role_models import (
+    WorkspaceRoleModelTest,
+    MemberRoleModelTest,
+    MemberPermissionsModelTest,
+)
+from .unit.models.test_schedule_models import (
+    ShiftModelTest,
+    ShiftRequestModelTest,
+    TimeOffRequestModelTest,
+    UnavailabilityModelTest,
+)
+from .unit.serializers.test_user_serializers import (
+    LoginUserSerializerTest,
+    RegisterUserSerializerTest,
+)
+from .unit.serializers.test_role_serializers import RoleSerializerTest
+from .unit.views.test_auth_views import (
+    LoginViewTest,
+    RegisterViewTest,
+)
+from .unit.views.test_role_views import (
+    CreateRoleViewTest,
+    DeleteWorkspaceRoleViewTest,
+    ModifyWorkspaceRoleViewTest,
+)
