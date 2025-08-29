@@ -78,10 +78,8 @@ class GetWorkspaceTests(APITestCase):
         self.client.force_authenticate(user=self.user3)
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        workspaces = response.data["workspaces"]
-
-        self.assertEqual(len(workspaces), 0)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Workspace ID is required", response.data["error"]["message"])
 
     def test_as_owner(self):
         self.client.force_authenticate(user=self.user)
@@ -114,12 +112,8 @@ class GetWorkspaceTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        workspaces = response.data["workspaces"]
-
-        self.assertEqual(len(workspaces), 2)
-        self.assertEqual(workspaces[0]["id"], self.workspace1.id)
-        self.assertEqual(workspaces[1]["id"], self.workspace2.id)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Workspace ID is required", response.data["error"]["message"])
 
     def test_invalid_workspace(self):
         self.client.force_authenticate(user=self.user)
