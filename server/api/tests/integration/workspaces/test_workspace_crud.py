@@ -275,7 +275,7 @@ class DeleteWorkspaceTests(APITestCase):
 
         # ensure workspace was not deleted
         try:
-            workspace = Workspace.objects.get(pk=self.workspace1.id)
+            Workspace.objects.get(pk=self.workspace1.id)
         except Workspace.DoesNotExist:
             self.assertTrue(False)
 
@@ -286,7 +286,7 @@ class DeleteWorkspaceTests(APITestCase):
 
         # ensure workspace was not deleted
         try:
-            workspace = Workspace.objects.get(pk=self.workspace1.id)
+            Workspace.objects.get(pk=self.workspace1.id)
         except Workspace.DoesNotExist:
             self.assertTrue(False)
 
@@ -296,7 +296,7 @@ class DeleteWorkspaceTests(APITestCase):
 
         # ensure workspace was deleted
         try:
-            workspace = Workspace.objects.get(pk=self.workspace1.id)
+            Workspace.objects.get(pk=self.workspace1.id)
             self.assertTrue(False)
         except Workspace.DoesNotExist:
             self.assertTrue(True)

@@ -7,138 +7,127 @@ from ....models import CustomUserManager, User, Workspace, WorkspaceMember
 
 class CustomUserManagerTest(TestCase):
     """Test cases for CustomUserManager methods"""
-    
+
     def setUp(self):
         self.manager = CustomUserManager()
         self.manager.model = User
-        
-    @patch('api.models.users.CustomUserManager.normalize_email')
+
+    @patch("api.models.users.CustomUserManager.normalize_email")
     def test_create_user_with_valid_email_normalizes_email(self, mock_normalize):
         """Test that create_user normalizes the email address"""
         mock_normalize.return_value = "test@example.com"
         mock_user = MagicMock()
-        
-        with patch.object(self.manager, 'model') as mock_model:
+
+        with patch.object(self.manager, "model") as mock_model:
             mock_model.return_value = mock_user
-            
-            result = self.manager.create_user("TEST@EXAMPLE.COM", "password123")
-            
+
+            self.manager.create_user("TEST@EXAMPLE.COM", "password123")
+
             mock_normalize.assert_called_once_with("TEST@EXAMPLE.COM")
             mock_user.set_password.assert_called_once_with("password123")
             mock_user.save.assert_called_once()
-    
+
     def test_create_user_without_email_raises_error(self):
         """Test that create_user raises ValueError when email is not provided"""
         with self.assertRaises(ValueError) as context:
             self.manager.create_user("", "password123")
-        
+
         self.assertEqual(str(context.exception), "The Email field must be set")
-        
+
         with self.assertRaises(ValueError) as context:
             self.manager.create_user(None, "password123")
-        
+
         self.assertEqual(str(context.exception), "The Email field must be set")
-    
-    @patch('api.models.users.CustomUserManager.create_user')
+
+    @patch("api.models.users.CustomUserManager.create_user")
     def test_create_superuser_sets_required_flags(self, mock_create_user):
         """Test that create_superuser sets is_staff and is_superuser to True"""
         mock_user = MagicMock()
         mock_create_user.return_value = mock_user
-        
-        result = self.manager.create_superuser("admin@example.com", "password123")
-        
+
+        self.manager.create_superuser("admin@example.com", "password123")
+
         mock_create_user.assert_called_once_with(
-            "admin@example.com", 
-            "password123", 
-            is_staff=True, 
-            is_superuser=True
+            "admin@example.com", "password123", is_staff=True, is_superuser=True
         )
-    
-    @patch('api.models.users.CustomUserManager.create_user')
+
+    @patch("api.models.users.CustomUserManager.create_user")
     def test_create_superuser_with_extra_fields(self, mock_create_user):
         """Test that create_superuser preserves extra fields"""
         mock_user = MagicMock()
         mock_create_user.return_value = mock_user
-        
-        result = self.manager.create_superuser(
-            "admin@example.com", 
-            "password123",
-            first_name="Admin",
-            last_name="User"
+
+        self.manager.create_superuser(
+            "admin@example.com", "password123", first_name="Admin", last_name="User"
         )
-        
+
         mock_create_user.assert_called_once_with(
-            "admin@example.com", 
-            "password123", 
-            is_staff=True, 
+            "admin@example.com",
+            "password123",
+            is_staff=True,
             is_superuser=True,
             first_name="Admin",
-            last_name="User"
+            last_name="User",
         )
-    
+
     def test_create_superuser_with_is_staff_false_raises_error(self):
         """Test that create_superuser raises ValueError if is_staff=False"""
         with self.assertRaises(ValueError) as context:
             self.manager.create_superuser(
-                "admin@example.com", 
-                "password123", 
-                is_staff=False
+                "admin@example.com", "password123", is_staff=False
             )
-        
+
         self.assertEqual(str(context.exception), "Superuser must have is_staff=True.")
-    
+
     def test_create_superuser_with_is_superuser_false_raises_error(self):
         """Test that create_superuser raises ValueError if is_superuser=False"""
         with self.assertRaises(ValueError) as context:
             self.manager.create_superuser(
-                "admin@example.com", 
-                "password123", 
-                is_superuser=False
+                "admin@example.com", "password123", is_superuser=False
             )
-        
-        self.assertEqual(str(context.exception), "Superuser must have is_superuser=True.")
+
+        self.assertEqual(
+            str(context.exception), "Superuser must have is_superuser=True."
+        )
 
 
 class UserModelTest(TestCase):
     """Test cases for User model"""
-    
+
     def test_user_creation_with_required_fields(self):
         """Test creating user with required fields"""
         user = User.objects.create_user(
             email="test@example.com",
             password="password123",
             first_name="Test",
-            last_name="User"
+            last_name="User",
         )
-        
+
         self.assertEqual(user.email, "test@example.com")
         self.assertEqual(user.first_name, "Test")
         self.assertEqual(user.last_name, "User")
         self.assertTrue(user.check_password("password123"))
         self.assertIsNone(user.username)
-    
+
     def test_user_creation_with_phone(self):
         """Test creating user with phone number"""
         user = User.objects.create_user(
-            email="test@example.com",
-            password="password123",
-            phone="1234567890"
+            email="test@example.com", password="password123", phone="1234567890"
         )
-        
+
         self.assertEqual(user.phone, "1234567890")
-    
+
     def test_user_email_unique_constraint(self):
         """Test that email field has unique constraint"""
         User.objects.create_user(email="test@example.com", password="password123")
-        
+
         with self.assertRaises(Exception):  # IntegrityError or ValidationError
             User.objects.create_user(email="test@example.com", password="password456")
-    
+
     def test_user_string_representation(self):
         """Test user string representation"""
         user = User.objects.create_user(
-            email="test@example.com",
-            password="password123"
+            email="test@example.com", password="password123"
         )
         # Default Django behavior should use email since username is None
         self.assertIn("test@example.com", str(user))
@@ -146,116 +135,98 @@ class UserModelTest(TestCase):
 
 class WorkspaceModelTest(TestCase):
     """Test cases for Workspace model"""
-    
+
     def setUp(self):
         self.user = User.objects.create_user(
-            email="owner@example.com",
-            password="password123"
+            email="owner@example.com", password="password123"
         )
-    
+
     def test_workspace_creation_with_defaults(self):
         """Test workspace creation with default values"""
-        workspace = Workspace.objects.create(
-            created_by=self.user,
-            owner=self.user
-        )
-        
+        workspace = Workspace.objects.create(created_by=self.user, owner=self.user)
+
         self.assertEqual(workspace.created_by, self.user)
         self.assertEqual(workspace.owner, self.user)
         self.assertEqual(workspace.name, "Unnamed Workspace")
         self.assertIsNotNone(workspace.date_created)
         self.assertIsNotNone(workspace.date_modified)
-    
+
     def test_workspace_creation_with_custom_name(self):
         """Test workspace creation with custom name"""
         workspace = Workspace.objects.create(
-            created_by=self.user,
-            owner=self.user,
-            name="My Custom Workspace"
+            created_by=self.user, owner=self.user, name="My Custom Workspace"
         )
-        
+
         self.assertEqual(workspace.name, "My Custom Workspace")
-    
+
     def test_workspace_owner_cascade_delete(self):
         """Test that workspace is deleted when owner is deleted"""
-        workspace = Workspace.objects.create(
-            created_by=self.user,
-            owner=self.user
-        )
+        workspace = Workspace.objects.create(created_by=self.user, owner=self.user)
         workspace_id = workspace.id
-        
+
         self.user.delete()
-        
+
         with self.assertRaises(Workspace.DoesNotExist):
             Workspace.objects.get(id=workspace_id)
 
 
 class WorkspaceMemberModelTest(TestCase):
     """Test cases for WorkspaceMember model"""
-    
+
     def setUp(self):
         self.owner = User.objects.create_user(
-            email="owner@example.com",
-            password="password123"
+            email="owner@example.com", password="password123"
         )
         self.member_user = User.objects.create_user(
-            email="member@example.com",
-            password="password123"
+            email="member@example.com", password="password123"
         )
         self.workspace = Workspace.objects.create(
-            created_by=self.owner,
-            owner=self.owner
+            created_by=self.owner, owner=self.owner
         )
-    
+
     def test_workspace_member_creation(self):
         """Test workspace member creation"""
         member = WorkspaceMember.objects.create(
-            workspace=self.workspace,
-            user=self.member_user,
-            added_by=self.owner
+            workspace=self.workspace, user=self.member_user, added_by=self.owner
         )
-        
+
         self.assertEqual(member.workspace, self.workspace)
         self.assertEqual(member.user, self.member_user)
         self.assertEqual(member.added_by, self.owner)
         self.assertIsNone(member.pay_rate)
         self.assertIsNotNone(member.date_created)
-    
+
     def test_workspace_member_with_pay_rate(self):
         """Test workspace member creation with pay rate"""
         member = WorkspaceMember.objects.create(
             workspace=self.workspace,
             user=self.member_user,
             added_by=self.owner,
-            pay_rate=15.50
+            pay_rate=15.50,
         )
-        
+
         self.assertEqual(member.pay_rate, 15.50)
-    
+
     def test_workspace_member_cascade_delete_on_workspace(self):
         """Test that workspace member is deleted when workspace is deleted"""
         member = WorkspaceMember.objects.create(
-            workspace=self.workspace,
-            user=self.member_user,
-            added_by=self.owner
+            workspace=self.workspace, user=self.member_user, added_by=self.owner
         )
         member_id = member.id
-        
+
         self.workspace.delete()
-        
+
         with self.assertRaises(WorkspaceMember.DoesNotExist):
             WorkspaceMember.objects.get(id=member_id)
-    
+
     def test_workspace_member_cascade_delete_on_user(self):
         """Test that workspace member is deleted when user is deleted"""
         member = WorkspaceMember.objects.create(
-            workspace=self.workspace,
-            user=self.member_user,
-            added_by=self.owner
+            workspace=self.workspace, user=self.member_user, added_by=self.owner
         )
         member_id = member.id
-        
+
         self.member_user.delete()
-        
+
         with self.assertRaises(WorkspaceMember.DoesNotExist):
             WorkspaceMember.objects.get(id=member_id)

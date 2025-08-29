@@ -47,7 +47,7 @@ class CreateRole(APIView):
             member = WorkspaceMember.objects.get(
                 user=request.user, workspace=request.data["workspace_id"]
             )
-            permissions = MemberPermissions.objects.get(
+            MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
                 member=member,
                 MANAGE_WORKSPACE_ROLES=True,
@@ -114,7 +114,7 @@ class DeleteWorkspaceRole(APIView):
         # Verify user has permissions to manage workspace roles
         try:
             member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
-            permissions = MemberPermissions.objects.get(
+            MemberPermissions.objects.get(
                 workspace=workspace, member=member, MANAGE_WORKSPACE_ROLES=True
             )
         except MemberPermissions.DoesNotExist:
@@ -156,9 +156,7 @@ class ModifyWorkspaceRole(APIView):
 
         # Verify role exists
         try:
-            workspace_role = WorkspaceRole.objects.get(
-                pk=request.data["workspace_role_id"]
-            )
+            WorkspaceRole.objects.get(pk=request.data["workspace_role_id"])
         except WorkspaceRole.DoesNotExist:
             response["error"]["message"] = "Workspace role does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -173,7 +171,7 @@ class ModifyWorkspaceRole(APIView):
         # Verify user has permissions to manage workspace roles
         try:
             member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
-            permissions = MemberPermissions.objects.get(
+            MemberPermissions.objects.get(
                 workspace=workspace, member=member, MANAGE_WORKSPACE_ROLES=True
             )
         except MemberPermissions.DoesNotExist:
@@ -242,7 +240,7 @@ class GetMemberRoles(APIView):  # returns of list of the WorkspaceRoles a member
     def post(self, request):
         response = {"error": {}}
 
-        """ 
+        """
         member_id
         """
 
@@ -329,7 +327,7 @@ class AddMemberRole(APIView):  # adds a role to a workspace member
             request_member = WorkspaceMember.objects.get(
                 user=request.user, workspace=workspace
             )
-            permissions = MemberPermissions.objects.get(
+            MemberPermissions.objects.get(
                 workspace=workspace, member=request_member, MANAGE_WORKSPACE_ROLES=True
             )
         except MemberPermissions.DoesNotExist:
@@ -343,7 +341,7 @@ class AddMemberRole(APIView):  # adds a role to a workspace member
 
         # Verify that role exists and is part of workspace
         try:
-            workspace_role = WorkspaceRole.objects.get(
+            WorkspaceRole.objects.get(
                 id=request.data["workspace_role_id"], workspace=workspace
             )
         except WorkspaceRole.DoesNotExist:
@@ -354,13 +352,13 @@ class AddMemberRole(APIView):  # adds a role to a workspace member
 
         # Verify that member does not already have this role
         try:
-            member_role = MemberRole.objects.get(
+            MemberRole.objects.get(
                 member=request.data["member_id"],
                 workspace_role=request.data["workspace_role_id"],
             )
         except MemberRole.DoesNotExist:
             # add role to member if they did not have it
-            member_role = MemberRole.objects.create(
+            MemberRole.objects.create(
                 member=modify_member, workspace_role=workspace_role
             )
             return Response(response, status=status.HTTP_201_CREATED)
@@ -421,7 +419,7 @@ class RemoveMemberRole(APIView):  # removes a role from a workspace member
             request_member = WorkspaceMember.objects.get(
                 user=request.user, workspace=workspace
             )
-            permissions = MemberPermissions.objects.get(
+            MemberPermissions.objects.get(
                 workspace=workspace, member=request_member, MANAGE_WORKSPACE_ROLES=True
             )
         except MemberPermissions.DoesNotExist:
@@ -435,7 +433,7 @@ class RemoveMemberRole(APIView):  # removes a role from a workspace member
 
         # Verify that role exists and is part of workspace
         try:
-            workspace_role = WorkspaceRole.objects.get(
+            WorkspaceRole.objects.get(
                 id=request.data["workspace_role_id"], workspace=workspace
             )
         except WorkspaceRole.DoesNotExist:
@@ -446,7 +444,7 @@ class RemoveMemberRole(APIView):  # removes a role from a workspace member
 
         # Verify that member already has this role
         try:
-            member_role = MemberRole.objects.get(
+            MemberRole.objects.get(
                 member=request.data["member_id"],
                 workspace_role=request.data["workspace_role_id"],
             )

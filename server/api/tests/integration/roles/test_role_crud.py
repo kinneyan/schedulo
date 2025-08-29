@@ -214,7 +214,7 @@ class DeleteRoleTests(APITestCase):
 
         # check that role was deleted
         try:
-            role = WorkspaceRole.objects.get(id=self.role.id)
+            WorkspaceRole.objects.get(id=self.role.id)
             self.assertTrue(False)
         except WorkspaceRole.DoesNotExist:
             self.assertTrue(True)
@@ -230,14 +230,14 @@ class DeleteRoleTests(APITestCase):
 
         # check that role was deleted
         try:
-            role = WorkspaceRole.objects.get(id=self.role.id)
+            WorkspaceRole.objects.get(id=self.role.id)
             self.assertTrue(False)
         except WorkspaceRole.DoesNotExist:
             self.assertTrue(True)
 
         # check that member role was deleted
         try:
-            role = MemberRole.objects.get(id=member_role.id)
+            MemberRole.objects.get(id=member_role.id)
             self.assertTrue(False)
         except MemberRole.DoesNotExist:
             self.assertTrue(True)

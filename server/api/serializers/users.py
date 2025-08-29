@@ -4,7 +4,7 @@ from ..models import User
 
 class LoginUserSerializer(serializers.ModelSerializer):
     email = serializers.CharField(validators=[])
-    
+
     class Meta:
         model = User
         fields = ["email", "password"]

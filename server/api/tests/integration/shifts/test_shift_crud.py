@@ -142,7 +142,7 @@ class CreateShiftTests(APITestCase):
 
         # check that shift was not created in db
         try:
-            shift = Shift.objects.get(
+            Shift.objects.get(
                 workspace=self.workspace,
                 role=self.role,
                 start_time=self.time1,
@@ -165,7 +165,7 @@ class CreateShiftTests(APITestCase):
 
         # check that shift was created in db
         try:
-            shift = Shift.objects.get(
+            Shift.objects.get(
                 workspace=self.workspace,
                 role=self.role,
                 start_time=self.time1,
@@ -188,7 +188,7 @@ class CreateShiftTests(APITestCase):
 
         # check that shift was created in db
         try:
-            shift = Shift.objects.get(
+            Shift.objects.get(
                 workspace=self.workspace,
                 role=self.role,
                 start_time=self.time1,
@@ -212,7 +212,7 @@ class CreateShiftTests(APITestCase):
 
         # check that shift not was created in db
         try:
-            shift = Shift.objects.get(
+            Shift.objects.get(
                 workspace=self.workspace,
                 role=self.role,
                 start_time=self.time1,
@@ -322,7 +322,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was not modified
         try:
-            shift = Shift.objects.get(
+            Shift.objects.get(
                 pk=self.shift.id, start_time=self.time1, end_time=self.time2
             )
         except Shift.DoesNotExist:
@@ -335,7 +335,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was not modified
         try:
-            shift = Shift.objects.get(
+            Shift.objects.get(
                 pk=self.shift.id, start_time=self.time1, end_time=self.time2
             )
         except Shift.DoesNotExist:
@@ -352,7 +352,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was not modified
         try:
-            shift = Shift.objects.get(
+            Shift.objects.get(
                 pk=self.shift.id, start_time=self.time1, end_time=self.time2
             )
         except Shift.DoesNotExist:
@@ -365,7 +365,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was not modified
         try:
-            shift = Shift.objects.get(
+            Shift.objects.get(
                 pk=self.shift.id, start_time=self.time1, end_time=self.time2
             )
         except Shift.DoesNotExist:
@@ -378,7 +378,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was not modified
         try:
-            shift = Shift.objects.get(
+            Shift.objects.get(
                 pk=self.shift.id, start_time=self.time1, end_time=self.time2
             )
         except Shift.DoesNotExist:
@@ -395,7 +395,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was modified
         try:
-            shift = Shift.objects.get(
+            Shift.objects.get(
                 pk=self.shift.id, start_time=self.time4, end_time=self.time3
             )
         except Shift.DoesNotExist:
@@ -408,7 +408,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was modified
         try:
-            shift = Shift.objects.get(
+            Shift.objects.get(
                 pk=self.shift.id, start_time=self.time4, end_time=self.time2
             )
         except Shift.DoesNotExist:
@@ -421,7 +421,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was modified
         try:
-            shift = Shift.objects.get(
+            Shift.objects.get(
                 pk=self.shift.id, start_time=self.time1, end_time=self.time3
             )
         except Shift.DoesNotExist:
@@ -434,7 +434,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was not modified
         try:
-            shift = Shift.objects.get(pk=self.shift.id, open=True)
+            Shift.objects.get(pk=self.shift.id, open=True)
         except Shift.DoesNotExist:
             self.assertTrue(False)
 
@@ -445,7 +445,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was modified
         try:
-            shift = Shift.objects.get(pk=self.shift.id, member=self.member, open=False)
+            Shift.objects.get(pk=self.shift.id, member=self.member, open=False)
         except Shift.DoesNotExist:
             self.assertTrue(False)
 
@@ -456,7 +456,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was not modified
         try:
-            shift = Shift.objects.get(pk=self.shift.id, role=self.role)
+            Shift.objects.get(pk=self.shift.id, role=self.role)
         except Shift.DoesNotExist:
             self.assertTrue(False)
 
@@ -467,7 +467,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was modified
         try:
-            shift = Shift.objects.get(pk=self.shift.id, role=self.role2)
+            Shift.objects.get(pk=self.shift.id, role=self.role2)
         except Shift.DoesNotExist:
             self.assertTrue(False)
 
@@ -484,7 +484,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was modified
         try:
-            shift = Shift.objects.get(
+            Shift.objects.get(
                 pk=self.shift.id,
                 role=self.role2,
                 member=self.member2,
@@ -601,7 +601,7 @@ class DeleteShiftTests(APITestCase):
 
         # check that shift was not deleted
         try:
-            shift = Shift.objects.get(pk=self.shift1.id)
+            Shift.objects.get(pk=self.shift1.id)
         except Shift.DoesNotExist:
             self.assertTrue(False)
 
@@ -612,13 +612,13 @@ class DeleteShiftTests(APITestCase):
 
         # check that shift was deleted
         try:
-            shift = Shift.objects.get(pk=self.shift1.id)
+            Shift.objects.get(pk=self.shift1.id)
             self.assertTrue(False)
         except Shift.DoesNotExist:
             self.assertTrue(True)
 
         # check that other shift was not deleted
         try:
-            shift = Shift.objects.get(pk=self.shift2.id)
+            Shift.objects.get(pk=self.shift2.id)
         except Shift.DoesNotExist:
             self.assertTrue(False)

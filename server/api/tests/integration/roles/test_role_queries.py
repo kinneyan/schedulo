@@ -265,9 +265,7 @@ class GetMemberRoleTests(APITestCase):
         self.assertEqual(len(response.data["roles"]), 0)
 
     def test_single(self):
-        member_role = MemberRole.objects.create(
-            workspace_role=self.role, member=self.member2
-        )
+        MemberRole.objects.create(workspace_role=self.role, member=self.member2)
 
         response = self.client.post(
             self.url, {"member_id": self.member2.id}, format="json"
@@ -279,15 +277,9 @@ class GetMemberRoleTests(APITestCase):
         self.assertEqual(self.role.id, role.id)
 
     def test_multiple(self):
-        member_role = MemberRole.objects.create(
-            workspace_role=self.role, member=self.member2
-        )
-        member_role2 = MemberRole.objects.create(
-            workspace_role=self.role2, member=self.member2
-        )
-        member_role3 = MemberRole.objects.create(
-            workspace_role=self.role3, member=self.member2
-        )
+        MemberRole.objects.create(workspace_role=self.role, member=self.member2)
+        MemberRole.objects.create(workspace_role=self.role2, member=self.member2)
+        MemberRole.objects.create(workspace_role=self.role3, member=self.member2)
 
         data = {"member_id": self.member2.id}
 

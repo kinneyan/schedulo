@@ -5,12 +5,26 @@ from .integration.users.test_user_retrieval import GetUserTests
 from .integration.users.test_user_updates import UpdateUserTests
 from .integration.permissions.test_permission_updates import UpdatePermissionsTests
 from .integration.workspaces.test_workspace_members import AddMemberTests
-from .integration.workspaces.test_workspace_crud import ModifyWorkspaceTests, DeleteWorkspaceTests
+from .integration.workspaces.test_workspace_crud import (
+    ModifyWorkspaceTests,
+    DeleteWorkspaceTests,
+)
 from .integration.workspaces.test_workspace_queries import GetWorkspaceTests
-from .integration.roles.test_role_crud import CreateRoleTests, DeleteRoleTests, ModifyWorkspaceRoleTests
+from .integration.roles.test_role_crud import (
+    CreateRoleTests,
+    DeleteRoleTests,
+    ModifyWorkspaceRoleTests,
+)
 from .integration.roles.test_role_queries import GetRolesTests, GetMemberRoleTests
-from .integration.roles.test_member_roles import AddMemberRoleTests, RemoveMemberRoleTests
-from .integration.shifts.test_shift_crud import CreateShiftTests, ModifyShiftTests, DeleteShiftTests
+from .integration.roles.test_member_roles import (
+    AddMemberRoleTests,
+    RemoveMemberRoleTests,
+)
+from .integration.shifts.test_shift_crud import (
+    CreateShiftTests,
+    ModifyShiftTests,
+    DeleteShiftTests,
+)
 from .integration.shifts.test_shift_queries import GetShiftsTest
 
 # Unit tests will be imported here as they are added

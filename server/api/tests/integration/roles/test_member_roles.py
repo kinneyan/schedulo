@@ -103,7 +103,7 @@ class AddMemberRoleTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         try:  # this is probably a bad way to handle this since the fail doesnt give any info but idk :(
-            role = MemberRole.objects.get(workspace_role=self.role, member=self.member2)
+            MemberRole.objects.get(workspace_role=self.role, member=self.member2)
         except MemberRole.DoesNotExist:
             self.assertTrue(False)
 
@@ -141,7 +141,7 @@ class AddMemberRoleTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         try:  # this is probably a bad way to handle this since the fail doesnt give any info but idk :(
-            role = MemberRole.objects.get(workspace_role=self.role, member=self.member2)
+            MemberRole.objects.get(workspace_role=self.role, member=self.member2)
             self.assertTrue(False)
         except MemberRole.DoesNotExist:
             self.assertTrue(True)
@@ -245,16 +245,14 @@ class RemoveMemberRoleTests(APITestCase):
 
         # check that member role was deleted
         try:
-            role = MemberRole.objects.get(member=self.member2, workspace_role=self.role)
+            MemberRole.objects.get(member=self.member2, workspace_role=self.role)
             self.assertTrue(False)
         except MemberRole.DoesNotExist:
             self.assertTrue(True)
 
         # check that member still has other role
         try:
-            role = MemberRole.objects.get(
-                member=self.member2, workspace_role=self.role2
-            )
+            MemberRole.objects.get(member=self.member2, workspace_role=self.role2)
         except MemberRole.DoesNotExist:
             self.assertTrue(False)
 
@@ -271,6 +269,6 @@ class RemoveMemberRoleTests(APITestCase):
 
         # check that member role wasnt deleted
         try:
-            role = MemberRole.objects.get(member=self.member2, workspace_role=self.role)
+            MemberRole.objects.get(member=self.member2, workspace_role=self.role)
         except MemberRole.DoesNotExist:
             self.assertTrue(False)
