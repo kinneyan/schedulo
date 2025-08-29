@@ -15,6 +15,12 @@ class LoginViewTest(TestCase):
         self.view = Login()
         self.view.request = None  # Will be set in each test
     
+    def _create_drf_request(self, url, data):
+        """Helper method to create properly initialized DRF request"""
+        request = self.factory.post(url, data, format='json')
+        self.view.setup(request)
+        return self.view.initialize_request(request)
+    
     @patch('api.views.auth.LoginUserSerializer')
     @patch('api.views.auth.authenticate')
     @patch('api.views.auth.CustomTokenObtainPairSerializer')
@@ -42,8 +48,7 @@ class LoginViewTest(TestCase):
         
         # Create request
         request_data = {'email': 'test@example.com', 'password': 'password123'}
-        request = self.factory.post('/login/', request_data, format='json')
-        self.view.request = request
+        request = self._create_drf_request('/login/', request_data)
         
         # Call view method
         response = self.view.post(request)
@@ -70,8 +75,7 @@ class LoginViewTest(TestCase):
         
         # Create request
         request_data = {'email': 'test@example.com'}  # Missing password
-        request = self.factory.post('/login/', request_data, format='json')
-        self.view.request = request
+        request = self._create_drf_request('/login/', request_data)
         
         # Call view method
         response = self.view.post(request)
@@ -98,8 +102,7 @@ class LoginViewTest(TestCase):
         
         # Create request
         request_data = {'email': 'nonexistent@example.com', 'password': 'password123'}
-        request = self.factory.post('/login/', request_data, format='json')
-        self.view.request = request
+        request = self._create_drf_request('/login/', request_data)
         
         # Call view method
         response = self.view.post(request)
@@ -132,8 +135,7 @@ class LoginViewTest(TestCase):
         
         # Create request
         request_data = {'email': 'test@example.com', 'password': 'password123'}
-        request = self.factory.post('/login/', request_data, format='json')
-        self.view.request = request
+        request = self._create_drf_request('/login/', request_data)
         
         # Call view method
         response = self.view.post(request)
@@ -151,6 +153,12 @@ class RegisterViewTest(TestCase):
         self.factory = APIRequestFactory()
         self.view = Register()
         self.view.request = None
+    
+    def _create_drf_request(self, url, data):
+        """Helper method to create properly initialized DRF request"""
+        request = self.factory.post(url, data, format='json')
+        self.view.setup(request)
+        return self.view.initialize_request(request)
     
     @patch('api.views.auth.RegisterUserSerializer')
     @patch('api.views.auth.User.objects.create_user')
@@ -189,8 +197,7 @@ class RegisterViewTest(TestCase):
             'last_name': 'Doe',
             'phone': '1234567890'
         }
-        request = self.factory.post('/register/', request_data, format='json')
-        self.view.request = request
+        request = self._create_drf_request('/register/', request_data)
         
         # Call view method
         response = self.view.post(request)
@@ -216,13 +223,12 @@ class RegisterViewTest(TestCase):
         # Setup mock
         mock_register_instance = MagicMock()
         mock_register_instance.is_valid.return_value = False
-        mock_register_instance.errors = {'email': ['This field is required.']}
+        mock_register_instance.errors = {'username': ['This field is required.']}
         mock_register_serializer.return_value = mock_register_instance
         
         # Create request
         request_data = {'password': 'securepassword'}  # Missing required fields
-        request = self.factory.post('/register/', request_data, format='json')
-        self.view.request = request
+        request = self._create_drf_request('/register/', request_data)
         
         # Call view method
         response = self.view.post(request)
@@ -251,8 +257,7 @@ class RegisterViewTest(TestCase):
             'last_name': 'Doe',
             'phone': '1234567890'
         }
-        request = self.factory.post('/register/', request_data, format='json')
-        self.view.request = request
+        request = self._create_drf_request('/register/', request_data)
         
         # Call view method
         response = self.view.post(request)
@@ -289,8 +294,7 @@ class RegisterViewTest(TestCase):
             'last_name': 'User',
             'phone': '1234567890'
         }
-        request = self.factory.post('/register/', request_data, format='json')
-        self.view.request = request
+        request = self._create_drf_request('/register/', request_data)
         
         # Call view method
         response = self.view.post(request)
@@ -337,8 +341,7 @@ class RegisterViewTest(TestCase):
             'last_name': 'User',
             'phone': '1234567890'
         }
-        request = self.factory.post('/register/', request_data, format='json')
-        self.view.request = request
+        request = self._create_drf_request('/register/', request_data)
         
         # Call view method
         response = self.view.post(request)
@@ -361,7 +364,7 @@ class RegisterViewTest(TestCase):
             mock_instance.errors = {}
             mock_serializer.return_value = mock_instance
             
-            request = self.factory.post('/register/', {})
+            request = self._create_drf_request('/register/', {})
             response = self.view.post(request)
             
             # Response should always have error structure

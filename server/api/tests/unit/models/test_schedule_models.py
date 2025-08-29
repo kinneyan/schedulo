@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.utils import timezone
 from unittest.mock import patch, MagicMock
 from datetime import datetime, date, timedelta
 from ....models import (
@@ -33,8 +34,8 @@ class ShiftModelTest(TestCase):
     
     def test_shift_creation_with_member(self):
         """Test shift creation with assigned member"""
-        start_time = datetime(2025, 1, 1, 9, 0)
-        end_time = datetime(2025, 1, 1, 17, 0)
+        start_time = datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone())
+        end_time = datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone())
         
         shift = Shift.objects.create(
             member=self.member,
@@ -55,8 +56,8 @@ class ShiftModelTest(TestCase):
     
     def test_shift_creation_open_shift(self):
         """Test creation of open shift (no assigned member)"""
-        start_time = datetime(2025, 1, 1, 9, 0)
-        end_time = datetime(2025, 1, 1, 17, 0)
+        start_time = datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone())
+        end_time = datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone())
         
         shift = Shift.objects.create(
             member=None,
@@ -75,8 +76,8 @@ class ShiftModelTest(TestCase):
         """Test that shift is deleted when workspace is deleted"""
         shift = Shift.objects.create(
             workspace=self.workspace,
-            start_time=datetime(2025, 1, 1, 9, 0),
-            end_time=datetime(2025, 1, 1, 17, 0),
+            start_time=datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()),
+            end_time=datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()),
             role=self.role,
             created_by=self.member
         )
@@ -121,8 +122,8 @@ class ShiftRequestModelTest(TestCase):
         self.sender_shift = Shift.objects.create(
             member=self.sender_member,
             workspace=self.workspace,
-            start_time=datetime(2025, 1, 1, 9, 0),
-            end_time=datetime(2025, 1, 1, 17, 0),
+            start_time=datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()),
+            end_time=datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()),
             role=self.role,
             created_by=self.sender_member
         )
@@ -147,8 +148,8 @@ class ShiftRequestModelTest(TestCase):
         recipient_shift = Shift.objects.create(
             member=self.recipient_member,
             workspace=self.workspace,
-            start_time=datetime(2025, 1, 2, 9, 0),
-            end_time=datetime(2025, 1, 2, 17, 0),
+            start_time=datetime(2025, 1, 2, 9, 0, tzinfo=timezone.get_default_timezone()),
+            end_time=datetime(2025, 1, 2, 17, 0, tzinfo=timezone.get_default_timezone()),
             role=self.role,
             created_by=self.recipient_member
         )
@@ -249,8 +250,8 @@ class UnavailabilityModelTest(TestCase):
         for day in range(7):  # 0-6 are valid
             unavailability = Unavailability.objects.create(
                 member=self.member,
-                start_time=datetime(2025, 1, 1, 9, 0),
-                end_time=datetime(2025, 1, 1, 17, 0),
+                start_time=datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()),
+                end_time=datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()),
                 day_of_week=day
             )
             
@@ -262,8 +263,8 @@ class UnavailabilityModelTest(TestCase):
         with self.assertRaises(ValidationError):
             unavailability = Unavailability(
                 member=self.member,
-                start_time=datetime(2025, 1, 1, 9, 0),
-                end_time=datetime(2025, 1, 1, 17, 0),
+                start_time=datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()),
+                end_time=datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()),
                 day_of_week=-1
             )
             unavailability.full_clean()
@@ -273,8 +274,8 @@ class UnavailabilityModelTest(TestCase):
         with self.assertRaises(ValidationError):
             unavailability = Unavailability(
                 member=self.member,
-                start_time=datetime(2025, 1, 1, 9, 0),
-                end_time=datetime(2025, 1, 1, 17, 0),
+                start_time=datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()),
+                end_time=datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()),
                 day_of_week=7
             )
             unavailability.full_clean()
@@ -285,8 +286,8 @@ class UnavailabilityModelTest(TestCase):
         # This tests that the constraint is properly defined in the model
         unavailability = Unavailability(
             member=self.member,
-            start_time=datetime(2025, 1, 1, 9, 0),
-            end_time=datetime(2025, 1, 1, 17, 0),
+            start_time=datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()),
+            end_time=datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()),
             day_of_week=5
         )
         
@@ -297,8 +298,8 @@ class UnavailabilityModelTest(TestCase):
     
     def test_unavailability_time_fields(self):
         """Test unavailability time field handling"""
-        start_time = datetime(2025, 1, 1, 9, 0)
-        end_time = datetime(2025, 1, 1, 17, 0)
+        start_time = datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone())
+        end_time = datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone())
         
         unavailability = Unavailability.objects.create(
             member=self.member,
@@ -314,8 +315,8 @@ class UnavailabilityModelTest(TestCase):
         """Test that unavailability is deleted when member is deleted"""
         unavailability = Unavailability.objects.create(
             member=self.member,
-            start_time=datetime(2025, 1, 1, 9, 0),
-            end_time=datetime(2025, 1, 1, 17, 0),
+            start_time=datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()),
+            end_time=datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()),
             day_of_week=1
         )
         unavailability_id = unavailability.id

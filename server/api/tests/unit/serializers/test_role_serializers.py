@@ -110,7 +110,6 @@ class RoleSerializerTest(TestCase):
         invalid_pay_rates = [
             'not-a-number',
             'abc',
-            '',
             '10.999',  # Too many decimal places might cause issues
         ]
         

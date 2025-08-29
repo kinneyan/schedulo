@@ -13,6 +13,22 @@ class CreateRoleViewTest(TestCase):
         self.factory = APIRequestFactory()
         self.view = CreateRole()
     
+    def _create_drf_request(self, url, data, method='put'):
+        """Helper method to create properly initialized DRF request"""
+        if method == 'put':
+            request = self.factory.put(url, data, format='json')
+        elif method == 'post':
+            request = self.factory.post(url, data, format='json')
+        elif method == 'delete':
+            request = self.factory.delete(url, data, format='json')
+        # Create a mock user with an id
+        mock_user = MagicMock()
+        mock_user.id = 1
+        mock_user.pk = 1
+        request.user = mock_user
+        self.view.setup(request)
+        return self.view.initialize_request(request)
+    
     @patch('api.views.role.RoleSerializer')
     @patch('api.views.role.Workspace.objects.get')
     @patch('api.views.role.WorkspaceMember.objects.get')
@@ -48,9 +64,7 @@ class CreateRoleViewTest(TestCase):
             'name': 'Manager',
             'pay_rate': 25.50
         }
-        request = self.factory.put('/create-role/', request_data, format='json')
-        request.user = MagicMock()
-        self.view.request = request
+        request = self._create_drf_request('/create-role/', request_data, method='put')
         
         # Call view method
         response = self.view.put(request)
@@ -72,8 +86,7 @@ class CreateRoleViewTest(TestCase):
         mock_serializer.return_value = mock_serializer_instance
         
         request_data = {'invalid': 'data'}
-        request = self.factory.put('/create-role/', request_data, format='json')
-        request.user = MagicMock()
+        request = self._create_drf_request('/create-role/', request_data, method='put')
         
         response = self.view.put(request)
         
@@ -89,8 +102,7 @@ class CreateRoleViewTest(TestCase):
         mock_serializer.return_value = mock_serializer_instance
         
         request_data = {'name': 'Manager'}  # Missing workspace_id
-        request = self.factory.put('/create-role/', request_data, format='json')
-        request.user = MagicMock()
+        request = self._create_drf_request('/create-role/', request_data, method='put')
         
         response = self.view.put(request)
         
@@ -108,8 +120,7 @@ class CreateRoleViewTest(TestCase):
         mock_workspace_get.side_effect = Workspace.DoesNotExist
         
         request_data = {'workspace_id': 999, 'name': 'Manager'}
-        request = self.factory.put('/create-role/', request_data, format='json')
-        request.user = MagicMock()
+        request = self._create_drf_request('/create-role/', request_data, method='put')
         
         response = self.view.put(request)
         
@@ -118,8 +129,9 @@ class CreateRoleViewTest(TestCase):
     
     @patch('api.views.role.RoleSerializer')
     @patch('api.views.role.Workspace.objects.get')
+    @patch('api.views.role.WorkspaceMember.objects.get')
     @patch('api.views.role.MemberPermissions.objects.get')
-    def test_create_role_insufficient_permissions(self, mock_permissions_get, mock_workspace_get, mock_serializer):
+    def test_create_role_insufficient_permissions(self, mock_permissions_get, mock_member_get, mock_workspace_get, mock_serializer):
         """Test role creation without proper permissions"""
         mock_serializer_instance = MagicMock()
         mock_serializer_instance.is_valid.return_value = True
@@ -128,11 +140,13 @@ class CreateRoleViewTest(TestCase):
         mock_workspace = MagicMock()
         mock_workspace_get.return_value = mock_workspace
         
+        mock_member = MagicMock()
+        mock_member_get.return_value = mock_member
+        
         mock_permissions_get.side_effect = MemberPermissions.DoesNotExist
         
         request_data = {'workspace_id': 1, 'name': 'Manager'}
-        request = self.factory.put('/create-role/', request_data, format='json')
-        request.user = MagicMock()
+        request = self._create_drf_request('/create-role/', request_data, method='put')
         
         response = self.view.put(request)
         
@@ -147,6 +161,22 @@ class DeleteWorkspaceRoleViewTest(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.view = DeleteWorkspaceRole()
+    
+    def _create_drf_request(self, url, data, method='delete'):
+        """Helper method to create properly initialized DRF request"""
+        if method == 'put':
+            request = self.factory.put(url, data, format='json')
+        elif method == 'post':
+            request = self.factory.post(url, data, format='json')
+        elif method == 'delete':
+            request = self.factory.delete(url, data, format='json')
+        # Create a mock user with an id
+        mock_user = MagicMock()
+        mock_user.id = 1
+        mock_user.pk = 1
+        request.user = mock_user
+        self.view.setup(request)
+        return self.view.initialize_request(request)
     
     @patch('api.views.role.WorkspaceRole.objects.get')
     @patch('api.views.role.Workspace.objects.get')
@@ -171,8 +201,7 @@ class DeleteWorkspaceRoleViewTest(TestCase):
         mock_permissions_get.return_value = mock_permissions
         
         request_data = {'workspace_role_id': 1}
-        request = self.factory.delete('/delete-role/', request_data, format='json')
-        request.user = MagicMock()
+        request = self._create_drf_request('/delete-role/', request_data, method='delete')
         
         response = self.view.delete(request)
         
@@ -183,8 +212,7 @@ class DeleteWorkspaceRoleViewTest(TestCase):
     def test_delete_role_missing_workspace_role_id(self):
         """Test role deletion without workspace_role_id"""
         request_data = {}  # Missing workspace_role_id
-        request = self.factory.delete('/delete-role/', request_data, format='json')
-        request.user = MagicMock()
+        request = self._create_drf_request('/delete-role/', request_data, method='delete')
         
         response = self.view.delete(request)
         
@@ -197,8 +225,7 @@ class DeleteWorkspaceRoleViewTest(TestCase):
         mock_role_get.side_effect = WorkspaceRole.DoesNotExist
         
         request_data = {'workspace_role_id': 999}
-        request = self.factory.delete('/delete-role/', request_data, format='json')
-        request.user = MagicMock()
+        request = self._create_drf_request('/delete-role/', request_data, method='delete')
         
         response = self.view.delete(request)
         
@@ -213,6 +240,22 @@ class ModifyWorkspaceRoleViewTest(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.view = ModifyWorkspaceRole()
+    
+    def _create_drf_request(self, url, data, method='post'):
+        """Helper method to create properly initialized DRF request"""
+        if method == 'put':
+            request = self.factory.put(url, data, format='json')
+        elif method == 'post':
+            request = self.factory.post(url, data, format='json')
+        elif method == 'delete':
+            request = self.factory.delete(url, data, format='json')
+        # Create a mock user with an id
+        mock_user = MagicMock()
+        mock_user.id = 1
+        mock_user.pk = 1
+        request.user = mock_user
+        self.view.setup(request)
+        return self.view.initialize_request(request)
     
     @patch('api.views.role.RoleSerializer')
     @patch('api.views.role.WorkspaceRole.objects.get')
@@ -249,8 +292,7 @@ class ModifyWorkspaceRoleViewTest(TestCase):
             'name': 'Updated Manager',
             'pay_rate': 30.00
         }
-        request = self.factory.post('/modify-role/', request_data, format='json')
-        request.user = MagicMock()
+        request = self._create_drf_request('/modify-role/', request_data, method='post')
         
         response = self.view.post(request)
         
@@ -264,8 +306,7 @@ class ModifyWorkspaceRoleViewTest(TestCase):
     def test_modify_role_missing_workspace_role_id(self):
         """Test role modification without workspace_role_id"""
         request_data = {'name': 'Updated Name'}  # Missing workspace_role_id
-        request = self.factory.post('/modify-role/', request_data, format='json')
-        request.user = MagicMock()
+        request = self._create_drf_request('/modify-role/', request_data, method='post')
         
         response = self.view.post(request)
         
@@ -283,8 +324,7 @@ class ModifyWorkspaceRoleViewTest(TestCase):
             'workspace_role_id': 1,
             'invalid': 'data'
         }
-        request = self.factory.post('/modify-role/', request_data, format='json')
-        request.user = MagicMock()
+        request = self._create_drf_request('/modify-role/', request_data, method='post')
         
         response = self.view.post(request)
         
@@ -306,8 +346,7 @@ class ModifyWorkspaceRoleViewTest(TestCase):
             'workspace_role_id': 999,
             'name': 'Updated Name'
         }
-        request = self.factory.post('/modify-role/', request_data, format='json')
-        request.user = MagicMock()
+        request = self._create_drf_request('/modify-role/', request_data, method='post')
         
         response = self.view.post(request)
         
@@ -317,8 +356,9 @@ class ModifyWorkspaceRoleViewTest(TestCase):
     @patch('api.views.role.RoleSerializer')
     @patch('api.views.role.WorkspaceRole.objects.get')
     @patch('api.views.role.Workspace.objects.get')
+    @patch('api.views.role.WorkspaceMember.objects.get')
     @patch('api.views.role.MemberPermissions.objects.get')
-    def test_modify_role_insufficient_permissions(self, mock_permissions_get, mock_workspace_get,
+    def test_modify_role_insufficient_permissions(self, mock_permissions_get, mock_member_get, mock_workspace_get,
                                                  mock_role_get, mock_serializer):
         """Test role modification without proper permissions"""
         mock_serializer_instance = MagicMock()
@@ -332,14 +372,16 @@ class ModifyWorkspaceRoleViewTest(TestCase):
         mock_workspace = MagicMock()
         mock_workspace_get.return_value = mock_workspace
         
+        mock_member = MagicMock()
+        mock_member_get.return_value = mock_member
+        
         mock_permissions_get.side_effect = MemberPermissions.DoesNotExist
         
         request_data = {
             'workspace_role_id': 1,
             'name': 'Updated Name'
         }
-        request = self.factory.post('/modify-role/', request_data, format='json')
-        request.user = MagicMock()
+        request = self._create_drf_request('/modify-role/', request_data, method='post')
         
         response = self.view.post(request)
         
@@ -381,8 +423,7 @@ class ModifyWorkspaceRoleViewTest(TestCase):
             'workspace_role_id': 1,
             'name': 'New Name Only'
         }
-        request = self.factory.post('/modify-role/', request_data, format='json')
-        request.user = MagicMock()
+        request = self._create_drf_request('/modify-role/', request_data, method='post')
         
         response = self.view.post(request)
         

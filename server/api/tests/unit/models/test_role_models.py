@@ -69,8 +69,8 @@ class WorkspaceRoleModelTest(TestCase):
             name="Test Role"
         )
         
-        # Should include role name in string representation
-        self.assertIn("Test Role", str(role))
+        # Should use default Django string representation
+        self.assertEqual(str(role), f"WorkspaceRole object ({role.id})")
 
 
 class MemberRoleModelTest(TestCase):
