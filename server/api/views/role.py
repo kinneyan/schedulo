@@ -156,7 +156,9 @@ class ModifyWorkspaceRole(APIView):
 
         # Verify role exists
         try:
-            workspace_role = WorkspaceRole.objects.get(pk=request.data["workspace_role_id"])
+            workspace_role = WorkspaceRole.objects.get(
+                pk=request.data["workspace_role_id"]
+            )
         except WorkspaceRole.DoesNotExist:
             response["error"]["message"] = "Workspace role does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
