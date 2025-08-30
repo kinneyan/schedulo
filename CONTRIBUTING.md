@@ -85,7 +85,7 @@ This guide outlines our team's standard coding conventions. Consistency is keyâ€
 * For JavaScript, always use semicolons at the end of statements.
 
   ```js
-  const max_value = 100;
+  const maxValue = 100;
   ```
 * Python does not require semicolons; do not use them in Python code.
 
@@ -94,7 +94,7 @@ This guide outlines our team's standard coding conventions. Consistency is keyâ€
 * Use double quotes for all strings in both JavaScript and Python.
 
   ```js
-  const default_message = "Hello world";
+  const defaultMessage = "Hello world";
   ```
 
   ```python
