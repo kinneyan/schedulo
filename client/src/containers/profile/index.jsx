@@ -72,15 +72,15 @@ const Profile = () =>
         e.preventDefault();
 
         let requestBody = {
-            firstName: fname,
-            lastName: lname,
+            first_name: fname,
+            last_name: lname,
             email: email,
             phone: phone,
         };
 
         if (newPassword !== "") 
         {
-            requestBody.currentPassword = oldPassword;
+            requestBody.current_password = oldPassword;
             requestBody.password = newPassword;
         }
 

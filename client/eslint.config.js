@@ -52,7 +52,7 @@ export default [
       'space-in-parens': ['error', 'never'],
       'object-curly-spacing': ['error', 'never'],
       'array-bracket-spacing': ['error', 'never'],
-      camelcase: ['error', { properties: 'always' }],
+      camelcase: ['error', { properties: "never", ignoreDestructuring: true }],
       'no-underscore-dangle': ['off'],
       'space-infix-ops': ['error', { int32Hint: false }],
       'key-spacing': ['error', { beforeColon: false, afterColon: true }],

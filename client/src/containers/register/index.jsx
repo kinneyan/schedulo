@@ -25,7 +25,7 @@ const RegisterContainer = () =>
                 const response = await fetch(import.meta.env.VITE_API_URL + "/api/register", {
                     method: "POST",
                     headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({email, password, firstName: firstName, lastName: lastName, phone}),
+                    body: JSON.stringify({email, password, first_name: firstName, last_name: lastName, phone}),
                 });
 
                 const data = await response.json();            
