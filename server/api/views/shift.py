@@ -61,9 +61,7 @@ class CreateShift(APIView):
             creator_member = WorkspaceMember.objects.get(
                 user=request.user, workspace=workspace
             )
-            creator_permissions = MemberPermissions.objects.get(
-                member=creator_member, MANAGE_SCHEDULES=True
-            )
+            MemberPermissions.objects.get(member=creator_member, MANAGE_SCHEDULES=True)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
@@ -170,9 +168,7 @@ class ModifyShift(APIView):
             creator_member = WorkspaceMember.objects.get(
                 user=request.user, workspace=workspace
             )
-            creator_permissions = MemberPermissions.objects.get(
-                member=creator_member, MANAGE_SCHEDULES=True
-            )
+            MemberPermissions.objects.get(member=creator_member, MANAGE_SCHEDULES=True)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
@@ -283,9 +279,7 @@ class DeleteShift(APIView):
             creator_member = WorkspaceMember.objects.get(
                 user=request.user, workspace=workspace
             )
-            creator_permissions = MemberPermissions.objects.get(
-                member=creator_member, MANAGE_SCHEDULES=True
-            )
+            MemberPermissions.objects.get(member=creator_member, MANAGE_SCHEDULES=True)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
@@ -351,7 +345,7 @@ class GetShifts(APIView):
                     date.min,
                     datetime.strptime(request.data["range_end"], "%Y-%m-%d").date(),
                 )
-        except:
+        except Exception:
             response["error"]["message"] = "Date range value is invalid."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 

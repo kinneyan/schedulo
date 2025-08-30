@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,9 +27,7 @@ SECRET_KEY = "django-insecure-2wz8w^3)xnssg7z#5f@u8%05mr+z(8ale^xfm=qe7e6l%sma=w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "schedulo.kinneyan.com"
-]
+ALLOWED_HOSTS = ["schedulo.kinneyan.com"]
 
 
 # Application definition
@@ -84,8 +84,6 @@ WSGI_APPLICATION = "server.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-import os
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -104,8 +102,6 @@ REST_FRAMEWORK = {
 }
 
 # JWT settings
-
-from datetime import timedelta
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),

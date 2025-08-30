@@ -28,7 +28,7 @@ class CreateWorkspace(APIView):
         )
 
         # set name if present
-        if not (serializer.data.get("name", None) == None):
+        if not (serializer.data.get("name", None) is None):
             name = serializer.validated_data["name"]
             workspace.name = name
             workspace.save()
@@ -39,7 +39,7 @@ class CreateWorkspace(APIView):
         )
 
         # create permissions for owner
-        permissions = MemberPermissions.objects.create(
+        MemberPermissions.objects.create(
             workspace=workspace,
             member=workspace_member,
             IS_OWNER=True,
@@ -88,7 +88,7 @@ class ModifyWorkspace(APIView):  # change name or owner, can only be done by own
             old_owner_member = WorkspaceMember.objects.get(
                 user=request.user, workspace=request.data["workspace_id"]
             )
-            permissions = MemberPermissions.objects.get(
+            MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
                 member=old_owner_member,
                 IS_OWNER=True,
@@ -146,7 +146,7 @@ class ModifyWorkspace(APIView):  # change name or owner, can only be done by own
                 response["error"]["message"] = "Could not find member with provided ID."
                 return Response(response, status=status.HTTP_404_NOT_FOUND)
 
-        if not (serializer.data.get("name", None) == None):  # update name
+        if not (serializer.data.get("name", None) is None):  # update name
             workspace.name = serializer.validated_data["name"]
             workspace.save()
 
@@ -199,7 +199,7 @@ class AddWorkspaceMember(APIView):
                 workspace_member.pay_rate = request.data["pay_rate"]
                 workspace_member.save()
 
-            permissions = MemberPermissions.objects.create(
+            MemberPermissions.objects.create(
                 workspace=Workspace.objects.get(pk=request.data["workspace_id"]),
                 member=workspace_member,
             )
@@ -215,48 +215,50 @@ class GetWorkspace(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        '''
+        """
         workspace_id (required)
-        '''
+        """
         response = {"error": {}}
 
         # Verify parameters contains required fields
-        if request.GET.get("workspace_id") == None:
+        if request.GET.get("workspace_id") is None:
             response["error"]["message"] = "Workspace ID is required."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify workspace exists
         try:
             workspace = Workspace.objects.get(pk=request.GET.get("workspace_id"))
-        except(Workspace.DoesNotExist):
+        except Workspace.DoesNotExist:
             response["error"]["message"] = "Workspace does not exists."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
-        
+
         # Verify user is member of workspace
         try:
             member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
-        except(WorkspaceMember.DoesNotExist):
+        except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "User is not a member of this workspace."
             return Response(response, status=status.HTTP_401_UNAUTHORIZED)
 
         # Get user's perms
         permissions = MemberPermissions.objects.get(workspace=workspace, member=member)
 
-        if (permissions.IS_OWNER):
+        if permissions.IS_OWNER:
             response["membership"] = "owner"
         # UNCOMMENT WHEN MANAGER MEMBERSHIP ADDED!!
-        #elif (permissions.IS_MANAGER): 
-         #   response["membership"] = "manager"
+        # elif (permissions.IS_MANAGER):
+        #   response["membership"] = "manager"
         else:
             response["membership"] = "employee"
-        
-        response["owner_name"] = workspace.owner.first_name + " " + workspace.owner.last_name
+
+        response["owner_name"] = (
+            workspace.owner.first_name + " " + workspace.owner.last_name
+        )
         response["owner_id"] = workspace.owner.id
         response["name"] = workspace.name
         response["workspace_id"] = workspace.id
 
         return Response(response, status=status.HTTP_200_OK)
-        '''
+        """
         DECPRICATED
         # Verify user exists
         try:
@@ -281,9 +283,9 @@ class GetWorkspace(APIView):
         response["workspaces"] = workspace_list
 
         return Response(response, status=status.HTTP_200_OK)
-        '''
-        
-        
+        """
+
+
 class DeleteWorkspace(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -312,7 +314,7 @@ class DeleteWorkspace(APIView):
             owner_member = WorkspaceMember.objects.get(
                 user=request.user, workspace=request.data["workspace_id"]
             )
-            permissions = MemberPermissions.objects.get(
+            MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
                 member=owner_member,
                 IS_OWNER=True,

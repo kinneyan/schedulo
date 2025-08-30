@@ -83,7 +83,7 @@ class Register(APIView):
             response["refresh"] = token_serializer.validated_data["refresh"]
             return Response(response, status=status.HTTP_201_CREATED)
 
-        except Exception as e:
+        except Exception:
             response["error"]["code"] = 500
             response["error"]["message"] = "Internal server error"
             return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
