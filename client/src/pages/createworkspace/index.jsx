@@ -1,7 +1,7 @@
 import "./index.scss";
 
 import NavigationBar from "../../components/navbar";
-import CreateWorkspaceContainer from "../../containers/createworkspace";
+import CreateWorkspaceContainer from "../../containers/createWorkspace";
 import withAuth from "../../components/auth";
 
 const CreateWorkspacePage = () => 

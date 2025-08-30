@@ -3,7 +3,7 @@ import Form from "react-bootstrap/Form";
 import PropTypes from "prop-types";
 
 import "./index.scss";
-import SubmitButton from "../submitbutton";
+import SubmitButton from "../buttons/submitButton";
 
 const ViewProfile = ({states, handleSubmit}) => 
 {

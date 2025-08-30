@@ -1,7 +1,7 @@
 import {useState} from "react";
 import Cookies from "universal-cookie";
 import {Navigate} from "react-router-dom";
-import RegisterForm from "../../components/registerform";
+import RegisterForm from "../../components/forms/registerForm";
 
 const RegisterContainer = () => 
 {

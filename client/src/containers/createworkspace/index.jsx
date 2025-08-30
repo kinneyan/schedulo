@@ -1,7 +1,7 @@
 import {useState} from "react";
 import Cookies from "universal-cookie";
 import {Navigate} from "react-router-dom";
-import CreateWorkspaceForm from "../../components/createworkspaceform";
+import CreateWorkspaceForm from "../../components/forms/createWorkspace";
 
 const CreateWorkspaceContainer = () => 
 {

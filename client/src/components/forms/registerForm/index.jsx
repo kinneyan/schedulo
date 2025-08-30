@@ -1,6 +1,6 @@
 import Container from "react-bootstrap/Container";
 import PropTypes from "prop-types";
-import SubmitButton from "../submitbutton";
+import SubmitButton from "../../buttons/submitButton";
 import "./index.scss";
 
 const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, firstName, setFirstName, lastName, setLastName, phone, setPhone, error, handleSubmit}) => 
