@@ -1,4 +1,4 @@
-name: Django Tests
+name: Django Unit Tests
 
 on:
   push:
@@ -32,7 +32,7 @@ jobs:
         cd server
         python manage.py migrate --settings=server.settings.tests
 
-    - name: Run tests
+    - name: Run unit tests
       run: |
         cd server
-        python manage.py test --settings=server.settings.tests
+        python manage.py test api.tests.unit --settings=server.settings.tests
