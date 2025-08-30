@@ -1,4 +1,4 @@
-# <img src="client/public/schedulo.png" alt="Schedulo Logo" width="40" height="40" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Schedulo
+# <img src="client/public/schedulo.png" alt="Schedulo Logo" width="40" height="40" align="left">&nbsp;&nbsp;Schedulo
 
 Schedulo is an open-source work tracking application built with modern web technologies and containerized with Docker. It features a React frontend powered by Vite, a Django REST API backend, and a PostgreSQL database.
 
