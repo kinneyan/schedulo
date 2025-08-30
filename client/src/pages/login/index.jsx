@@ -1,8 +1,7 @@
-import React from 'react';
-import './index.scss';
+import "./index.scss";
 
-import NavbarContainer from '../../containers/navbar';
-import LoginContainer from '../../containers/login';
+import NavbarContainer from "../../containers/navbar";
+import LoginContainer from "../../containers/login";
 
 const LoginPage = () => 
 {
@@ -10,7 +9,7 @@ const LoginPage = () =>
         <div id="login-page">
             <NavbarContainer />
             <div id="login-form-container">
-                    <LoginContainer />
+                <LoginContainer />
             </div>
         </div>
     );

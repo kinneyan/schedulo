@@ -1,7 +1,6 @@
-import React from 'react';
-import './index.scss';
+import "./index.scss";
 
-import NavbarContainer from '../../containers/navbar';
+import NavbarContainer from "../../containers/navbar";
 
 const HomePage = () => 
 {

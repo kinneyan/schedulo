@@ -1,9 +1,10 @@
-import React from 'react';
-import Container from 'react-bootstrap/Container';
-import SubmitButton from '../submitbutton';
+import Container from "react-bootstrap/Container";
+import SubmitButton from "../../buttons/submitButton";
 import "./index.scss";
+import PropTypes from "prop-types";
 
-const CreateWorkspaceForm = ({ name, setName, error, handleSubmit }) => {
+const CreateWorkspaceForm = ({name, setName, error, handleSubmit}) => 
+{
     return (
         <Container id="create-workspace-container">
             <form id="create-workspace-form" onSubmit={handleSubmit}>
@@ -17,13 +18,20 @@ const CreateWorkspaceForm = ({ name, setName, error, handleSubmit }) => {
                     onChange={(e) => setName(e.target.value)}
                     required
                 />
-                <SubmitButton button_text="Create Workspace" />
+                <SubmitButton buttonText="Create Workspace" />
                 {error && <div id="error-container">
                     <p id="error-text">{error}</p>
                 </div>}
             </form>
         </Container>
     );
+};
+
+CreateWorkspaceForm.propTypes = {
+    name: PropTypes.string.isRequired,
+    setName: PropTypes.func.isRequired,
+    error: PropTypes.string,
+    handleSubmit: PropTypes.func.isRequired,
 };
 
 export default CreateWorkspaceForm;

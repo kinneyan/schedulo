@@ -1,9 +1,8 @@
-import React from 'react';
-import './index.scss';
+import "./index.scss";
 
-import with_auth from '../../components/auth';
-import NavbarContainer from '../../containers/navbar';
-import Profile from '../../containers/profile';
+import withAuth from "../../components/auth";
+import NavbarContainer from "../../containers/navbar";
+import Profile from "../../containers/profile";
 
 const ProfilePage = () => 
 {
@@ -15,5 +14,4 @@ const ProfilePage = () =>
     );
 };
 
-//export default ProfilePage; // TESTING
-export default with_auth(ProfilePage);
+export default withAuth(ProfilePage);

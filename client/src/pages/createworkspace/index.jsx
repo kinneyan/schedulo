@@ -1,11 +1,11 @@
-import React from 'react';
-import './index.scss';
+import "./index.scss";
 
-import NavigationBar from '../../components/navbar';
-import CreateWorkspaceContainer from '../../containers/createworkspace';
-import with_auth from '../../components/auth';
+import NavigationBar from "../../components/navbar";
+import CreateWorkspaceContainer from "../../containers/createWorkspace";
+import withAuth from "../../components/auth";
 
-const CreateWorkspacePage = () => {
+const CreateWorkspacePage = () => 
+{
     return (
         <div id="create-workspace-page">
             <NavigationBar />
@@ -16,4 +16,4 @@ const CreateWorkspacePage = () => {
     );
 };
 
-export default with_auth(CreateWorkspacePage);
+export default withAuth(CreateWorkspacePage);
