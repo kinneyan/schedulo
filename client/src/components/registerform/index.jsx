@@ -1,9 +1,10 @@
-import React from 'react';
-import Container from 'react-bootstrap/Container';
-import SubmitButton from '../submitbutton';
+import Container from "react-bootstrap/Container";
+import PropTypes from "prop-types";
+import SubmitButton from "../submitbutton";
 import "./index.scss";
 
-const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, first_name, setfirst_name, last_name, setlast_name, phone, setPhone, error, handleSubmit}) => {
+const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, firstName, setFirstName, lastName, setLastName, phone, setPhone, error, handleSubmit}) => 
+{
     return (
         <Container id="register-container">
             <form id="register-form" onSubmit={handleSubmit}>
@@ -12,8 +13,8 @@ const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, 
                     type="text"
                     name="first-name"
                     id="first-name-form"
-                    value={first_name}
-                    onChange={(e) => setfirst_name(e.target.value)}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                     required
                 />
                 <label id="last-name-label">Last Name</label>
@@ -21,8 +22,8 @@ const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, 
                     type="text"
                     name="last-name"
                     id="last-name-form"
-                    value={last_name}
-                    onChange={(e) => setlast_name(e.target.value)}
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                     required
                 />
                 <label id="email-label">Email</label>
@@ -61,7 +62,7 @@ const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, 
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                 />
-                <SubmitButton button_text="Sign up" />
+                <SubmitButton buttonText="Sign up" />
                 {error && <div id="error-container">
                     <p id="error-text">{error}</p>
                 </div>}
@@ -70,6 +71,23 @@ const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, 
             </form>
         </Container>
     );
+};
+
+RegisterForm.propTypes = {
+    email: PropTypes.string.isRequired,
+    setEmail: PropTypes.func.isRequired,
+    password: PropTypes.string.isRequired,
+    setPassword: PropTypes.func.isRequired,
+    confirmPassword: PropTypes.string.isRequired,
+    setConfirmPassword: PropTypes.func.isRequired,
+    firstName: PropTypes.string.isRequired,
+    setFirstName: PropTypes.func.isRequired,
+    lastName: PropTypes.string.isRequired,
+    setLastName: PropTypes.func.isRequired,
+    phone: PropTypes.string.isRequired,
+    setPhone: PropTypes.func.isRequired,
+    error: PropTypes.string,
+    handleSubmit: PropTypes.func.isRequired,
 };
 
 export default RegisterForm;

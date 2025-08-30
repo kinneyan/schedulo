@@ -1,32 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import Cookies from 'universal-cookie';
+import {useState, useEffect} from "react";
+import Cookies from "universal-cookie";
 
-import NavigationBar from '../../components/navbar';
+import NavigationBar from "../../components/navbar";
 
 const NavbarContainer = () => 
 {
-    const [logged_in, setLogged_in] = useState(false);
+    const [loggedIn, setLoggedIn] = useState(false);
 
     useEffect(() => 
     {
         const cookies = new Cookies();
-        const token = cookies.get('token');
-        if (token == undefined)
+        const token = cookies.get("token");
+        if (token === undefined) 
         {
-            setLogged_in(false);
+            setLoggedIn(false);
         }
         else 
         {
-            setLogged_in(true);
+            setLoggedIn(true);
         }
     }, []);
 
-    
     return (
         <div>
-            <NavigationBar logged_in={logged_in} />
+            <NavigationBar loggedIn={loggedIn} />
         </div>
-    )
-}
+    );
+};
 
 export default NavbarContainer;

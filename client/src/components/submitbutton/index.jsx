@@ -1,13 +1,17 @@
-import Container from 'react-bootstrap/Container';
-import Button from 'react-bootstrap/Button';
+import Button from "react-bootstrap/Button";
+import PropTypes from "prop-types";
 
-import './index.scss';
+import "./index.scss";
 
-const SubmitButton = ({ button_text }) => 
+const SubmitButton = ({buttonText}) => 
 {
     return (
-        <Button id="button-item" type="submit">{button_text}</Button>
+        <Button id="button-item" type="submit">{buttonText}</Button>
     );
+};
+
+SubmitButton.propTypes = {
+    buttonText: PropTypes.string.isRequired,
 };
 
 export default SubmitButton;

@@ -1,9 +1,9 @@
-import React from 'react';
-import Container from 'react-bootstrap/Container';
-import SubmitButton from '../submitbutton';
+import Container from "react-bootstrap/Container";
+import PropTypes from "prop-types";
+import SubmitButton from "../submitbutton";
 import "./index.scss";
 
-const LoginForm = ({ email, setEmail, password, setPassword, error, handleSubmit }) => 
+const LoginForm = ({email, setEmail, password, setPassword, error, handleSubmit}) => 
 {
     return (
         <Container id="login-container">
@@ -26,15 +26,24 @@ const LoginForm = ({ email, setEmail, password, setPassword, error, handleSubmit
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-                <SubmitButton button_text="Log in" />
+                <SubmitButton buttonText="Log in" />
                 {error && <div id="error-container">
                     <p id="error-text">{error}</p>
                 </div>}
                 <hr />
-                <p>Don't have an account? <a href="register">Sign up</a></p>
+                <p>Don&#39;t have an account? <a href="register">Sign up</a></p>
             </form>
         </Container>
     );
+};
+
+LoginForm.propTypes = {
+    email: PropTypes.string.isRequired,
+    setEmail: PropTypes.func.isRequired,
+    password: PropTypes.string.isRequired,
+    setPassword: PropTypes.func.isRequired,
+    error: PropTypes.string,
+    handleSubmit: PropTypes.func.isRequired,
 };
 
 export default LoginForm;

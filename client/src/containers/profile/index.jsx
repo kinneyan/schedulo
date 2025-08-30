@@ -1,15 +1,13 @@
-import React, {useState, useEffect} from 'react';
+import {useState, useEffect} from "react";
 import Cookies from "universal-cookie";
 
-import ViewProfile from '../../components/profile';
+import ViewProfile from "../../components/profile";
 
 const Profile = () => 
 {
-    // get token from cookies
     const cookies = new Cookies();
     const token = cookies.get("token");
 
-    // create states
     const [fname, setFname] = useState("");
     const [lname, setLname] = useState("");
     const [email, setEmail] = useState("");
@@ -30,19 +28,17 @@ const Profile = () =>
         setOldPassword,
         newPassword,
         setNewPassword,
-        error, 
+        error,
         setError,
-    }
+    };
 
     useEffect(() => 
     {
         const fetchData = async () => 
         {
-            // populate user information
             try 
             {
-                const response = await fetch(import.meta.env.VITE_API_URL + "/api/user", 
-                {
+                const response = await fetch(import.meta.env.VITE_API_URL + "/api/user", {
                     method: "GET",
                     withCredentials: true,
                     credentials: "include",
@@ -51,7 +47,7 @@ const Profile = () =>
         
                 const data = await response.json();
         
-                if (response.status == 401)
+                if (response.status === 401) 
                 {
                     throw new Error("Failed to authorize request.");
                 }
@@ -61,39 +57,36 @@ const Profile = () =>
                 setEmail(data.email);
                 setPhone(data.phone);
             }
-            catch (error)
+            catch (error) 
             {
                 console.log(error);
             }
         };
 
         fetchData();
-    }, []);
+    }, [token.access]);
     
 
     const handleSubmit = async (e) => 
     {
-        e.preventDefault();     // stop default form submission
+        e.preventDefault();
 
-        // build request body
         let requestBody = {
-            first_name: fname,
-            last_name: lname,
+            firstName: fname,
+            lastName: lname,
             email: email,
             phone: phone,
-        }
+        };
 
-        if (newPassword !== "")
+        if (newPassword !== "") 
         {
-            requestBody.current_password = oldPassword;
+            requestBody.currentPassword = oldPassword;
             requestBody.password = newPassword;
         }
 
-        // make request
         try 
         {
-            const response = await fetch(import.meta.env.VITE_API_URL + "/api/user", 
-            {
+            const response = await fetch(import.meta.env.VITE_API_URL + "/api/user", {
                 method: "PUT",
                 withCredentials: true,
                 credentials: "include",
@@ -103,19 +96,19 @@ const Profile = () =>
             
             const data = await response.json();
 
-            if (response.status === 400 && data.error.message == "Current password is incorrect.")
+            if (response.status === 400 && data.error.message === "Current password is incorrect.") 
             {
                 throw new Error("Current password is incorrect.");
             }
 
-            if (response.status != 200)
+            if (response.status !== 200) 
             {
                 throw new Error("Failed to update user information.");
             }
 
-            window.location.reload();   // refresh page
+            window.location.reload();
         }
-        catch (error)
+        catch (error) 
         {
             setError(error);
         }

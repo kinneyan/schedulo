@@ -1,8 +1,7 @@
-import React from 'react';
-import './index.scss';
+import "./index.scss";
 
-import NavbarContainer from '../../containers/navbar';
-import with_auth from '../../components/auth';
+import NavbarContainer from "../../containers/navbar";
+import withAuth from "../../components/auth";
 
 const DashboardPage = () => 
 {
@@ -13,4 +12,4 @@ const DashboardPage = () =>
     );
 };
 
-export default with_auth(DashboardPage);
+export default withAuth(DashboardPage);
