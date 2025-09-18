@@ -1,12 +1,11 @@
-import {useState} from "react";
+import { useState } from "react";
 import Form from "react-bootstrap/Form";
 import PropTypes from "prop-types";
 
 import "./index.scss";
 import SubmitButton from "../buttons/submitButton";
 
-const ViewProfile = ({states, handleSubmit}) => 
-{
+const ViewProfile = ({ states, handleSubmit, userData }) => {
     const [activeTab, setActiveTab] = useState("account");
 
     const {
@@ -18,6 +17,58 @@ const ViewProfile = ({states, handleSubmit}) =>
         newPassword, setNewPassword,
         error,
     } = states;
+
+    const handleLeaveWorkspace = async (workspaceId) => {
+        // TODO: Implement leave workspace functionality
+        console.log(`Leave workspace ${workspaceId}`);
+        // This would typically make an API call to leave the workspace
+        // For now, just show confirmation
+        if (window.confirm("Are you sure you want to leave this workspace?")) {
+            console.log("User confirmed leaving workspace");
+            // API call would go here
+        }
+    };
+
+    const renderWorkspaceSettings = () => {
+        if (!userData) return <p>Loading workspace data...</p>;
+
+        return (
+            <div className="settings-form-container">
+                <h3>Workspace Settings</h3>
+
+                {/* Workspace Memberships */}
+                <div className="workspace-section">
+                    <h4>Your Workspaces</h4>
+                    {userData.workspaces && userData.workspaces.length > 0 ? (
+                        <div className="workspace-list">
+                            {userData.workspaces.map((workspace) => (
+                                <div key={workspace.id} className="workspace-item">
+                                    <div className="workspace-info">
+                                        <h5>{workspace.name}</h5>
+                                        <p>Role: {workspace.role || 'Member'}</p>
+                                        {workspace.description && (
+                                            <p className="workspace-description">{workspace.description}</p>
+                                        )}
+                                    </div>
+                                    <div className="workspace-actions">
+                                        <button
+                                            className="btn-secondary"
+                                            onClick={() => handleLeaveWorkspace(workspace.id)}
+                                        >
+                                            Leave Workspace
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p>You are not a member of any workspaces yet.</p>
+                    )}
+                </div>
+
+            </div>
+        );
+    };
     
     return (
         <div id="settings-component">
@@ -106,10 +157,7 @@ const ViewProfile = ({states, handleSubmit}) =>
                             </Form>
                         </div>
                     ) : (
-                        <div className="settings-form-container">
-                            <h3>Workspace Settings</h3>
-                            <p>Workspace settings will be implemented later.</p>
-                        </div>
+                        renderWorkspaceSettings()
                     )}
                 </div>
             </div>
@@ -135,6 +183,7 @@ ViewProfile.propTypes = {
         error: PropTypes.string,
     }).isRequired,
     handleSubmit: PropTypes.func.isRequired,
+    userData: PropTypes.object,
 };
 
 export default ViewProfile;

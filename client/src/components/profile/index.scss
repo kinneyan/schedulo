@@ -148,6 +148,82 @@ $field-font-size: 18px;
         }
       }
     }
+
+    // Workspace settings styling
+    .workspace-section {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+      &:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      h4 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      h5 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #ffffff;
+      }
+
+      p {
+        margin-bottom: 0.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 14px;
+      }
+    }
+
+    .workspace-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .workspace-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+
+      .workspace-info {
+        flex: 1;
+
+        .workspace-description {
+          font-style: italic;
+          color: rgba(255, 255, 255, 0.6);
+        }
+      }
+
+      .workspace-actions {
+        margin-left: 1rem;
+
+        .btn-secondary {
+          background: rgba(239, 68, 68, 0.8);
+          border: 1px solid rgba(239, 68, 68, 1);
+          color: white;
+          padding: 8px 16px;
+          border-radius: 4px;
+          font-size: 14px;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+
+          &:hover {
+            background: rgba(239, 68, 68, 1);
+          }
+        }
+      }
+    }
   }
 
     #nav-container {

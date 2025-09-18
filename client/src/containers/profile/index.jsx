@@ -1,124 +1,57 @@
-import {useState, useEffect} from "react";
-import Cookies from "universal-cookie";
-
+import PropTypes from "prop-types";
 import ViewProfile from "../../components/profile";
 
-const Profile = () => 
-{
-    const cookies = new Cookies();
-    const token = cookies.get("token");
-
-    const [fname, setFname] = useState("");
-    const [lname, setLname] = useState("");
-    const [email, setEmail] = useState("");
-    const [phone, setPhone] = useState("");
-    const [oldPassword, setOldPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [error, setError] = useState("");
+const Profile = ({
+    accountData,
+    updateAccountField,
+    handleAccountSubmit,
+    userData,
+    error,
+    setError,
+}) => {
+    // Transform accountData into legacy states format for ViewProfile
     const states = {
-        fname,
-        setFname,
-        lname,
-        setLname,
-        email,
-        setEmail,
-        phone,
-        setPhone,
-        oldPassword,
-        setOldPassword,
-        newPassword,
-        setNewPassword,
+        fname: accountData.fname,
+        setFname: (value) => updateAccountField("fname", value),
+        lname: accountData.lname,
+        setLname: (value) => updateAccountField("lname", value),
+        email: accountData.email,
+        setEmail: (value) => updateAccountField("email", value),
+        phone: accountData.phone,
+        setPhone: (value) => updateAccountField("phone", value),
+        oldPassword: accountData.oldPassword,
+        setOldPassword: (value) => updateAccountField("oldPassword", value),
+        newPassword: accountData.newPassword,
+        setNewPassword: (value) => updateAccountField("newPassword", value),
         error,
         setError,
     };
 
-    useEffect(() => 
-    {
-        const fetchData = async () => 
-        {
-            try 
-            {
-                const response = await fetch(import.meta.env.VITE_API_URL + "/api/user", {
-                    method: "GET",
-                    withCredentials: true,
-                    credentials: "include",
-                    headers: {"Content-Type": "application/json", "Authorization": "Bearer " + token.access},
-                });
-        
-                const data = await response.json();
-        
-                if (response.status === 401) 
-                {
-                    throw new Error("Failed to authorize request.");
-                }
-
-                setFname(data.first_name);
-                setLname(data.last_name);
-                setEmail(data.email);
-                setPhone(data.phone);
-            }
-            catch (error) 
-            {
-                console.log(error);
-            }
-        };
-
-        fetchData();
-    }, [token.access]);
-    
-
-    const handleSubmit = async (e) => 
-    {
-        e.preventDefault();
-
-        let requestBody = {
-            first_name: fname,
-            last_name: lname,
-            email: email,
-            phone: phone,
-        };
-
-        if (newPassword !== "") 
-        {
-            requestBody.current_password = oldPassword;
-            requestBody.password = newPassword;
-        }
-
-        try 
-        {
-            const response = await fetch(import.meta.env.VITE_API_URL + "/api/user", {
-                method: "PUT",
-                withCredentials: true,
-                credentials: "include",
-                headers: {"Content-Type": "application/json", "Authorization": "Bearer " + token.access},
-                body: JSON.stringify(requestBody),
-            });
-            
-            const data = await response.json();
-
-            if (response.status === 400 && data.error.message === "Current password is incorrect.") 
-            {
-                throw new Error("Current password is incorrect.");
-            }
-
-            if (response.status !== 200) 
-            {
-                throw new Error("Failed to update user information.");
-            }
-
-            window.location.reload();
-        }
-        catch (error) 
-        {
-            setError(error);
-        }
-    };
-
     return (
         <div>
-            <ViewProfile states={states} handleSubmit={handleSubmit}/>
+            <ViewProfile
+                states={states}
+                handleSubmit={handleAccountSubmit}
+                userData={userData}
+            />
         </div>
     );
+};
+
+Profile.propTypes = {
+    accountData: PropTypes.shape({
+        fname: PropTypes.string.isRequired,
+        lname: PropTypes.string.isRequired,
+        email: PropTypes.string.isRequired,
+        phone: PropTypes.string.isRequired,
+        oldPassword: PropTypes.string.isRequired,
+        newPassword: PropTypes.string.isRequired,
+    }).isRequired,
+    updateAccountField: PropTypes.func.isRequired,
+    handleAccountSubmit: PropTypes.func.isRequired,
+    userData: PropTypes.object.isRequired,
+    error: PropTypes.string.isRequired,
+    setError: PropTypes.func.isRequired,
 };
 
 export default Profile;
