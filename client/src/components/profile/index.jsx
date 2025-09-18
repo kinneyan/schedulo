@@ -21,24 +21,24 @@ const ViewProfile = ({states, handleSubmit}) =>
     
     return (
         <div id="settings-component">
-            <div id="nav-container">
-                <ul id="settings-nav">
-                    <li 
-                        className={activeTab === "account" ? "active" : ""} 
-                        onClick={() => setActiveTab("account")}
-                    >
-                        <h1>Account Settings</h1>
-                    </li>
-                    <li 
-                        className={activeTab === "workspace" ? "active" : ""} 
-                        onClick={() => setActiveTab("workspace")}
-                    >
-                        <h1>Workspace Settings</h1>
-                    </li>
-                </ul>
-            </div>
-
             <div id="settings-container">
+                <div id="nav-container">
+                    <ul id="settings-nav">
+                        <li 
+                            className={activeTab === "account" ? "active" : ""} 
+                            onClick={() => setActiveTab("account")}
+                        >
+                            <span>Account Settings</span>
+                        </li>
+                        <li 
+                            className={activeTab === "workspace" ? "active" : ""} 
+                            onClick={() => setActiveTab("workspace")}
+                        >
+                            <span>Workspace Settings</span>
+                        </li>
+                    </ul>
+                </div>
+
                 <div id="settings-content">
                     {activeTab === "account" ? (
                         <div className="settings-form-container">
