@@ -45,7 +45,7 @@ const ViewProfile = ({states, handleSubmit}) =>
                             <h3>Account Information</h3>
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group className="fgroup">
-                                    <h4>First Name</h4>
+                                    <Form.Label>First Name</Form.Label>
                                     <Form.Control 
                                         type="text" 
                                         value={fname} 
@@ -54,7 +54,7 @@ const ViewProfile = ({states, handleSubmit}) =>
                                 </Form.Group>
 
                                 <Form.Group className="fgroup">
-                                    <h4>Last Name</h4>
+                                    <Form.Label>Last Name</Form.Label>
                                     <Form.Control 
                                         type="text" 
                                         value={lname} 
@@ -63,7 +63,7 @@ const ViewProfile = ({states, handleSubmit}) =>
                                 </Form.Group>
 
                                 <Form.Group className="fgroup">
-                                    <h4>Email</h4>
+                                    <Form.Label>Email</Form.Label>
                                     <Form.Control 
                                         type="email" 
                                         value={email} 
@@ -72,7 +72,7 @@ const ViewProfile = ({states, handleSubmit}) =>
                                 </Form.Group>
 
                                 <Form.Group className="fgroup">
-                                    <h4>Phone</h4>
+                                    <Form.Label>Phone</Form.Label>
                                     <Form.Control 
                                         type="tel" 
                                         value={phone} 
@@ -83,7 +83,7 @@ const ViewProfile = ({states, handleSubmit}) =>
                                 <h3>Change Password</h3>
                                 
                                 <Form.Group className="fgroup">
-                                    <h4>Current Password</h4>
+                                    <Form.Label>Current Password</Form.Label>
                                     <Form.Control 
                                         type="password" 
                                         value={oldPassword} 
@@ -92,7 +92,7 @@ const ViewProfile = ({states, handleSubmit}) =>
                                 </Form.Group>
 
                                 <Form.Group className="fgroup">
-                                    <h4>New Password</h4>
+                                    <Form.Label>New Password</Form.Label>
                                     <Form.Control 
                                         type="password" 
                                         value={newPassword} 
