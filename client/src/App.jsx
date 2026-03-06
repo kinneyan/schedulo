@@ -5,7 +5,7 @@ import LoginPage from "./pages/login";
 import ProfilePage from "./pages/profile";
 import DashboardPage from "./pages/dashboard";
 import RegisterPage from "./pages/register";
-import CreateWorkspacePage from "./pages/createworkspace";
+import CreateWorkspacePage from "./pages/createWorkspace";
 
 function App() 
 {
