@@ -118,10 +118,10 @@ schedulo/
 │   ├── api/               # Django API app
 │   ├── server/            # Django project settings
 │   │   └── settings/      # Environment-specific settings
-│   ├── manage.py
-│   └── requirements.txt
+│   └── manage.py
 ├── docker-compose.yml     # Development configuration
 ├── docker-compose-prod.yml # Production configuration
+├── pyproject.toml         # Python package metadata and dependencies
 ├── .env.dev.example       # Development environment template
 ├── .env.prod.example      # Production environment template
 └── README.md
