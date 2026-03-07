@@ -11,6 +11,15 @@ class CatchAllURLTest(TestCase):
         "pathlib.Path.open",
         mock_open(read_data=b"<html><div id='root'></div></html>"),
     )
+    def test_root_path_returns_200(self, _exists):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+
+    @patch("pathlib.Path.exists", return_value=True)
+    @patch(
+        "pathlib.Path.open",
+        mock_open(read_data=b"<html><div id='root'></div></html>"),
+    )
     def test_unknown_path_returns_200(self, _exists):
         response = self.client.get("/some-react-route/")
         self.assertEqual(response.status_code, 200)

@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.conf import settings
 from django.http import FileResponse, Http404
-from django.urls import include, path, re_path
+from django.urls import include, path
 
 
-def serve_react(request):
+def serve_react(request, path=""):
     index = settings.WHITENOISE_ROOT / "index.html"
     if not index.exists():
         raise Http404
@@ -14,5 +14,6 @@ def serve_react(request):
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("api.urls")),
-    re_path(r"^(?!api/|admin/).*$", serve_react),
+    path("", serve_react),
+    path("<path:path>", serve_react),
 ]
