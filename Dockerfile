@@ -9,8 +9,8 @@ RUN npm run build
 
 # Stage 2: Python runtime
 FROM python:3.12-slim
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 WORKDIR /server
 COPY server/requirements.txt /server/
 RUN pip install --no-cache-dir -r requirements.txt
