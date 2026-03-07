@@ -42,11 +42,11 @@ class CreateWorkspace(APIView):
         MemberPermissions.objects.create(
             workspace=workspace,
             member=workspace_member,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         return Response(response, status=status.HTTP_201_CREATED)
@@ -91,7 +91,7 @@ class ModifyWorkspace(APIView):  # change name or owner, can only be done by own
             MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
                 member=old_owner_member,
-                IS_OWNER=True,
+                is_owner=True,
             )
         except MemberPermissions.DoesNotExist:
             response["error"][
@@ -124,15 +124,15 @@ class ModifyWorkspace(APIView):  # change name or owner, can only be done by own
                     ] = "Member is already owner of this workspace."
                     return Response(response, status=status.HTTP_409_CONFLICT)
 
-                old_owner_perms.IS_OWNER = False
+                old_owner_perms.is_owner = False
                 old_owner_perms.save()
 
                 # set new owner to be owner
-                new_owner_perms.IS_OWNER = True
-                new_owner_perms.MANAGE_WORKSPACE_MEMBERS = True
-                new_owner_perms.MANAGE_WORKSPACE_ROLES = True
-                new_owner_perms.MANAGE_SCHEDULES = True
-                new_owner_perms.MANAGE_TIME_OFF = True
+                new_owner_perms.is_owner = True
+                new_owner_perms.manage_workspace_members = True
+                new_owner_perms.manage_workspace_roles = True
+                new_owner_perms.manage_schedules = True
+                new_owner_perms.manage_time_off = True
                 new_owner_perms.save()
 
                 # update owner id in workspace
@@ -175,7 +175,7 @@ class AddWorkspaceMember(APIView):
             MemberPermissions.objects.get(
                 member=workspace_member,
                 workspace=request.data["workspace_id"],
-                MANAGE_WORKSPACE_MEMBERS=True,
+                manage_workspace_members=True,
             )
         except MemberPermissions.DoesNotExist:
             response["error"] = (
@@ -242,7 +242,7 @@ class GetWorkspace(APIView):
         # Get user's perms
         permissions = MemberPermissions.objects.get(workspace=workspace, member=member)
 
-        if permissions.IS_OWNER:
+        if permissions.is_owner:
             response["membership"] = "owner"
         # UNCOMMENT WHEN MANAGER MEMBERSHIP ADDED!!
         # elif (permissions.IS_MANAGER):
@@ -317,7 +317,7 @@ class DeleteWorkspace(APIView):
             MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
                 member=owner_member,
-                IS_OWNER=True,
+                is_owner=True,
             )
         except MemberPermissions.DoesNotExist:
             response["error"][

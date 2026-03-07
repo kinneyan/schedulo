@@ -44,11 +44,11 @@ class GetUserTests(APITestCase):
         self.permissions = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         self.token = RefreshToken.for_user(self.user)

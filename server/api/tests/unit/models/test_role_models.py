@@ -150,11 +150,11 @@ class MemberPermissionsModelTest(TestCase):
 
         self.assertEqual(permissions.workspace, self.workspace)
         self.assertEqual(permissions.member, self.member)
-        self.assertFalse(permissions.IS_OWNER)
-        self.assertFalse(permissions.MANAGE_WORKSPACE_MEMBERS)
-        self.assertFalse(permissions.MANAGE_WORKSPACE_ROLES)
-        self.assertFalse(permissions.MANAGE_SCHEDULES)
-        self.assertFalse(permissions.MANAGE_TIME_OFF)
+        self.assertFalse(permissions.is_owner)
+        self.assertFalse(permissions.manage_workspace_members)
+        self.assertFalse(permissions.manage_workspace_roles)
+        self.assertFalse(permissions.manage_schedules)
+        self.assertFalse(permissions.manage_time_off)
         self.assertIsNotNone(permissions.date_created)
         self.assertIsNotNone(permissions.date_modified)
 
@@ -163,55 +163,55 @@ class MemberPermissionsModelTest(TestCase):
         permissions = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
-        self.assertTrue(permissions.IS_OWNER)
-        self.assertTrue(permissions.MANAGE_WORKSPACE_MEMBERS)
-        self.assertTrue(permissions.MANAGE_WORKSPACE_ROLES)
-        self.assertTrue(permissions.MANAGE_SCHEDULES)
-        self.assertTrue(permissions.MANAGE_TIME_OFF)
+        self.assertTrue(permissions.is_owner)
+        self.assertTrue(permissions.manage_workspace_members)
+        self.assertTrue(permissions.manage_workspace_roles)
+        self.assertTrue(permissions.manage_schedules)
+        self.assertTrue(permissions.manage_time_off)
 
     def test_member_permissions_owner_permissions(self):
         """Test setting up owner permissions"""
         permissions = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         # Owner should have all permissions
-        self.assertTrue(permissions.IS_OWNER)
-        self.assertTrue(permissions.MANAGE_WORKSPACE_MEMBERS)
-        self.assertTrue(permissions.MANAGE_WORKSPACE_ROLES)
-        self.assertTrue(permissions.MANAGE_SCHEDULES)
-        self.assertTrue(permissions.MANAGE_TIME_OFF)
+        self.assertTrue(permissions.is_owner)
+        self.assertTrue(permissions.manage_workspace_members)
+        self.assertTrue(permissions.manage_workspace_roles)
+        self.assertTrue(permissions.manage_schedules)
+        self.assertTrue(permissions.manage_time_off)
 
     def test_member_permissions_selective_permissions(self):
         """Test setting selective permissions for non-owner"""
         permissions = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member,
-            IS_OWNER=False,
-            MANAGE_WORKSPACE_MEMBERS=False,
-            MANAGE_WORKSPACE_ROLES=True,  # Only this permission
-            MANAGE_SCHEDULES=False,
-            MANAGE_TIME_OFF=False,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=True,  # Only this permission
+            manage_schedules=False,
+            manage_time_off=False,
         )
 
-        self.assertFalse(permissions.IS_OWNER)
-        self.assertFalse(permissions.MANAGE_WORKSPACE_MEMBERS)
-        self.assertTrue(permissions.MANAGE_WORKSPACE_ROLES)
-        self.assertFalse(permissions.MANAGE_SCHEDULES)
-        self.assertFalse(permissions.MANAGE_TIME_OFF)
+        self.assertFalse(permissions.is_owner)
+        self.assertFalse(permissions.manage_workspace_members)
+        self.assertTrue(permissions.manage_workspace_roles)
+        self.assertFalse(permissions.manage_schedules)
+        self.assertFalse(permissions.manage_time_off)
 
     def test_member_permissions_one_to_one_relationship(self):
         """Test that member permissions has one-to-one relationship with member"""
@@ -253,12 +253,12 @@ class MemberPermissionsModelTest(TestCase):
         permissions = MemberPermissions(
             workspace=self.workspace,
             member=self.member,
-            IS_OWNER=False,
-            MANAGE_SCHEDULES=False,
+            is_owner=False,
+            manage_schedules=False,
         )
 
         # Simulate promoting user to have schedule management
-        permissions.MANAGE_SCHEDULES = True
+        permissions.manage_schedules = True
 
-        self.assertTrue(permissions.MANAGE_SCHEDULES)
-        self.assertFalse(permissions.IS_OWNER)  # Other permissions unchanged
+        self.assertTrue(permissions.manage_schedules)
+        self.assertFalse(permissions.is_owner)  # Other permissions unchanged

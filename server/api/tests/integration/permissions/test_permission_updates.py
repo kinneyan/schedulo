@@ -28,11 +28,11 @@ class UpdatePermissionsTests(APITestCase):
         self.permissions = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member,
-            IS_OWNER=False,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=False,
-            MANAGE_SCHEDULES=False,
-            MANAGE_TIME_OFF=False,
+            is_owner=False,
+            manage_workspace_members=True,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
         )
         self.client.force_authenticate(user=self.member.user)
 
@@ -67,7 +67,7 @@ class UpdatePermissionsTests(APITestCase):
         )
 
     def test_cannot_update_owner_permissions(self):
-        self.permissions.IS_OWNER = True
+        self.permissions.is_owner = True
         self.permissions.save()
         response = self.client.put(
             self.url,
@@ -95,10 +95,10 @@ class UpdatePermissionsTests(APITestCase):
         response = self.client.put(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.permissions.refresh_from_db()
-        self.assertTrue(self.permissions.MANAGE_WORKSPACE_MEMBERS)
-        self.assertTrue(self.permissions.MANAGE_WORKSPACE_ROLES)
-        self.assertTrue(self.permissions.MANAGE_SCHEDULES)
-        self.assertTrue(self.permissions.MANAGE_TIME_OFF)
+        self.assertTrue(self.permissions.manage_workspace_members)
+        self.assertTrue(self.permissions.manage_workspace_roles)
+        self.assertTrue(self.permissions.manage_schedules)
+        self.assertTrue(self.permissions.manage_time_off)
 
     def test_member_not_in_workspace(self):
         # Create a new workspace and a member in that workspace

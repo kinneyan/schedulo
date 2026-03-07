@@ -61,7 +61,7 @@ class CreateShift(APIView):
             creator_member = WorkspaceMember.objects.get(
                 user=request.user, workspace=workspace
             )
-            MemberPermissions.objects.get(member=creator_member, MANAGE_SCHEDULES=True)
+            MemberPermissions.objects.get(member=creator_member, manage_schedules=True)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
@@ -168,7 +168,7 @@ class ModifyShift(APIView):
             creator_member = WorkspaceMember.objects.get(
                 user=request.user, workspace=workspace
             )
-            MemberPermissions.objects.get(member=creator_member, MANAGE_SCHEDULES=True)
+            MemberPermissions.objects.get(member=creator_member, manage_schedules=True)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
@@ -279,7 +279,7 @@ class DeleteShift(APIView):
             creator_member = WorkspaceMember.objects.get(
                 user=request.user, workspace=workspace
             )
-            MemberPermissions.objects.get(member=creator_member, MANAGE_SCHEDULES=True)
+            MemberPermissions.objects.get(member=creator_member, manage_schedules=True)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)

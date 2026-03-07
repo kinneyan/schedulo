@@ -39,11 +39,11 @@ class GetWorkspaceTests(APITestCase):
         self.workspace1_permissions1 = MemberPermissions.objects.create(
             workspace=self.workspace1,
             member=self.workspace1_member1,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
         self.workspace1_member2 = WorkspaceMember.objects.create(
             user=self.user2, workspace=self.workspace1, added_by=self.user
@@ -51,11 +51,11 @@ class GetWorkspaceTests(APITestCase):
         self.workspace1_permissions2 = MemberPermissions.objects.create(
             workspace=self.workspace1,
             member=self.workspace1_member2,
-            IS_OWNER=False,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=False,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         self.workspace2 = Workspace.objects.create(
@@ -67,11 +67,11 @@ class GetWorkspaceTests(APITestCase):
         self.workspace2_permissions1 = MemberPermissions.objects.create(
             workspace=self.workspace2,
             member=self.workspace2_member1,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
     def test_no_workspaces(self):

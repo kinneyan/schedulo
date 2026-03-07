@@ -45,11 +45,11 @@ class GetRolesTests(APITestCase):
         self.permissions = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         self.member2 = WorkspaceMember.objects.create(
@@ -58,11 +58,11 @@ class GetRolesTests(APITestCase):
         self.permissions2 = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member2,
-            IS_OWNER=False,
-            MANAGE_WORKSPACE_MEMBERS=False,
-            MANAGE_WORKSPACE_ROLES=False,
-            MANAGE_SCHEDULES=False,
-            MANAGE_TIME_OFF=False,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
         )
         self.client.force_authenticate(user=self.member.user)
 
@@ -139,11 +139,11 @@ class GetRolesTests(APITestCase):
         self.permissions5 = MemberPermissions.objects.create(
             workspace=self.workspace2,
             member=self.member5,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         response = self.client.put(
@@ -218,11 +218,11 @@ class GetMemberRoleTests(APITestCase):
         self.permissions = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         self.member2 = WorkspaceMember.objects.create(
@@ -231,11 +231,11 @@ class GetMemberRoleTests(APITestCase):
         self.permissions2 = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member2,
-            IS_OWNER=False,
-            MANAGE_WORKSPACE_MEMBERS=False,
-            MANAGE_WORKSPACE_ROLES=False,
-            MANAGE_SCHEDULES=False,
-            MANAGE_TIME_OFF=False,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
         )
         self.client.force_authenticate(user=self.member.user)
 

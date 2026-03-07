@@ -37,11 +37,11 @@ class ModifyWorkspaceTests(APITestCase):
         self.permissions = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
         self.client.force_authenticate(user=self.member.user)
 
@@ -83,9 +83,9 @@ class ModifyWorkspaceTests(APITestCase):
             workspace=self.workspace,
         )
 
-        self.assertTrue(perms.IS_OWNER)
+        self.assertTrue(perms.is_owner)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertFalse(self.permissions.IS_OWNER)
+        self.assertFalse(self.permissions.is_owner)
 
     def test_change_owner_to_non_workplace_member(self):
         # set user2 to owner
@@ -97,7 +97,7 @@ class ModifyWorkspaceTests(APITestCase):
         self.permissions.refresh_from_db()
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertTrue(self.permissions.IS_OWNER)
+        self.assertTrue(self.permissions.is_owner)
 
     def test_change_owner_to_self(self):
         # set user to owner
@@ -109,7 +109,7 @@ class ModifyWorkspaceTests(APITestCase):
         self.permissions.refresh_from_db()
 
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
-        self.assertTrue(self.permissions.IS_OWNER)
+        self.assertTrue(self.permissions.is_owner)
 
     def test_change_owner_as_not_owner(self):
         # add user2 to workspace
@@ -146,8 +146,8 @@ class ModifyWorkspaceTests(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertTrue(self.permissions.IS_OWNER)
-        self.assertFalse(perms.IS_OWNER)
+        self.assertTrue(self.permissions.is_owner)
+        self.assertFalse(perms.is_owner)
 
     def test_change_name_valid(self):
         self.url = reverse("modify_workspace")
@@ -224,11 +224,11 @@ class DeleteWorkspaceTests(APITestCase):
         self.workspace1_permissions1 = MemberPermissions.objects.create(
             workspace=self.workspace1,
             member=self.workspace1_member1,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
         self.workspace1_member2 = WorkspaceMember.objects.create(
             user=self.user2, workspace=self.workspace1, added_by=self.user
@@ -236,11 +236,11 @@ class DeleteWorkspaceTests(APITestCase):
         self.workspace1_permissions2 = MemberPermissions.objects.create(
             workspace=self.workspace1,
             member=self.workspace1_member2,
-            IS_OWNER=False,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=False,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         self.workspace2 = Workspace.objects.create(
@@ -252,11 +252,11 @@ class DeleteWorkspaceTests(APITestCase):
         self.workspace2_permissions1 = MemberPermissions.objects.create(
             workspace=self.workspace2,
             member=self.workspace2_member1,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
         self.client.force_authenticate(user=self.user)
 

@@ -31,11 +31,11 @@ class GetPermissions(APIView):
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         response["permissions"] = {
-            "is_owner": permissions.IS_OWNER,
-            "manage_workspace_members": permissions.MANAGE_WORKSPACE_MEMBERS,
-            "manage_workspace_roles": permissions.MANAGE_WORKSPACE_ROLES,
-            "manage_schedules": permissions.MANAGE_SCHEDULES,
-            "manage_time_off": permissions.MANAGE_TIME_OFF,
+            "is_owner": permissions.is_owner,
+            "manage_workspace_members": permissions.manage_workspace_members,
+            "manage_workspace_roles": permissions.manage_workspace_roles,
+            "manage_schedules": permissions.manage_schedules,
+            "manage_time_off": permissions.manage_time_off,
         }
 
         return Response(response, status=status.HTTP_200_OK)
@@ -65,7 +65,7 @@ class UpdatePermissions(APIView):
             permissions = MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
                 member=workspace_member,
-                MANAGE_WORKSPACE_MEMBERS=True,
+                manage_workspace_members=True,
             )
         except MemberPermissions.DoesNotExist:
             response["error"][
@@ -100,7 +100,7 @@ class UpdatePermissions(APIView):
             )
 
         # Check if user is owner, cannot update owner permissions as they are fixed (all)
-        if permissions.IS_OWNER:
+        if permissions.is_owner:
             response["error"][
                 "message"
             ] = "Cannot update permissions for workspace owner."
@@ -113,18 +113,18 @@ class UpdatePermissions(APIView):
 
         # Update permissions
         if "manage_workspace_members" in request.data:
-            permissions.MANAGE_WORKSPACE_MEMBERS = request.data[
+            permissions.manage_workspace_members = request.data[
                 "manage_workspace_members"
             ]
 
         if "manage_workspace_roles" in request.data:
-            permissions.MANAGE_WORKSPACE_ROLES = request.data["manage_workspace_roles"]
+            permissions.manage_workspace_roles = request.data["manage_workspace_roles"]
 
         if "manage_schedules" in request.data:
-            permissions.MANAGE_SCHEDULES = request.data["manage_schedules"]
+            permissions.manage_schedules = request.data["manage_schedules"]
 
         if "manage_time_off" in request.data:
-            permissions.MANAGE_TIME_OFF = request.data["manage_time_off"]
+            permissions.manage_time_off = request.data["manage_time_off"]
 
         # Save permissions to db
         permissions.save()

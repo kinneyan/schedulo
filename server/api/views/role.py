@@ -50,7 +50,7 @@ class CreateRole(APIView):
             MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
                 member=member,
-                MANAGE_WORKSPACE_ROLES=True,
+                manage_workspace_roles=True,
             )
         except MemberPermissions.DoesNotExist:
             response["error"][
@@ -115,7 +115,7 @@ class DeleteWorkspaceRole(APIView):
         try:
             member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(
-                workspace=workspace, member=member, MANAGE_WORKSPACE_ROLES=True
+                workspace=workspace, member=member, manage_workspace_roles=True
             )
         except MemberPermissions.DoesNotExist:
             response["error"][
@@ -174,7 +174,7 @@ class ModifyWorkspaceRole(APIView):
         try:
             member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(
-                workspace=workspace, member=member, MANAGE_WORKSPACE_ROLES=True
+                workspace=workspace, member=member, manage_workspace_roles=True
             )
         except MemberPermissions.DoesNotExist:
             response["error"][
@@ -330,7 +330,7 @@ class AddMemberRole(APIView):  # adds a role to a workspace member
                 user=request.user, workspace=workspace
             )
             MemberPermissions.objects.get(
-                workspace=workspace, member=request_member, MANAGE_WORKSPACE_ROLES=True
+                workspace=workspace, member=request_member, manage_workspace_roles=True
             )
         except MemberPermissions.DoesNotExist:
             response["error"][
@@ -422,7 +422,7 @@ class RemoveMemberRole(APIView):  # removes a role from a workspace member
                 user=request.user, workspace=workspace
             )
             MemberPermissions.objects.get(
-                workspace=workspace, member=request_member, MANAGE_WORKSPACE_ROLES=True
+                workspace=workspace, member=request_member, manage_workspace_roles=True
             )
         except MemberPermissions.DoesNotExist:
             response["error"][

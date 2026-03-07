@@ -26,8 +26,8 @@ class MemberPermissions(models.Model):
     member = models.OneToOneField(WorkspaceMember, on_delete=models.CASCADE)
 
     # Permissions
-    IS_OWNER = models.BooleanField(default=False)
-    MANAGE_WORKSPACE_MEMBERS = models.BooleanField(default=False)
-    MANAGE_WORKSPACE_ROLES = models.BooleanField(default=False)
-    MANAGE_SCHEDULES = models.BooleanField(default=False)
-    MANAGE_TIME_OFF = models.BooleanField(default=False)
+    is_owner = models.BooleanField(default=False)
+    manage_workspace_members = models.BooleanField(default=False)
+    manage_workspace_roles = models.BooleanField(default=False)
+    manage_schedules = models.BooleanField(default=False)
+    manage_time_off = models.BooleanField(default=False)

@@ -39,7 +39,7 @@ class AddMemberTests(APITestCase):
         self.permission = MemberPermissions.objects.create(
             member=self.workspace_member,
             workspace=self.workspace,
-            MANAGE_WORKSPACE_MEMBERS=True,
+            manage_workspace_members=True,
         )
 
     def test_add_workspace_member_permission(self):
@@ -48,7 +48,7 @@ class AddMemberTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_add_workspace_member_no_permission(self):
-        self.permission.MANAGE_WORKSPACE_MEMBERS = False
+        self.permission.manage_workspace_members = False
         self.permission.save()
         data = {"added_user_id": self.other_user.id, "workspace_id": self.workspace.id}
         response = self.client.post(self.url, data, format="json")
