@@ -1,4 +1,6 @@
 .DS_Store
+.idea/
+.claude/
 node_modules
 *env
 .env.dev
