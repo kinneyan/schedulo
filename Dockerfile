@@ -15,7 +15,7 @@ WORKDIR /server
 COPY server/requirements.txt /server/
 RUN pip install --no-cache-dir -r requirements.txt
 COPY server/ /server/
-COPY --from=build /app/dist /server/static_build
+COPY --from=build /app/dist /server/server/static_build
 RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 --workers 3 server.wsgi:application"]
