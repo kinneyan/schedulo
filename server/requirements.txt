@@ -18,3 +18,4 @@ pycodestyle==2.13.0
 pyflakes==3.3.2
 PyJWT==2.10.1
 sqlparse==0.5.2
+whitenoise==6.9.0
