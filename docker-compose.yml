@@ -12,29 +12,15 @@ services:
 
   app:
     build:
-      context: ./server
-    container_name: django
-    restart: unless-stopped
-    env_file:
-      - ./.env.dev
-    ports: 
-      - "8000:8000"
-    volumes: 
-      - ./server:/app
-    depends_on: 
-      - db
-
-  frontend:
-    build:
-      context: ./client
-    container_name: react
+      context: .
+    container_name: schedulo
     restart: unless-stopped
     env_file:
       - ./.env.dev
     ports:
-      - "${REACT_PORT:-5173}:${REACT_PORT:-5173}"
+      - "8000:8000"
     depends_on:
-      - app
+      - db
 
 volumes:
   postgres_data:
