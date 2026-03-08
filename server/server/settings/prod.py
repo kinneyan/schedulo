@@ -1,6 +1,6 @@
 from typing import List
 
-from .default import *
+from .base import *
 from server.utils import require_env
 
 DEBUG = False
