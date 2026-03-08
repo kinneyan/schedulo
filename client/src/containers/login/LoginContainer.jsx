@@ -1,5 +1,5 @@
 import {useState} from "react";
-import LoginForm from "../../components/forms/loginForm";
+import LoginForm from "../../components/forms/loginForm/LoginForm";
 import Cookies from "universal-cookie";
 import {Navigate} from "react-router-dom";
 

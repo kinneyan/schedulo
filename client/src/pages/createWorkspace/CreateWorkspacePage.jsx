@@ -1,8 +1,8 @@
 import "./index.scss";
 
-import NavigationBar from "../../components/navbar";
-import CreateWorkspaceContainer from "../../containers/createWorkspace";
-import withAuth from "../../components/auth";
+import NavigationBar from "../../components/navbar/NavigationBar";
+import CreateWorkspaceContainer from "../../containers/createWorkspace/CreateWorkspaceContainer";
+import withAuth from "../../components/auth/WithAuth";
 
 /**
  * Page that renders the workspace creation form, protected by authentication.

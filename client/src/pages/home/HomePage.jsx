@@ -1,6 +1,6 @@
 import "./index.scss";
 
-import NavbarContainer from "../../containers/navbar";
+import NavbarContainer from "../../containers/navbar/NavbarContainer";
 
 /**
  * Public home/landing page.

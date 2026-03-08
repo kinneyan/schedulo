@@ -3,7 +3,7 @@ import Form from "react-bootstrap/Form";
 import PropTypes from "prop-types";
 
 import "./index.scss";
-import SubmitButton from "../buttons/submitButton";
+import SubmitButton from "../buttons/submitButton/SubmitButton";
 
 /**
  * Settings page component with tabbed navigation for account and workspace settings.

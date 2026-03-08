@@ -1,7 +1,7 @@
 import "./index.scss";
 
-import NavigationBar from "../../components/navbar";
-import RegisterContainer from "../../containers/register";
+import NavigationBar from "../../components/navbar/NavigationBar";
+import RegisterContainer from "../../containers/register/RegisterContainer";
 
 /**
  * Public registration page combining the navbar and registration form container.

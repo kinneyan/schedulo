@@ -1,11 +1,11 @@
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 
-import HomePage from "./pages/home";
-import LoginPage from "./pages/login";
-import ProfilePage from "./pages/profile";
-import DashboardPage from "./pages/dashboard";
-import RegisterPage from "./pages/register";
-import CreateWorkspacePage from "./pages/createWorkspace";
+import HomePage from "./pages/home/HomePage";
+import LoginPage from "./pages/login/LoginPage";
+import ProfilePage from "./pages/profile/ProfilePage";
+import DashboardPage from "./pages/dashboard/DashboardPage";
+import RegisterPage from "./pages/register/RegisterPage";
+import CreateWorkspacePage from "./pages/createWorkspace/CreateWorkspacePage";
 
 /**
  * Root application component that defines the client-side route tree.

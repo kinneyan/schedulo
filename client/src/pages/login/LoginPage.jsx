@@ -1,7 +1,7 @@
 import "./index.scss";
 
-import NavbarContainer from "../../containers/navbar";
-import LoginContainer from "../../containers/login";
+import NavbarContainer from "../../containers/navbar/NavbarContainer";
+import LoginContainer from "../../containers/login/LoginContainer";
 
 /**
  * Public login page combining the navbar and login form container.

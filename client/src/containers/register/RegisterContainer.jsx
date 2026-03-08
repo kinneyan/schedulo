@@ -1,7 +1,7 @@
 import {useState} from "react";
 import Cookies from "universal-cookie";
 import {Navigate} from "react-router-dom";
-import RegisterForm from "../../components/forms/registerForm";
+import RegisterForm from "../../components/forms/registerForm/RegisterForm";
 
 /**
  * Stateful container that manages registration form state, API submission, and post-registration redirect.

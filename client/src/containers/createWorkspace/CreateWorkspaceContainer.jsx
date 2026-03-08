@@ -1,7 +1,7 @@
 import {useState} from "react";
 import Cookies from "universal-cookie";
 import {Navigate} from "react-router-dom";
-import CreateWorkspaceForm from "../../components/forms/createWorkspace";
+import CreateWorkspaceForm from "../../components/forms/createWorkspace/CreateWorkspaceForm";
 
 /**
  * Stateful container that manages workspace creation, including form state and API submission.

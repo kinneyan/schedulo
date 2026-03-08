@@ -1,6 +1,6 @@
 import Container from "react-bootstrap/Container";
 import PropTypes from "prop-types";
-import SubmitButton from "../../buttons/submitButton";
+import SubmitButton from "../../buttons/submitButton/SubmitButton";
 import "./index.scss";
 
 /**

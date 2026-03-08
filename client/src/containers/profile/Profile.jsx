@@ -1,7 +1,7 @@
 import {useState, useEffect} from "react";
 import Cookies from "universal-cookie";
 
-import ViewProfile from "../../components/profile";
+import ViewProfile from "../../components/profile/ViewProfile";
 
 /**
  * Stateful container that fetches the user's profile data and handles account update submissions.

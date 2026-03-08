@@ -1,8 +1,8 @@
 import "./index.scss";
 
-import withAuth from "../../components/auth";
-import NavbarContainer from "../../containers/navbar";
-import Profile from "../../containers/profile";
+import withAuth from "../../components/auth/WithAuth";
+import NavbarContainer from "../../containers/navbar/NavbarContainer";
+import Profile from "../../containers/profile/Profile";
 
 /**
  * User profile/settings page, protected by authentication.
