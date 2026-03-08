@@ -18,4 +18,5 @@ COPY server/ /server/
 COPY --from=build /app/dist /server/server/static_build
 RUN python manage.py collectstatic --noinput
 EXPOSE 8000
+ENV DJANGO_SETTINGS_MODULE=server.settings.prod
 CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 --workers 3 server.wsgi:application"]

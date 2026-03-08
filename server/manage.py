@@ -6,8 +6,9 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server.settings.prod")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server.settings.default")
     try:
+        from django.core.exceptions import ImproperlyConfigured
         from django.core.management import execute_from_command_line
     except ImportError as exc:
         raise ImportError(
@@ -15,7 +16,11 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-    execute_from_command_line(sys.argv)
+    try:
+        execute_from_command_line(sys.argv)
+    except ImproperlyConfigured as exc:
+        print(f"Configuration error: {exc}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

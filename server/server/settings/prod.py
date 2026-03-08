@@ -1,9 +1,9 @@
-import os
+from typing import List
 
 from .default import *
+from server.utils import require_env
 
 DEBUG = False
-SECRET_KEY = os.environ["SECRET_KEY"]
-ALLOWED_HOSTS = [h for h in os.environ["ALLOWED_HOSTS"].split(",") if h]
-CORS_ALLOWED_ORIGINS = [h for h in os.environ["CORS_ALLOWED_ORIGINS"].split(",") if h]
-# All three above raise KeyError at startup if the env var is not set — intentional
+SECRET_KEY: str = require_env("SECRET_KEY")
+ALLOWED_HOSTS: List[str] = [h for h in require_env("ALLOWED_HOSTS").split(",") if h]
+CORS_ALLOWED_ORIGINS: List[str] = [h for h in require_env("CORS_ALLOWED_ORIGINS").split(",") if h]
