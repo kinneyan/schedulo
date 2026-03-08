@@ -11,3 +11,4 @@ dist
 .vite/
 __pycache__/
 *.pyc
+*.egg-info/
