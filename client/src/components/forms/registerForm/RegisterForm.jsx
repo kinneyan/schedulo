@@ -28,7 +28,7 @@ const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, 
     return (
         <Container id="register-container">
             <form id="register-form" onSubmit={handleSubmit}>
-                <label id="first-name-label">First Name</label>
+                <label id="first-name-label" htmlFor="first-name-form">First Name</label>
                 <input
                     type="text"
                     name="first-name"
@@ -37,7 +37,7 @@ const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, 
                     onChange={(e) => setFirstName(e.target.value)}
                     required
                 />
-                <label id="last-name-label">Last Name</label>
+                <label id="last-name-label" htmlFor="last-name-form">Last Name</label>
                 <input
                     type="text"
                     name="last-name"
@@ -46,7 +46,7 @@ const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, 
                     onChange={(e) => setLastName(e.target.value)}
                     required
                 />
-                <label id="email-label">Email</label>
+                <label id="email-label" htmlFor="email-form">Email</label>
                 <input
                     type="email"
                     name="email"
@@ -55,7 +55,7 @@ const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, 
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <label id="phone-label">Phone Number</label>
+                <label id="phone-label" htmlFor="phone-form">Phone Number</label>
                 <input
                     type="tel"
                     name="phone"
@@ -64,7 +64,7 @@ const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, 
                     onChange={(e) => setPhone(e.target.value)}
                     required
                 />
-                <label id="password-label">Password</label>
+                <label id="password-label" htmlFor="password-form">Password</label>
                 <input
                     type="password"
                     name="password"
@@ -73,7 +73,7 @@ const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, 
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-                <label id="confirm-password-label">Confirm Password</label>
+                <label id="confirm-password-label" htmlFor="confirm-password-form">Confirm Password</label>
                 <input
                     type="password"
                     name="confirm-password"

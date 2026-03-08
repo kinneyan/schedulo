@@ -20,7 +20,7 @@ const LoginForm = ({email, setEmail, password, setPassword, error, handleSubmit}
     return (
         <Container id="login-container">
             <form id="login-form" onSubmit={handleSubmit}>
-                <label id="email-label">Email</label>
+                <label id="email-label" htmlFor="email-form">Email</label>
                 <input
                     type="email"
                     name="email"
@@ -29,7 +29,7 @@ const LoginForm = ({email, setEmail, password, setPassword, error, handleSubmit}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <label id="password-label">Password</label>
+                <label id="password-label" htmlFor="password-form">Password</label>
                 <input
                     type="password"
                     name="password"
