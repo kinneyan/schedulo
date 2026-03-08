@@ -6,4 +6,3 @@ from server.utils import require_env
 DEBUG = False
 SECRET_KEY: str = require_env("SECRET_KEY")
 ALLOWED_HOSTS: List[str] = [h for h in require_env("ALLOWED_HOSTS").split(",") if h]
-CORS_ALLOWED_ORIGINS: List[str] = [h for h in require_env("CORS_ALLOWED_ORIGINS").split(",") if h]

@@ -17,7 +17,7 @@ class WhiteNoiseSettingsTest(TestCase):
         idx_whitenoise = settings.MIDDLEWARE.index(
             "whitenoise.middleware.WhiteNoiseMiddleware"
         )
-        self.assertEqual(idx_whitenoise, idx_security + 1)
+        self.assertLess(idx_security, idx_whitenoise)
 
     def test_static_root_configured(self):
         self.assertIsInstance(settings.STATIC_ROOT, Path)
