@@ -1,15 +1,18 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import SubmitButton from './SubmitButton';
+import {render, screen} from "@testing-library/react";
+import {describe, it, expect} from "vitest";
+import SubmitButton from "./SubmitButton";
 
-describe('SubmitButton', () => {
-    it('renders with the provided buttonText', () => {
+describe("SubmitButton", () => 
+{
+    it("renders with the provided buttonText", () => 
+    {
         render(<SubmitButton buttonText="Save" />);
-        expect(screen.getByText('Save')).toBeInTheDocument();
+        expect(screen.getByText("Save")).toBeInTheDocument();
     });
 
-    it('has type="submit"', () => {
+    it("has type=\"submit\"", () => 
+    {
         render(<SubmitButton buttonText="Save" />);
-        expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute('type', 'submit');
+        expect(screen.getByRole("button", {name: "Save"})).toHaveAttribute("type", "submit");
     });
 });

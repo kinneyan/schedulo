@@ -1,54 +1,62 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi } from 'vitest';
-import LoginForm from './LoginForm';
+import {render, screen} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import {describe, it, expect, vi} from "vitest";
+import LoginForm from "./LoginForm";
 
 const defaultProps = {
-    email: '',
+    email: "",
     setEmail: vi.fn(),
-    password: '',
+    password: "",
     setPassword: vi.fn(),
-    error: '',
+    error: "",
     handleSubmit: vi.fn(),
 };
 
-describe('LoginForm', () => {
-    it('renders email and password inputs', () => {
+describe("LoginForm", () => 
+{
+    it("renders email and password inputs", () => 
+    {
         render(<LoginForm {...defaultProps} />);
-        expect(screen.getByLabelText('Email')).toBeInTheDocument();
-        expect(screen.getByLabelText('Password')).toBeInTheDocument();
+        expect(screen.getByLabelText("Email")).toBeInTheDocument();
+        expect(screen.getByLabelText("Password")).toBeInTheDocument();
     });
 
-    it('renders the submit button', () => {
+    it("renders the submit button", () => 
+    {
         render(<LoginForm {...defaultProps} />);
-        expect(screen.getByRole('button', { name: /log in/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", {name: /log in/i})).toBeInTheDocument();
     });
 
-    it('calls setEmail when the email input changes', async () => {
+    it("calls setEmail when the email input changes", async () => 
+    {
         const setEmail = vi.fn();
         render(<LoginForm {...defaultProps} setEmail={setEmail} />);
-        await userEvent.type(screen.getByLabelText('Email'), 'a');
+        await userEvent.type(screen.getByLabelText("Email"), "a");
         expect(setEmail).toHaveBeenCalled();
     });
 
-    it('calls setPassword when the password input changes', async () => {
+    it("calls setPassword when the password input changes", async () => 
+    {
         const setPassword = vi.fn();
         render(<LoginForm {...defaultProps} setPassword={setPassword} />);
-        await userEvent.type(screen.getByLabelText('Password'), 'a');
+        await userEvent.type(screen.getByLabelText("Password"), "a");
         expect(setPassword).toHaveBeenCalled();
     });
 
-    it('does not render an error message when error is empty', () => {
+    it("does not render an error message when error is empty", () => 
+    {
         render(<LoginForm {...defaultProps} error="" />);
-        expect(screen.queryByText('Incorrect email or password')).not.toBeInTheDocument();
+        expect(screen.queryByText("Incorrect email or password")).not.toBeInTheDocument();
     });
 
-    it('renders the error message when error is set', () => {
+    it("renders the error message when error is set", () => 
+    {
         render(<LoginForm {...defaultProps} error="Incorrect email or password" />);
-        expect(screen.getByText('Incorrect email or password')).toBeInTheDocument();
+        expect(screen.getByText("Incorrect email or password")).toBeInTheDocument();
     });
 
-    it('calls handleSubmit when the form is submitted', async () => {
+    it("calls handleSubmit when the form is submitted", async () => 
+    {
         const handleSubmit = vi.fn((e) => e.preventDefault());
         // Provide non-empty values so HTML5 required validation passes
         render(<LoginForm
@@ -57,7 +65,7 @@ describe('LoginForm', () => {
             password="password123"
             handleSubmit={handleSubmit}
         />);
-        await userEvent.click(screen.getByRole('button', { name: /log in/i }));
+        await userEvent.click(screen.getByRole("button", {name: /log in/i}));
         expect(handleSubmit).toHaveBeenCalledOnce();
     });
 });
