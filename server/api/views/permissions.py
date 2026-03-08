@@ -7,10 +7,19 @@ from ..models import MemberPermissions, WorkspaceMember, Workspace
 
 
 class GetPermissions(APIView):
+    """API view for retrieving the authenticated user's permissions in a workspace."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        """Return the authenticated user's permission flags for a given workspace.
+
+        :param request: Authenticated HTTP request containing workspace_id in the body.
+        :type request: rest_framework.request.Request
+        :return: Permission flags object, or an error response.
+        :rtype: rest_framework.response.Response
+        """
         response = {"error": {}}
 
         if "workspace_id" not in request.data:
@@ -42,10 +51,24 @@ class GetPermissions(APIView):
 
 
 class UpdatePermissions(APIView):
+    """API view for updating a workspace member's permission flags."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def put(self, request):
+        """Update permission flags for a specific workspace member.
+
+        Requires manage_workspace_members permission. Accepted body fields:
+        workspace_id (required), member_id (required), manage_workspace_members,
+        manage_workspace_roles, manage_schedules, manage_time_off.
+
+        :param request: Authenticated HTTP request with workspace_id, member_id,
+            and optional permission flags in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response, or an error response describing the failure.
+        :rtype: rest_framework.response.Response
+        """
         response = {"error": {}}
 
         # Verify body contains required fields

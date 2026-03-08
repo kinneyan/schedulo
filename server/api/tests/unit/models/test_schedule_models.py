@@ -20,6 +20,7 @@ class ShiftModelTest(TestCase):
     """Test cases for Shift model"""
 
     def setUp(self):
+        """Create a user, workspace, member, and role for use in each shift test."""
         self.user = User.objects.create_user(
             email="test@example.com", password="password123"
         )
@@ -96,6 +97,7 @@ class ShiftRequestModelTest(TestCase):
     """Test cases for ShiftRequest model"""
 
     def setUp(self):
+        """Create sender, recipient, workspace, members, role, and sender shift for each test."""
         self.sender_user = User.objects.create_user(
             email="sender@example.com", password="password123"
         )
@@ -173,6 +175,7 @@ class TimeOffRequestModelTest(TestCase):
     """Test cases for TimeOffRequest model"""
 
     def setUp(self):
+        """Create a user, approver, workspace, and members for use in each time-off test."""
         self.user = User.objects.create_user(
             email="test@example.com", password="password123"
         )
@@ -227,6 +230,7 @@ class UnavailabilityModelTest(TestCase):
     """Test cases for Unavailability model and its constraints"""
 
     def setUp(self):
+        """Create a user, workspace, and member for use in each unavailability test."""
         self.user = User.objects.create_user(
             email="test@example.com", password="password123"
         )

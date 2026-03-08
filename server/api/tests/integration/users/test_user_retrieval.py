@@ -11,7 +11,10 @@ from ....models import (
 
 
 class GetUserTests(APITestCase):
+    """Integration tests for the user retrieval endpoint."""
+
     def setUp(self):
+        """Create test users, a workspace, and authenticate the primary user."""
         self.url = reverse("get_user")
         self.user = User.objects.create_user(
             email="testuser@example.com",
@@ -55,6 +58,7 @@ class GetUserTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.token.access_token}")
 
     def test_get_user(self):
+        """Verify that the authenticated user's profile and workspace memberships are returned."""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["email"], self.user.email)
@@ -67,6 +71,7 @@ class GetUserTests(APITestCase):
         self.assertEqual(workspaces[0]["name"], self.workspace.name)
 
     def test_get_user_no_workspaces(self):
+        """Verify that a user with no workspace memberships returns an empty workspaces list."""
         self.client.force_authenticate(user=self.user2)  # send request as user2
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)

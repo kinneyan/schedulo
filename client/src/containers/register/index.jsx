@@ -3,7 +3,12 @@ import Cookies from "universal-cookie";
 import {Navigate} from "react-router-dom";
 import RegisterForm from "../../components/forms/registerForm";
 
-const RegisterContainer = () => 
+/**
+ * Stateful container that manages registration form state, API submission, and post-registration redirect.
+ *
+ * @returns {JSX.Element}
+ */
+const RegisterContainer = () =>
 {
     const [email, setEmail] = useState("");
     const [firstName, setFirstName] = useState("");
@@ -14,13 +19,19 @@ const RegisterContainer = () =>
     const [error, setError] = useState("");
     const [registered, setRegistered] = useState(false);
 
-    const handleSubmit = async (e) => 
+    /**
+     * Validates passwords match, registers the user via the API, and stores the returned JWT.
+     *
+     * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
+     * @returns {Promise<void>}
+     */
+    const handleSubmit = async (e) =>
     {
         e.preventDefault();
 
-        try 
+        try
         {
-            if (password === confirmPassword) 
+            if (password === confirmPassword)
             {
                 const response = await fetch(import.meta.env.VITE_API_URL + "/api/register", {
                     method: "POST",
@@ -28,15 +39,15 @@ const RegisterContainer = () =>
                     body: JSON.stringify({email, password, first_name: firstName, last_name: lastName, phone}),
                 });
 
-                const data = await response.json();            
+                const data = await response.json();
                 const body = {
                     access: data.access,
                     refresh: data.refresh,
                 };
 
-                if (response.status !== 201) 
-                {     
-                    console.log(data.error.message); 
+                if (response.status !== 201)
+                {
+                    console.log(data.error.message);
                     throw new Error(data.error.message);
                 }
 
@@ -49,15 +60,15 @@ const RegisterContainer = () =>
 
                 setRegistered(true);
             }
-            else 
+            else
             {
                 console.log("Password do not match");
                 throw new Error("Passwords do not match");
             }
         }
-        catch (error) 
+        catch (error)
         {
-            setError(error.message); 
+            setError(error.message);
         }
     };
 
@@ -79,7 +90,7 @@ const RegisterContainer = () =>
                 error={error}
                 handleSubmit={handleSubmit}
             />
-            {registered && <Navigate to="/dashboard" />} 
+            {registered && <Navigate to="/dashboard" />}
         </div>
     );
 };

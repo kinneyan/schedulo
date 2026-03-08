@@ -7,7 +7,12 @@ import DashboardPage from "./pages/dashboard";
 import RegisterPage from "./pages/register";
 import CreateWorkspacePage from "./pages/createWorkspace";
 
-function App() 
+/**
+ * Root application component that defines the client-side route tree.
+ *
+ * @returns {JSX.Element}
+ */
+function App()
 {
     return (
         <>

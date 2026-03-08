@@ -5,7 +5,10 @@ from ....models import MemberPermissions, WorkspaceMember, Workspace, User
 
 
 class UpdatePermissionsTests(APITestCase):
+    """Integration tests for the member permissions update endpoint."""
+
     def setUp(self):
+        """Create a workspace, owner, member, and initial permissions."""
         self.url = reverse("update_permissions")
         self.user = User.objects.create_user(
             email="testuser@example.com",
@@ -37,16 +40,19 @@ class UpdatePermissionsTests(APITestCase):
         self.client.force_authenticate(user=self.member.user)
 
     def test_missing_workspace_id(self):
+        """Verify that omitting workspace_id returns a 400 error."""
         response = self.client.put(self.url, {"member_id": self.member.id})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["error"]["message"], "Workspace ID is required.")
 
     def test_missing_member_id(self):
+        """Verify that omitting member_id returns a 400 error."""
         response = self.client.put(self.url, {"workspace_id": self.workspace.id})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["error"]["message"], "Member ID is required.")
 
     def test_member_not_found(self):
+        """Verify that a non-existent member_id returns a 404 error."""
         response = self.client.put(
             self.url, {"workspace_id": self.workspace.id, "member_id": 999}
         )
@@ -56,6 +62,7 @@ class UpdatePermissionsTests(APITestCase):
         )
 
     def test_create_new_permissions(self):
+        """Verify that a permissions record is created when one does not yet exist."""
         response = self.client.put(
             self.url, {"workspace_id": self.workspace.id, "member_id": self.member.id}
         )
@@ -67,6 +74,7 @@ class UpdatePermissionsTests(APITestCase):
         )
 
     def test_cannot_update_owner_permissions(self):
+        """Verify that attempting to update a workspace owner's permissions returns 409."""
         self.permissions.is_owner = True
         self.permissions.save()
         response = self.client.put(
@@ -84,6 +92,7 @@ class UpdatePermissionsTests(APITestCase):
         )
 
     def test_successfully_update_permissions(self):
+        """Verify that all permission flags are correctly updated on success."""
         data = {
             "workspace_id": self.workspace.id,
             "member_id": self.member.id,
@@ -101,6 +110,7 @@ class UpdatePermissionsTests(APITestCase):
         self.assertTrue(self.permissions.manage_time_off)
 
     def test_member_not_in_workspace(self):
+        """Verify that a member from a different workspace returns a 404 error."""
         # Create a new workspace and a member in that workspace
         new_workspace = Workspace.objects.create(owner=self.user, created_by=self.user)
         new_member = WorkspaceMember.objects.create(

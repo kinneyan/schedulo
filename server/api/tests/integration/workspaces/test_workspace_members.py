@@ -6,7 +6,10 @@ from ....models import Workspace, WorkspaceMember, User, MemberPermissions
 
 
 class AddMemberTests(APITestCase):
+    """Integration tests for the add workspace member endpoint."""
+
     def setUp(self):
+        """Create a workspace with an authenticated owner member and one additional user."""
         self.url = reverse("add_workspace_member")
 
         # add users
@@ -43,11 +46,13 @@ class AddMemberTests(APITestCase):
         )
 
     def test_add_workspace_member_permission(self):
+        """Verify that a member with the manage_workspace_members permission can add a new member."""
         data = {"added_user_id": self.other_user.id, "workspace_id": self.workspace.id}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_add_workspace_member_no_permission(self):
+        """Verify that a member without manage_workspace_members permission is denied with a 403."""
         self.permission.manage_workspace_members = False
         self.permission.save()
         data = {"added_user_id": self.other_user.id, "workspace_id": self.workspace.id}
@@ -59,6 +64,7 @@ class AddMemberTests(APITestCase):
         )
 
     def test_add_duplicate_workspace_member(self):
+        """Verify that adding an already existing workspace member returns a 409 conflict."""
         # Add the user as a workspace member for the first time
         data = {"added_user_id": self.other_user.id, "workspace_id": self.workspace.id}
         response = self.client.post(self.url, data, format="json")

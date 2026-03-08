@@ -3,47 +3,58 @@ import Cookies from "universal-cookie";
 import {Navigate} from "react-router-dom";
 import CreateWorkspaceForm from "../../components/forms/createWorkspace";
 
-const CreateWorkspaceContainer = () => 
+/**
+ * Stateful container that manages workspace creation, including form state and API submission.
+ *
+ * @returns {JSX.Element}
+ */
+const CreateWorkspaceContainer = () =>
 {
     const [name, setName] = useState("");
     const [error, setError] = useState("");
     const [created, setCreated] = useState(false);
-    
-    const handleSubmit = async (e) => 
+
+    /**
+     * Submits the new workspace name to the API and redirects to the dashboard on success.
+     *
+     * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
+     * @returns {Promise<void>}
+     */
+    const handleSubmit = async (e) =>
     {
         e.preventDefault();
 
-        try 
+        try
         {
             const cookies = new Cookies();
             const token = cookies.get("token");
-            
+
             const response = await fetch(import.meta.env.VITE_API_URL + "/api/workspace/create/", {
                 method: "POST",
                 withCredentials: true,
                 credentials: "include",
                 headers: {"Content-Type": "application/json", "Authorization": "Bearer " + token.access},
                 body: JSON.stringify({name}),
-            });      
-            
-            const data = await response.json();  
+            });
 
-            if (response.status === 400) 
-            {     
-                console.log(data.error.message); 
+            const data = await response.json();
+
+            if (response.status === 400)
+            {
+                console.log(data.error.message);
                 throw new Error(data.error.message);
             }
-            else if (response.status !== 201) 
+            else if (response.status !== 201)
             {
-                console.log(response.status); 
+                console.log(response.status);
                 throw new Error(response.status);
             }
 
             setCreated(true);
         }
-        catch (error) 
+        catch (error)
         {
-            setError(error.message); 
+            setError(error.message);
         }
     };
 
@@ -55,7 +66,7 @@ const CreateWorkspaceContainer = () =>
                 error={error}
                 handleSubmit={handleSubmit}
             />
-            {created && <Navigate to="/dashboard" />} 
+            {created && <Navigate to="/dashboard" />}
         </div>
     );
 };

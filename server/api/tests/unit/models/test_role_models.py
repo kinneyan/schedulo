@@ -17,6 +17,7 @@ class WorkspaceRoleModelTest(TestCase):
     """Test cases for WorkspaceRole model"""
 
     def setUp(self):
+        """Create a user and workspace for use in each workspace role test."""
         self.user = User.objects.create_user(
             email="test@example.com", password="password123"
         )
@@ -71,6 +72,7 @@ class MemberRoleModelTest(TestCase):
     """Test cases for MemberRole model"""
 
     def setUp(self):
+        """Create a user, workspace, member, and role for use in each member role test."""
         self.user = User.objects.create_user(
             email="test@example.com", password="password123"
         )
@@ -134,6 +136,7 @@ class MemberPermissionsModelTest(TestCase):
     """Test cases for MemberPermissions model"""
 
     def setUp(self):
+        """Create a user, workspace, and member for use in each permissions test."""
         self.user = User.objects.create_user(
             email="test@example.com", password="password123"
         )

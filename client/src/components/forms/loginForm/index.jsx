@@ -3,7 +3,19 @@ import PropTypes from "prop-types";
 import SubmitButton from "../../buttons/submitButton";
 import "./index.scss";
 
-const LoginForm = ({email, setEmail, password, setPassword, error, handleSubmit}) => 
+/**
+ * Presentational login form with email and password fields.
+ *
+ * @param {Object} props
+ * @param {string} props.email - Current value of the email field.
+ * @param {Function} props.setEmail - State setter for the email field.
+ * @param {string} props.password - Current value of the password field.
+ * @param {Function} props.setPassword - State setter for the password field.
+ * @param {string} [props.error] - Error message to display beneath the form, if any.
+ * @param {Function} props.handleSubmit - Form submit handler.
+ * @returns {JSX.Element}
+ */
+const LoginForm = ({email, setEmail, password, setPassword, error, handleSubmit}) =>
 {
     return (
         <Container id="login-container">

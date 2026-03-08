@@ -3,7 +3,14 @@ import PropTypes from "prop-types";
 
 import "./index.scss";
 
-const SubmitButton = ({buttonText}) => 
+/**
+ * Submit button for enclosing forms.
+ *
+ * @param {Object} props
+ * @param {string} props.buttonText - Label displayed on the button.
+ * @returns {JSX.Element}
+ */
+const SubmitButton = ({buttonText}) =>
 {
     return (
         <Button id="button-item" type="submit">{buttonText}</Button>

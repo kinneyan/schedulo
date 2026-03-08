@@ -3,7 +3,12 @@ import "./index.scss";
 import NavigationBar from "../../components/navbar";
 import RegisterContainer from "../../containers/register";
 
-const RegisterPage = () => 
+/**
+ * Public registration page combining the navbar and registration form container.
+ *
+ * @returns {JSX.Element}
+ */
+const RegisterPage = () =>
 {
     return (
         <div id="register-page">

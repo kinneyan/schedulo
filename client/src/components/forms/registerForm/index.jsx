@@ -3,7 +3,27 @@ import PropTypes from "prop-types";
 import SubmitButton from "../../buttons/submitButton";
 import "./index.scss";
 
-const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, firstName, setFirstName, lastName, setLastName, phone, setPhone, error, handleSubmit}) => 
+/**
+ * Presentational registration form collecting user account details.
+ *
+ * @param {Object} props
+ * @param {string} props.email - Current value of the email field.
+ * @param {Function} props.setEmail - State setter for the email field.
+ * @param {string} props.password - Current value of the password field.
+ * @param {Function} props.setPassword - State setter for the password field.
+ * @param {string} props.confirmPassword - Current value of the confirm-password field.
+ * @param {Function} props.setConfirmPassword - State setter for the confirm-password field.
+ * @param {string} props.firstName - Current value of the first name field.
+ * @param {Function} props.setFirstName - State setter for the first name field.
+ * @param {string} props.lastName - Current value of the last name field.
+ * @param {Function} props.setLastName - State setter for the last name field.
+ * @param {string} props.phone - Current value of the phone number field.
+ * @param {Function} props.setPhone - State setter for the phone number field.
+ * @param {string} [props.error] - Error message to display beneath the form, if any.
+ * @param {Function} props.handleSubmit - Form submit handler.
+ * @returns {JSX.Element}
+ */
+const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, firstName, setFirstName, lastName, setLastName, phone, setPhone, error, handleSubmit}) =>
 {
     return (
         <Container id="register-container">

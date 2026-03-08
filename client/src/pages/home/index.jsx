@@ -2,7 +2,12 @@ import "./index.scss";
 
 import NavbarContainer from "../../containers/navbar";
 
-const HomePage = () => 
+/**
+ * Public home/landing page.
+ *
+ * @returns {JSX.Element}
+ */
+const HomePage = () =>
 {
     return (
         <div id="home-page">

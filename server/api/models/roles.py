@@ -3,6 +3,8 @@ from .users import Workspace, WorkspaceMember
 
 
 class WorkspaceRole(models.Model):
+    """A named role within a workspace, optionally associated with a pay rate."""
+
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
@@ -13,6 +15,8 @@ class WorkspaceRole(models.Model):
 
 
 class MemberRole(models.Model):
+    """An assignment of a WorkspaceRole to a WorkspaceMember."""
+
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     workspace_role = models.ForeignKey(WorkspaceRole, on_delete=models.CASCADE)
@@ -20,6 +24,8 @@ class MemberRole(models.Model):
 
 
 class MemberPermissions(models.Model):
+    """Permission flags controlling what actions a WorkspaceMember can perform."""
+
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, null=True)

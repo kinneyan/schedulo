@@ -18,10 +18,23 @@ from ..models import (
 
 
 class CreateRole(APIView):
+    """API view for creating a new role in a workspace."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def put(self, request):
+        """Create a new WorkspaceRole in the given workspace.
+
+        Requires manage_workspace_roles permission. Accepted body fields:
+        workspace_id (required), name (optional), pay_rate (optional).
+
+        :param request: Authenticated HTTP request with workspace_id and optional
+            role fields in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response on creation, or an error response.
+        :rtype: rest_framework.response.Response
+        """
         response = {"error": {}}
 
         serializer = RoleSerializer(data=request.data)
@@ -74,23 +87,22 @@ class CreateRole(APIView):
 
 
 class DeleteWorkspaceRole(APIView):
+    """API view for deleting a workspace role. Requires manage_workspace_roles."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    """
-    # workspace_id (DEPRICATED)
-    workspace_role_id
-    """
-
     def delete(self, request):
+        """Delete a WorkspaceRole by ID.
+
+        :param request: Authenticated HTTP request containing workspace_role_id
+            in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response on deletion, or an error response.
+        :rtype: rest_framework.response.Response
+        """
         response = {"error": {}}
 
-        # Verify body contains required fields
-        """
-        if "workspace_id" not in request.data:
-            response["error"]["message"] = "Workspace ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-        """
         if "workspace_role_id" not in request.data:
             response["error"]["message"] = "Workspace role ID is required."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
@@ -132,17 +144,24 @@ class DeleteWorkspaceRole(APIView):
 
 
 class ModifyWorkspaceRole(APIView):
+    """API view for updating a workspace role's name or pay rate."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        response = {"error": {}}
+        """Update name and/or pay_rate for an existing WorkspaceRole.
 
+        Requires manage_workspace_roles permission. Accepted body fields:
+        workspace_role_id (required), name (optional), pay_rate (optional).
+
+        :param request: Authenticated HTTP request with workspace_role_id and
+            optional update fields in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response, or an error response describing the failure.
+        :rtype: rest_framework.response.Response
         """
-        workspace_role_id
-        name (optional)
-        pay_rate (optional)
-        """
+        response = {"error": {}}
 
         if "workspace_role_id" not in request.data:
             response["error"]["message"] = "Workspace role ID is required."
@@ -196,16 +215,21 @@ class ModifyWorkspaceRole(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 
-class GetWorkspaceRoles(APIView):  # returns a list of all roles in a workspace
+class GetWorkspaceRoles(APIView):
+    """API view for listing all roles in a workspace."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        response = {"error": {}}
+        """Return a list of all WorkspaceRoles in the given workspace.
 
+        :param request: Authenticated HTTP request containing workspace_id in the body.
+        :type request: rest_framework.request.Request
+        :return: List of roles with id, name, and pay_rate, or an error response.
+        :rtype: rest_framework.response.Response
         """
-        workspace_id
-        """
+        response = {"error": {}}
 
         # Verify body contains required fields
         if "workspace_id" not in request.data:
@@ -235,16 +259,21 @@ class GetWorkspaceRoles(APIView):  # returns a list of all roles in a workspace
         return Response(response, status=status.HTTP_200_OK)
 
 
-class GetMemberRoles(APIView):  # returns of list of the WorkspaceRoles a member has
+class GetMemberRoles(APIView):
+    """API view for listing all WorkspaceRoles assigned to a specific member."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        response = {"error": {}}
+        """Return the list of WorkspaceRoles assigned to a given workspace member.
 
+        :param request: Authenticated HTTP request containing member_id in the body.
+        :type request: rest_framework.request.Request
+        :return: List of roles with id, name, and pay_rate, or an error response.
+        :rtype: rest_framework.response.Response
         """
-        member_id
-        """
+        response = {"error": {}}
 
         if "member_id" not in request.data:
             response["error"]["message"] = "Member ID is required"
@@ -278,25 +307,25 @@ class GetMemberRoles(APIView):  # returns of list of the WorkspaceRoles a member
 ### MEMBER ROLE ENDPOINTS ###
 
 
-class AddMemberRole(APIView):  # adds a role to a workspace member
+class AddMemberRole(APIView):
+    """API view for assigning a WorkspaceRole to a workspace member."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    """
-    # workspace_id (DEPRICATED)
-    member_id; the member to have the role added to them
-    workspace_role_id
-    """
-
     def put(self, request):
-        response = {"error": {}}
+        """Assign a WorkspaceRole to a workspace member.
 
-        # Verify body contains required fields
+        Requires manage_workspace_roles permission. Accepted body fields:
+        member_id (required), workspace_role_id (required).
+
+        :param request: Authenticated HTTP request with member_id and
+            workspace_role_id in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response on assignment, or an error response.
+        :rtype: rest_framework.response.Response
         """
-        if "workspace_id" not in request.data:
-            response["error"]["message"] = "Workspace ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-        """
+        response = {"error": {}}
 
         if "member_id" not in request.data:
             response["error"]["message"] = "Member ID is required"
@@ -306,14 +335,6 @@ class AddMemberRole(APIView):  # adds a role to a workspace member
             response["error"]["message"] = "Role ID is required"
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-        """
-        # Verify workspace exists
-        try:
-            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
-        except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exist."
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-        """
         # Verify member exists
         try:
             modify_member = WorkspaceMember.objects.get(id=request.data["member_id"])
@@ -370,25 +391,25 @@ class AddMemberRole(APIView):  # adds a role to a workspace member
         return Response(response, status=status.HTTP_409_CONFLICT)
 
 
-class RemoveMemberRole(APIView):  # removes a role from a workspace member
+class RemoveMemberRole(APIView):
+    """API view for removing a WorkspaceRole from a workspace member."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    """
-    # workspace_id (DEPRICATED)
-    member_id; the member to have the role removed from them
-    workspace_role_id
-    """
-
     def delete(self, request):
-        response = {"error": {}}
+        """Remove a WorkspaceRole from a workspace member.
 
-        # Verify body contains required fields
+        Requires manage_workspace_roles permission. Accepted body fields:
+        member_id (required), workspace_role_id (required).
+
+        :param request: Authenticated HTTP request with member_id and
+            workspace_role_id in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response on removal, or an error response.
+        :rtype: rest_framework.response.Response
         """
-        if "workspace_id" not in request.data:
-            response["error"]["message"] = "Workspace ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-        """
+        response = {"error": {}}
 
         if "member_id" not in request.data:
             response["error"]["message"] = "Member ID is required"
@@ -398,14 +419,6 @@ class RemoveMemberRole(APIView):  # removes a role from a workspace member
             response["error"]["message"] = "Role ID is required"
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-        """
-        # Verify workspace exists
-        try:
-            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
-        except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exist."
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-        """
         # Verify member exists
         try:
             modify_member = WorkspaceMember.objects.get(id=request.data["member_id"])

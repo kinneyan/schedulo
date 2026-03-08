@@ -19,19 +19,24 @@ from ..models import (
 
 
 class CreateShift(APIView):
+    """API view for creating a new shift in a workspace."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def put(self, request):
-        response = {"error": {}}
+        """Create a new Shift in the given workspace.
 
+        Requires manage_schedules permission. Accepted body fields:
+        workspace_id (required), role_id (required), start_time (required),
+        end_time (required), member_id (optional).
+
+        :param request: Authenticated HTTP request with shift details in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response on creation, or an error response.
+        :rtype: rest_framework.response.Response
         """
-        workspace_id; the workspace the shift is being made for
-        member_id; (optional) member that the shift is being assiged to
-        role_id; workspace role that this shift is part of
-        start_time
-        end_time
-        """
+        response = {"error": {}}
 
         serializer = ShiftSerializer(data=request.data)
         if not serializer.is_valid():
@@ -124,20 +129,24 @@ class CreateShift(APIView):
 
 
 class ModifyShift(APIView):
+    """API view for updating fields on an existing shift."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        """
-        shift_id
+        """Update one or more fields on an existing Shift.
 
-        Following are optional, anything included will be updated:
-        member_id; member that the shift is being assiged to
-        role_id; workspace role that this shift is part of
-        start_time
-        end_time
-        """
+        Requires manage_schedules permission. Accepted body fields: shift_id
+        (required), member_id (optional), role_id (optional), start_time (optional),
+        end_time (optional).
 
+        :param request: Authenticated HTTP request with shift_id and optional
+            update fields in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response, or an error response describing the failure.
+        :rtype: rest_framework.response.Response
+        """
         response = {"error": {}}
 
         serializer = ModifyShiftSerializer(data=request.data)
@@ -249,14 +258,22 @@ class ModifyShift(APIView):
 
 
 class DeleteShift(APIView):
+    """API view for deleting an existing shift."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def delete(self, request):
-        """
-        shift_id
-        """
+        """Delete a Shift by ID.
 
+        Requires manage_schedules permission. Accepted body fields:
+        shift_id (required).
+
+        :param request: Authenticated HTTP request containing shift_id in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response on deletion, or an error response.
+        :rtype: rest_framework.response.Response
+        """
         response = {"error": {}}
 
         # Ensure that shift ID present
@@ -295,24 +312,25 @@ class DeleteShift(APIView):
 
 
 class GetShifts(APIView):
+    """API view for querying shifts across the authenticated user's workspaces."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        """
-        Will filter by any of the following parameters, all are optional, minimum of 1 must be included.
-        The more params included the slower the search will be.
+        """Return shifts matching the provided filters.
 
-        shift_id
-        member_id
-        role_id
-        workspace_id
-        open (T/F)
-        created_by_id
-        range_start; Y-m-d (ex. 2025-01-05)
-        range_end; Y-m-d (ex. 2025-01-05)
-        """
+        Results are always scoped to workspaces the authenticated user belongs to.
+        All filter fields are optional but at least one should be provided.
+        Accepted body fields: shift_id, member_id, role_id, workspace_id, open,
+        created_by_id, range_start (Y-m-d), range_end (Y-m-d).
 
+        :param request: Authenticated HTTP request with optional filter fields
+            in the body.
+        :type request: rest_framework.request.Request
+        :return: List of matching shifts, or an error response.
+        :rtype: rest_framework.response.Response
+        """
         response = {"error": {}}
 
         filters = {}

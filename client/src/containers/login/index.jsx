@@ -3,18 +3,29 @@ import LoginForm from "../../components/forms/loginForm";
 import Cookies from "universal-cookie";
 import {Navigate} from "react-router-dom";
 
-const LoginContainer = () => 
+/**
+ * Stateful container that manages login form state, API submission, and post-login redirect.
+ *
+ * @returns {JSX.Element}
+ */
+const LoginContainer = () =>
 {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loggedIn, setLoggedIn] = useState(false);
 
-    const handleSubmit = async (e) => 
+    /**
+     * Authenticates the user against the API and stores the returned JWT in a cookie.
+     *
+     * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
+     * @returns {Promise<void>}
+     */
+    const handleSubmit = async (e) =>
     {
         e.preventDefault();
 
-        try 
+        try
         {
             const response = await fetch(import.meta.env.VITE_API_URL + "/api/login", {
                 method: "POST",
@@ -22,13 +33,13 @@ const LoginContainer = () =>
                 body: JSON.stringify({email, password}),
             });
 
-            if (response.status !== 200) 
+            if (response.status !== 200)
             {
                 throw new Error("Incorrect email or password");
             }
 
             const data = await response.json();
-            
+
             const body = {
                 access: data.access,
                 refresh: data.refresh,
@@ -43,7 +54,7 @@ const LoginContainer = () =>
 
             setLoggedIn(true);
         }
-        catch 
+        catch
         {
             setError("Incorrect email or password");
         }

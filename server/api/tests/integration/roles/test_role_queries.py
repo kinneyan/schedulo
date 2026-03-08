@@ -13,7 +13,10 @@ from ....models import (
 
 
 class GetRolesTests(APITestCase):
+    """Integration tests for retrieving workspace roles."""
+
     def setUp(self):
+        """Create a workspace, owner with manage_workspace_roles permission, and an unprivileged member."""
         self.url = reverse("create_workspace_role")
         self.user = User.objects.create_user(
             email="testuser@example.com",
@@ -67,6 +70,7 @@ class GetRolesTests(APITestCase):
         self.client.force_authenticate(user=self.member.user)
 
     def test_no_workspace(self):
+        """Verify that omitting workspace_id returns 400."""
         data = {"name": "test name1", "pay_rate": 15.00}
 
         self.url = reverse("get_workspace_roles")
@@ -74,6 +78,7 @@ class GetRolesTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace(self):
+        """Verify that a nonexistent workspace_id returns 404."""
         data = {"workspace_id": 999, "name": "test name1", "pay_rate": 15.00}
 
         self.url = reverse("get_workspace_roles")
@@ -81,6 +86,7 @@ class GetRolesTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_single(self):
+        """Verify that retrieving roles for a workspace with one role returns that role correctly."""
         data = {
             "workspace_id": self.workspace.id,
             "name": "test name1",
@@ -99,6 +105,7 @@ class GetRolesTests(APITestCase):
         self.assertEqual(role.name, data["name"])
 
     def test_multiple(self):
+        """Verify that retrieving roles for a workspace with multiple roles returns all of them."""
         data = []
         data.append(
             {"workspace_id": self.workspace.id, "name": "test name1", "pay_rate": 15.00}
@@ -128,6 +135,7 @@ class GetRolesTests(APITestCase):
             self.assertEqual(data[i]["name"], role.name)
 
     def test_multiple_workspaces(self):
+        """Verify that fetching roles for one workspace does not include roles from another workspace."""
         # add another workspace and role to this workspace
         self.workspace2 = Workspace.objects.create(
             owner=self.user, created_by=self.user
@@ -186,7 +194,10 @@ class GetRolesTests(APITestCase):
 
 
 class GetMemberRoleTests(APITestCase):
+    """Integration tests for retrieving roles assigned to a workspace member."""
+
     def setUp(self):
+        """Create a workspace, owner, member, and three workspace roles."""
         self.url = reverse("get_member_roles")
         self.user = User.objects.create_user(
             email="testuser@example.com",
@@ -250,14 +261,17 @@ class GetMemberRoleTests(APITestCase):
         )
 
     def test_no_member_id(self):
+        """Verify that omitting member_id returns 400."""
         response = self.client.post(self.url, {}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_member_id(self):
+        """Verify that a nonexistent member_id returns 404."""
         response = self.client.post(self.url, {"member_id": 999}, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_no_roles(self):
+        """Verify that fetching roles for a member with no assignments returns an empty list."""
         response = self.client.post(
             self.url, {"member_id": self.member2.id}, format="json"
         )
@@ -265,6 +279,7 @@ class GetMemberRoleTests(APITestCase):
         self.assertEqual(len(response.data["roles"]), 0)
 
     def test_single(self):
+        """Verify that fetching roles for a member with one assignment returns that role."""
         MemberRole.objects.create(workspace_role=self.role, member=self.member2)
 
         response = self.client.post(
@@ -277,6 +292,7 @@ class GetMemberRoleTests(APITestCase):
         self.assertEqual(self.role.id, role.id)
 
     def test_multiple(self):
+        """Verify that fetching roles for a member with multiple assignments returns all of them in order."""
         MemberRole.objects.create(workspace_role=self.role, member=self.member2)
         MemberRole.objects.create(workspace_role=self.role2, member=self.member2)
         MemberRole.objects.create(workspace_role=self.role3, member=self.member2)

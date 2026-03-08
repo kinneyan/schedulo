@@ -3,7 +3,17 @@ import SubmitButton from "../../buttons/submitButton";
 import "./index.scss";
 import PropTypes from "prop-types";
 
-const CreateWorkspaceForm = ({name, setName, error, handleSubmit}) => 
+/**
+ * Presentational form for creating a new workspace.
+ *
+ * @param {Object} props
+ * @param {string} props.name - Current value of the workspace name field.
+ * @param {Function} props.setName - State setter for the workspace name.
+ * @param {string} [props.error] - Error message to display beneath the form, if any.
+ * @param {Function} props.handleSubmit - Form submit handler.
+ * @returns {JSX.Element}
+ */
+const CreateWorkspaceForm = ({name, setName, error, handleSubmit}) =>
 {
     return (
         <Container id="create-workspace-container">

@@ -13,7 +13,10 @@ from ....models import (
 
 
 class CreateRoleTests(APITestCase):
+    """Integration tests for creating workspace roles."""
+
     def setUp(self):
+        """Create a workspace, owner with manage_workspace_roles permission, and an unprivileged member."""
         self.url = reverse("create_workspace_role")
         self.user = User.objects.create_user(
             email="testuser@example.com",
@@ -67,16 +70,19 @@ class CreateRoleTests(APITestCase):
         self.client.force_authenticate(user=self.member.user)
 
     def test_no_workspace(self):
+        """Verify that omitting workspace_id returns 400."""
         data = {"name": "test name1", "pay_rate": 15.00}
         response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace(self):
+        """Verify that a nonexistent workspace_id returns 404."""
         data = {"workspace_id": 999, "name": "test name1", "pay_rate": 15.00}
         response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_workspace_role_valid(self):
+        """Verify that a valid role creation request returns 201 and persists the role with correct attributes."""
         data = {
             "workspace_id": self.workspace.id,
             "name": "test name1",
@@ -92,6 +98,7 @@ class CreateRoleTests(APITestCase):
         self.assertEqual(role.pay_rate, data["pay_rate"])
 
     def test_create_workspace_role_no_name_or_payrate(self):
+        """Verify that omitting name and pay_rate creates a role with defaults of 'Unnamed Role' and no pay rate."""
         data = {"workspace_id": self.workspace.id}
         response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -103,6 +110,7 @@ class CreateRoleTests(APITestCase):
         self.assertEqual(role.pay_rate, None)
 
     def test_create_workspace_role_without_permissions(self):
+        """Verify that a member without manage_workspace_roles permission receives 403."""
         data = {
             "workspace_id": self.workspace.id,
             "name": "test name1",
@@ -118,6 +126,7 @@ class CreateRoleTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_create_workspace_role_as_non_member(self):
+        """Verify that a user who is not a workspace member receives 403."""
         data = {
             "workspace_id": self.workspace.id,
             "name": "test name1",
@@ -134,7 +143,10 @@ class CreateRoleTests(APITestCase):
 
 
 class DeleteRoleTests(APITestCase):
+    """Integration tests for deleting workspace roles."""
+
     def setUp(self):
+        """Create a workspace, owner with manage_workspace_roles permission, and three roles."""
         self.url = reverse("delete_workspace_role")
         self.user = User.objects.create_user(
             email="testuser@example.com",
@@ -198,16 +210,19 @@ class DeleteRoleTests(APITestCase):
         )
 
     def test_no_workspace_role_id(self):
+        """Verify that omitting workspace_role_id returns 400."""
         data = {}
         response = self.client.delete(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace_id(self):
+        """Verify that a nonexistent workspace_role_id returns 404."""
         data = {"workspace_role_id": 999}
         response = self.client.delete(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_valid(self):
+        """Verify that deleting a valid role returns 200 and removes the role from the database."""
         data = {"workspace_role_id": self.role.id}
         response = self.client.delete(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -220,6 +235,7 @@ class DeleteRoleTests(APITestCase):
             self.assertTrue(True)
 
     def test_delete_with_children(self):
+        """Verify that deleting a role with assigned MemberRoles returns 200 and cascades deletion to MemberRoles."""
         member_role = MemberRole.objects.create(
             workspace_role=self.role, member=self.member2
         )  # create child member role
@@ -244,7 +260,10 @@ class DeleteRoleTests(APITestCase):
 
 
 class ModifyWorkspaceRoleTests(APITestCase):
+    """Integration tests for modifying workspace role attributes."""
+
     def setUp(self):
+        """Create a workspace, owner with manage_workspace_roles permission, and three roles."""
         self.url = reverse("modify_workspace_role")
         self.user = User.objects.create_user(
             email="testuser@example.com",
@@ -308,16 +327,19 @@ class ModifyWorkspaceRoleTests(APITestCase):
         )
 
     def test_no_workspace_role_id(self):
+        """Verify that omitting workspace_role_id returns 400."""
         data = {}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace_role_id(self):
+        """Verify that a nonexistent workspace_role_id returns 404."""
         data = {"workspace_role_id": 999}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_modify_valid(self):
+        """Verify that a valid modification request returns 200 and updates the role's name and pay rate."""
         data = {"workspace_role_id": self.role.id, "name": "new name", "pay_rate": 25}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -328,6 +350,7 @@ class ModifyWorkspaceRoleTests(APITestCase):
         self.assertEqual(role.pay_rate, data["pay_rate"])
 
     def test_modify_without_permissions(self):
+        """Verify that a member without manage_workspace_roles permission receives 403 and the role is unchanged."""
         self.client.force_authenticate(user=self.member2.user)
         data = {"workspace_role_id": self.role.id, "name": "new name", "pay_rate": 25}
         response = self.client.post(self.url, data, format="json")

@@ -3,7 +3,12 @@ import Cookies from "universal-cookie";
 
 import ViewProfile from "../../components/profile";
 
-const Profile = () => 
+/**
+ * Stateful container that fetches the user's profile data and handles account update submissions.
+ *
+ * @returns {JSX.Element}
+ */
+const Profile = () =>
 {
     const cookies = new Cookies();
     const token = cookies.get("token");
@@ -32,11 +37,16 @@ const Profile = () =>
         setError,
     };
 
-    useEffect(() => 
+    useEffect(() =>
     {
-        const fetchData = async () => 
+        /**
+         * Fetches the authenticated user's profile data from the API and populates form state.
+         *
+         * @returns {Promise<void>}
+         */
+        const fetchData = async () =>
         {
-            try 
+            try
             {
                 const response = await fetch(import.meta.env.VITE_API_URL + "/api/user", {
                     method: "GET",
@@ -44,10 +54,10 @@ const Profile = () =>
                     credentials: "include",
                     headers: {"Content-Type": "application/json", "Authorization": "Bearer " + token.access},
                 });
-        
+
                 const data = await response.json();
-        
-                if (response.status === 401) 
+
+                if (response.status === 401)
                 {
                     throw new Error("Failed to authorize request.");
                 }
@@ -57,7 +67,7 @@ const Profile = () =>
                 setEmail(data.email);
                 setPhone(data.phone);
             }
-            catch (error) 
+            catch (error)
             {
                 console.log(error);
             }
@@ -65,9 +75,15 @@ const Profile = () =>
 
         fetchData();
     }, [token.access]);
-    
 
-    const handleSubmit = async (e) => 
+
+    /**
+     * Submits updated profile information to the API, including an optional password change.
+     *
+     * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
+     * @returns {Promise<void>}
+     */
+    const handleSubmit = async (e) =>
     {
         e.preventDefault();
 
@@ -78,13 +94,13 @@ const Profile = () =>
             phone: phone,
         };
 
-        if (newPassword !== "") 
+        if (newPassword !== "")
         {
             requestBody.current_password = oldPassword;
             requestBody.password = newPassword;
         }
 
-        try 
+        try
         {
             const response = await fetch(import.meta.env.VITE_API_URL + "/api/user", {
                 method: "PUT",
@@ -93,22 +109,22 @@ const Profile = () =>
                 headers: {"Content-Type": "application/json", "Authorization": "Bearer " + token.access},
                 body: JSON.stringify(requestBody),
             });
-            
+
             const data = await response.json();
 
-            if (response.status === 400 && data.error.message === "Current password is incorrect.") 
+            if (response.status === 400 && data.error.message === "Current password is incorrect.")
             {
                 throw new Error("Current password is incorrect.");
             }
 
-            if (response.status !== 200) 
+            if (response.status !== 200)
             {
                 throw new Error("Failed to update user information.");
             }
 
             window.location.reload();
         }
-        catch (error) 
+        catch (error)
         {
             setError(error);
         }

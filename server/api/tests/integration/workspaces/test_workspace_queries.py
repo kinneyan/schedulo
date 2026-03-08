@@ -6,7 +6,10 @@ from ....models import Workspace, WorkspaceMember, User, MemberPermissions
 
 
 class GetWorkspaceTests(APITestCase):
+    """Integration tests for the get workspace endpoint."""
+
     def setUp(self):
+        """Create two workspaces with members and authenticate test users."""
         self.url = reverse("get_workspace")
         self.user = User.objects.create_user(
             email="testuser@example.com",
@@ -75,6 +78,7 @@ class GetWorkspaceTests(APITestCase):
         )
 
     def test_no_workspaces(self):
+        """Verify that a 400 is returned when no workspace_id is provided and the user has no memberships."""
         self.client.force_authenticate(user=self.user3)
 
         response = self.client.get(self.url)
@@ -82,6 +86,7 @@ class GetWorkspaceTests(APITestCase):
         self.assertIn("Workspace ID is required", response.data["error"]["message"])
 
     def test_as_owner(self):
+        """Verify that a workspace owner can retrieve workspace details with membership set to owner."""
         self.client.force_authenticate(user=self.user)
 
         response = self.client.get(self.url, {"workspace_id": self.workspace1.id})
@@ -94,6 +99,7 @@ class GetWorkspaceTests(APITestCase):
         self.assertEqual(response.data["membership"], "owner")
 
     def test_as_employee(self):
+        """Verify that a non-owner member can retrieve workspace details with membership set to employee."""
         self.client.force_authenticate(user=self.user2)
 
         response = self.client.get(self.url, {"workspace_id": self.workspace1.id})
@@ -106,6 +112,7 @@ class GetWorkspaceTests(APITestCase):
         self.assertEqual(response.data["membership"], "employee")
 
     def test_no_workspace(self):
+        """Verify that a 400 is returned when workspace_id is omitted from the request."""
         self.client.force_authenticate(user=self.user)
 
         response = self.client.get(self.url, {})
@@ -116,6 +123,7 @@ class GetWorkspaceTests(APITestCase):
         self.assertIn("Workspace ID is required", response.data["error"]["message"])
 
     def test_invalid_workspace(self):
+        """Verify that a 404 is returned when the requested workspace does not exist."""
         self.client.force_authenticate(user=self.user)
 
         response = self.client.get(self.url, {"workspace_id": 999})

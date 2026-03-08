@@ -4,7 +4,12 @@ import withAuth from "../../components/auth";
 import NavbarContainer from "../../containers/navbar";
 import Profile from "../../containers/profile";
 
-const ProfilePage = () => 
+/**
+ * User profile/settings page, protected by authentication.
+ *
+ * @returns {JSX.Element}
+ */
+const ProfilePage = () =>
 {
     return (
         <div id="profile-page">

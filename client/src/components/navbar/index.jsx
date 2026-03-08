@@ -7,17 +7,34 @@ import PropTypes from "prop-types";
 
 import "./index.scss";
 
-const NavigationBar = ({loggedIn}) => 
+/**
+ * Top-level navigation bar with branding, page links, and an account dropdown.
+ *
+ * @param {Object} props
+ * @param {boolean} props.loggedIn - Whether the current user is authenticated.
+ * @returns {JSX.Element}
+ */
+const NavigationBar = ({loggedIn}) =>
 {
-    const AuthButton = ({loggedIn}) => 
+    /**
+     * Account dropdown content that adapts to the user's authentication state.
+     *
+     * @param {Object} props
+     * @param {boolean} props.loggedIn - Whether the current user is authenticated.
+     * @returns {JSX.Element}
+     */
+    const AuthButton = ({loggedIn}) =>
     {
-        const logOut = () => 
+        /**
+         * Removes the auth token cookie, effectively logging the user out.
+         */
+        const logOut = () =>
         {
             const cookies = new Cookies();
             cookies.remove("token");
         };
 
-        if (!loggedIn) 
+        if (!loggedIn)
         {
             return <NavDropdown.Item href="/login">Log in</NavDropdown.Item>;
         }
@@ -39,7 +56,7 @@ const NavigationBar = ({loggedIn}) =>
         <Navbar fixed="top">
             <Container fluid className="p-0">
                 <Navbar.Brand href="/">
-                    <img 
+                    <img
                         src="/schedulo.png"
                         alt="logo"
                     />
@@ -49,7 +66,7 @@ const NavigationBar = ({loggedIn}) =>
                     <Nav.Link href="/">Home</Nav.Link>
                     <Nav.Link href="#">About</Nav.Link>
                     <NavDropdown title="Account">
-                        <AuthButton loggedIn={loggedIn} />    
+                        <AuthButton loggedIn={loggedIn} />
                     </NavDropdown>
                 </Nav>
             </Container>
