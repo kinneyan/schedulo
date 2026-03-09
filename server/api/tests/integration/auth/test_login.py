@@ -5,13 +5,17 @@ from ....models import User
 
 
 class LoginTests(APITestCase):
+    """Integration tests for the login endpoint."""
+
     def setUp(self):
+        """Create a test user and set the login URL."""
         self.url = reverse("login")
         self.user = User.objects.create_user(
             email="test@example.com", password="password123"
         )
 
     def test_login_with_valid_credentials(self):
+        """Verify that valid credentials return 200 with access and refresh tokens."""
         data = {"email": "test@example.com", "password": "password123"}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -19,6 +23,7 @@ class LoginTests(APITestCase):
         self.assertIn("refresh", response.data)
 
     def test_login_with_invalid_credentials(self):
+        """Verify that invalid credentials return 401 with an error message."""
         data = {"email": "test@example.com", "password": "wrongpassword"}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -28,6 +33,7 @@ class LoginTests(APITestCase):
         )
 
     def test_login_with_invalid_request_data(self):
+        """Verify that missing required fields return 400 with an error message."""
         data = {
             "email": "test@example.com"
             # Missing password

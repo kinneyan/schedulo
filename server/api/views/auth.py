@@ -11,7 +11,16 @@ from ..models import User
 
 
 class Login(APIView):
+    """API view for authenticating a user and returning JWT tokens."""
+
     def post(self, request):
+        """Authenticate a user with email and password and return JWT tokens.
+
+        :param request: HTTP request containing email and password in the body.
+        :type request: rest_framework.request.Request
+        :return: JWT access and refresh tokens on success, or an error response.
+        :rtype: rest_framework.response.Response
+        """
         response = {"error": {}}
 
         serializer = LoginUserSerializer(data=request.data)
@@ -45,7 +54,17 @@ class Login(APIView):
 
 
 class Register(APIView):
+    """API view for creating a new user account and returning JWT tokens."""
+
     def post(self, request):
+        """Register a new user and return JWT tokens on success.
+
+        :param request: HTTP request containing email, password, first_name,
+            last_name, and phone in the body.
+        :type request: rest_framework.request.Request
+        :return: JWT access and refresh tokens on success, or an error response.
+        :rtype: rest_framework.response.Response
+        """
         response = {"error": {}}
 
         serializer = RegisterUserSerializer(data=request.data)

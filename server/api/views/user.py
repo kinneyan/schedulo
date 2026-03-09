@@ -10,10 +10,19 @@ from ..models import Workspace, WorkspaceMember
 
 
 class GetUser(APIView):
+    """API view for retrieving and updating the authenticated user's profile."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """Return the authenticated user's profile and their workspace memberships.
+
+        :param request: Authenticated HTTP request.
+        :type request: rest_framework.request.Request
+        :return: User profile fields and a list of workspaces the user belongs to.
+        :rtype: rest_framework.response.Response
+        """
         response = {"error": {}}
 
         response["email"] = request.user.email
@@ -42,14 +51,15 @@ class GetUser(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
     def put(self, request):
-        """
-        email
-        phone
-        first_name
-        last_name
-        last_name
-        password
-        current_password
+        """Update one or more fields on the authenticated user's profile.
+
+        Accepted body fields (all optional): email, phone, first_name, last_name,
+        password (requires current_password also be present).
+
+        :param request: Authenticated HTTP request with fields to update in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response, or an error response describing the failure.
+        :rtype: rest_framework.response.Response
         """
         response = {"error": {}}
 

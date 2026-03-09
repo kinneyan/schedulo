@@ -9,6 +9,7 @@ class CustomUserManagerTest(TestCase):
     """Test cases for CustomUserManager methods"""
 
     def setUp(self):
+        """Set up a bare CustomUserManager instance with the User model attached."""
         self.manager = CustomUserManager()
         self.manager.model = User
 
@@ -137,6 +138,7 @@ class WorkspaceModelTest(TestCase):
     """Test cases for Workspace model"""
 
     def setUp(self):
+        """Create an owner user for use in each workspace test."""
         self.user = User.objects.create_user(
             email="owner@example.com", password="password123"
         )
@@ -174,6 +176,7 @@ class WorkspaceMemberModelTest(TestCase):
     """Test cases for WorkspaceMember model"""
 
     def setUp(self):
+        """Create owner, member user, and workspace for use in each test."""
         self.owner = User.objects.create_user(
             email="owner@example.com", password="password123"
         )

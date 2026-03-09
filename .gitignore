@@ -1,4 +1,6 @@
 .DS_Store
+.idea/
+.claude/
 node_modules
 *env
 .env.dev
@@ -9,3 +11,4 @@ dist
 .vite/
 __pycache__/
 *.pyc
+*.egg-info/

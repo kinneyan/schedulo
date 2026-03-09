@@ -163,14 +163,54 @@ This guide outlines our team's standard coding conventions. Consistency is key�
 
 ---
 
-## Git & Branch Naming
+## Docstrings & Documentation
 
-### Branch Names
+### Python — Sphinx style
 
-* Prefix all branch names with the related task number:
+Write a one-line summary, then use `:param:` and `:return:` tags. Include `:raises:` when a function raises intentionally.
 
-  * Format: `SCHED-<num>-short-description`
+```python
+def get_user(user_id: int) -> User:
+    """Fetch a user by their ID.
 
-  ```bash
-  git checkout -b SCHED-89-add-user-login
-  ```
+    :param int user_id: Primary key of the user to fetch.
+    :return: The matching User instance.
+    :rtype: User
+    :raises ValueError: If no user with the given ID exists.
+    """
+```
+
+
+### JavaScript / React — JSDoc style
+
+Use JSDoc for plain functions and utilities:
+
+```js
+/**
+ * Formats a phone number for display.
+ *
+ * @param {string} raw - Unformatted phone number string.
+ * @returns {string} Phone number in (xxx) xxx-xxxx format.
+ */
+function formatPhone(raw)
+{
+    // ...
+}
+```
+
+For React components, document props and the return type:
+
+```jsx
+/**
+ * Button that submits the enclosing form.
+ *
+ * @param {Object} props
+ * @param {string} props.buttonText - Label shown on the button.
+ * @returns {JSX.Element}
+ */
+const SubmitButton = ({ buttonText }) =>
+{
+    // ...
+};
+```
+

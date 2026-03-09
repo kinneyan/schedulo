@@ -10,6 +10,7 @@ class RoleSerializerTest(TestCase):
     """Test cases for RoleSerializer"""
 
     def setUp(self):
+        """Store the RoleSerializer class for use in each test."""
         self.serializer_class = RoleSerializer
 
     def test_role_serializer_valid_data_with_all_fields(self):

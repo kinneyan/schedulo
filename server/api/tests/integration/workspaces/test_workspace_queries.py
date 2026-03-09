@@ -6,7 +6,10 @@ from ....models import Workspace, WorkspaceMember, User, MemberPermissions, Work
 
 
 class GetWorkspaceTests(APITestCase):
+    """Integration tests for the get workspace endpoint."""
+
     def setUp(self):
+        """Create two workspaces with members and authenticate test users."""
         self.url = reverse("get_workspace")
         self.user = User.objects.create_user(
             email="testuser@example.com",
@@ -39,11 +42,11 @@ class GetWorkspaceTests(APITestCase):
         self.workspace1_permissions1 = MemberPermissions.objects.create(
             workspace=self.workspace1,
             member=self.workspace1_member1,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
         self.workspace1_member2 = WorkspaceMember.objects.create(
             user=self.user2, workspace=self.workspace1, added_by=self.user
@@ -51,11 +54,11 @@ class GetWorkspaceTests(APITestCase):
         self.workspace1_permissions2 = MemberPermissions.objects.create(
             workspace=self.workspace1,
             member=self.workspace1_member2,
-            IS_OWNER=False,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=False,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         self.workspace2 = Workspace.objects.create(
@@ -67,14 +70,15 @@ class GetWorkspaceTests(APITestCase):
         self.workspace2_permissions1 = MemberPermissions.objects.create(
             workspace=self.workspace2,
             member=self.workspace2_member1,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
     def test_no_workspaces(self):
+        """Verify that a 400 is returned when no workspace_id is provided and the user has no memberships."""
         self.client.force_authenticate(user=self.user3)
 
         response = self.client.get(self.url)
@@ -82,6 +86,7 @@ class GetWorkspaceTests(APITestCase):
         self.assertIn("Workspace ID is required", response.data["error"]["message"])
 
     def test_as_owner(self):
+        """Verify that a workspace owner can retrieve workspace details with membership set to owner."""
         self.client.force_authenticate(user=self.user)
 
         response = self.client.get(self.url, {"workspace_id": self.workspace1.id})
@@ -94,6 +99,7 @@ class GetWorkspaceTests(APITestCase):
         self.assertEqual(response.data["membership"], "owner")
 
     def test_as_employee(self):
+        """Verify that a non-owner member can retrieve workspace details with membership set to employee."""
         self.client.force_authenticate(user=self.user2)
 
         response = self.client.get(self.url, {"workspace_id": self.workspace1.id})
@@ -106,6 +112,7 @@ class GetWorkspaceTests(APITestCase):
         self.assertEqual(response.data["membership"], "employee")
 
     def test_no_workspace(self):
+        """Verify that a 400 is returned when workspace_id is omitted from the request."""
         self.client.force_authenticate(user=self.user)
 
         response = self.client.get(self.url, {})
@@ -116,6 +123,7 @@ class GetWorkspaceTests(APITestCase):
         self.assertIn("Workspace ID is required", response.data["error"]["message"])
 
     def test_invalid_workspace(self):
+        """Verify that a 404 is returned when the requested workspace does not exist."""
         self.client.force_authenticate(user=self.user)
 
         response = self.client.get(self.url, {"workspace_id": 999})

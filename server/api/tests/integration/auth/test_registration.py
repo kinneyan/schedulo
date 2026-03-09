@@ -5,8 +5,10 @@ from ....models import User
 
 
 class RegisterTests(APITestCase):
+    """Integration tests for the registration endpoint."""
 
     def setUp(self):
+        """Create a test user and set the registration URL."""
         self.url = reverse("register")
         self.user_data = {
             "email": "test@example.com",
@@ -18,6 +20,7 @@ class RegisterTests(APITestCase):
         self.user = User.objects.create_user(**self.user_data)
 
     def test_register_valid(self):
+        """Verify that valid registration data returns 201 with access and refresh tokens."""
         data = {
             "email": "newuser@example.com",
             "password": "newpassword123",
@@ -31,6 +34,7 @@ class RegisterTests(APITestCase):
         self.assertIn("refresh", response.data)
 
     def test_register_email_exists(self):
+        """Verify that a duplicate email returns 409 with an error message."""
         data = self.user_data
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
@@ -40,6 +44,7 @@ class RegisterTests(APITestCase):
         )
 
     def test_register_invalid_data(self):
+        """Verify that invalid field values return 400 with an error message."""
         data = {
             "email": "invalidemail",
             "password": "short",

@@ -9,10 +9,20 @@ from ..models import Workspace, WorkspaceMember, User, MemberPermissions, Member
 
 
 class CreateWorkspace(APIView):
+    """API view for creating a new workspace owned by the authenticated user."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        """Create a new workspace and add the authenticated user as its owner.
+
+        :param request: Authenticated HTTP request containing an optional name
+            in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response on creation, or an error response.
+        :rtype: rest_framework.response.Response
+        """
         response = {"error": {}}
 
         # get name from request using serializer
@@ -42,27 +52,34 @@ class CreateWorkspace(APIView):
         MemberPermissions.objects.create(
             workspace=workspace,
             member=workspace_member,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         return Response(response, status=status.HTTP_201_CREATED)
 
 
-class ModifyWorkspace(APIView):  # change name or owner, can only be done by owner.
+class ModifyWorkspace(APIView):
+    """API view for renaming a workspace or transferring ownership. Owner only."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def put(self, request):
-        """
-        workspace_id
-        new_owner_id (optional)
-        name (optional)
-        """
+        """Update the name or owner of a workspace.
 
+        Requires the authenticated user to be the workspace owner. Accepted body
+        fields: workspace_id (required), new_owner_id (optional), name (optional).
+
+        :param request: Authenticated HTTP request with workspace_id and optional
+            new_owner_id or name in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response, or an error response describing the failure.
+        :rtype: rest_framework.response.Response
+        """
         response = {"error": {}}
 
         serializer = WorkspaceSerializer(data=request.data)
@@ -91,7 +108,7 @@ class ModifyWorkspace(APIView):  # change name or owner, can only be done by own
             MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
                 member=old_owner_member,
-                IS_OWNER=True,
+                is_owner=True,
             )
         except MemberPermissions.DoesNotExist:
             response["error"][
@@ -124,15 +141,15 @@ class ModifyWorkspace(APIView):  # change name or owner, can only be done by own
                     ] = "Member is already owner of this workspace."
                     return Response(response, status=status.HTTP_409_CONFLICT)
 
-                old_owner_perms.IS_OWNER = False
+                old_owner_perms.is_owner = False
                 old_owner_perms.save()
 
                 # set new owner to be owner
-                new_owner_perms.IS_OWNER = True
-                new_owner_perms.MANAGE_WORKSPACE_MEMBERS = True
-                new_owner_perms.MANAGE_WORKSPACE_ROLES = True
-                new_owner_perms.MANAGE_SCHEDULES = True
-                new_owner_perms.MANAGE_TIME_OFF = True
+                new_owner_perms.is_owner = True
+                new_owner_perms.manage_workspace_members = True
+                new_owner_perms.manage_workspace_roles = True
+                new_owner_perms.manage_schedules = True
+                new_owner_perms.manage_time_off = True
                 new_owner_perms.save()
 
                 # update owner id in workspace
@@ -154,16 +171,22 @@ class ModifyWorkspace(APIView):  # change name or owner, can only be done by own
 
 
 class AddWorkspaceMember(APIView):
+    """API view for adding a user to a workspace. Requires manage_workspace_members."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        """
-        body:
-            added_user_id
-            workspace_id
-            pay_rate (optional)
-            workspace_role_id (optional) # not yet implemented
+        """Add a user to a workspace as a new member.
+
+        Accepted body fields: added_user_id (required), workspace_id (required),
+        pay_rate (optional).
+
+        :param request: Authenticated HTTP request with added_user_id and
+            workspace_id in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response on creation, or an error response.
+        :rtype: rest_framework.response.Response
         """
         response = {"error": {}}
 
@@ -175,7 +198,7 @@ class AddWorkspaceMember(APIView):
             MemberPermissions.objects.get(
                 member=workspace_member,
                 workspace=request.data["workspace_id"],
-                MANAGE_WORKSPACE_MEMBERS=True,
+                manage_workspace_members=True,
             )
         except MemberPermissions.DoesNotExist:
             response["error"] = (
@@ -211,12 +234,19 @@ class AddWorkspaceMember(APIView):
 
 
 class GetWorkspace(APIView):
+    """API view for retrieving details about a workspace the user belongs to."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        """
-        workspace_id (required)
+        """Return workspace details and the authenticated user's membership role.
+
+        :param request: Authenticated HTTP request with workspace_id as a query
+            parameter.
+        :type request: rest_framework.request.Request
+        :return: Workspace name, owner info, membership level, or an error response.
+        :rtype: rest_framework.response.Response
         """
         response = {"error": {}}
 
@@ -242,7 +272,7 @@ class GetWorkspace(APIView):
         # Get user's perms
         permissions = MemberPermissions.objects.get(workspace=workspace, member=member)
 
-        if permissions.IS_OWNER:
+        if permissions.is_owner:
             response["membership"] = "owner"
         # UNCOMMENT WHEN MANAGER MEMBERSHIP ADDED!!
         # elif (permissions.IS_MANAGER):
@@ -353,14 +383,19 @@ class GetWorkspaceMembers(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class DeleteWorkspace(APIView):
+    """API view for deleting a workspace. Requires the authenticated user to be owner."""
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    """
-    workspace_id
-    """
-
     def delete(self, request):
+        """Delete a workspace by ID.
+
+        :param request: Authenticated HTTP request containing workspace_id in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response on deletion, or an error response.
+        :rtype: rest_framework.response.Response
+        """
         response = {"error": {}}
 
         # Verify body contains required fields
@@ -383,7 +418,7 @@ class DeleteWorkspace(APIView):
             MemberPermissions.objects.get(
                 workspace=request.data["workspace_id"],
                 member=owner_member,
-                IS_OWNER=True,
+                is_owner=True,
             )
         except MemberPermissions.DoesNotExist:
             response["error"][

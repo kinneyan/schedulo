@@ -10,6 +10,7 @@ class LoginUserSerializerTest(TestCase):
     """Test cases for LoginUserSerializer"""
 
     def setUp(self):
+        """Store the LoginUserSerializer class for use in each test."""
         self.serializer_class = LoginUserSerializer
 
     def test_login_serializer_valid_data(self):
@@ -94,6 +95,7 @@ class RegisterUserSerializerTest(TestCase):
     """Test cases for RegisterUserSerializer"""
 
     def setUp(self):
+        """Store the RegisterUserSerializer class for use in each test."""
         self.serializer_class = RegisterUserSerializer
 
     def test_register_serializer_valid_data(self):

@@ -15,7 +15,10 @@ from ....models import (
 
 
 class CreateShiftTests(APITestCase):
+    """Integration tests for the shift creation endpoint."""
+
     def setUp(self):
+        """Create users, workspace, members with permissions, and a role."""
         self.url = reverse("create_shift")
         self.user = User.objects.create_user(
             email="testuser@example.com",
@@ -47,11 +50,11 @@ class CreateShiftTests(APITestCase):
         self.permissions = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         self.member2 = WorkspaceMember.objects.create(
@@ -60,11 +63,11 @@ class CreateShiftTests(APITestCase):
         self.permissions2 = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member2,
-            IS_OWNER=False,
-            MANAGE_WORKSPACE_MEMBERS=False,
-            MANAGE_WORKSPACE_ROLES=False,
-            MANAGE_SCHEDULES=False,
-            MANAGE_TIME_OFF=False,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
         )
 
         self.role = WorkspaceRole.objects.create(
@@ -77,6 +80,7 @@ class CreateShiftTests(APITestCase):
         self.client.force_authenticate(user=self.member.user)
 
     def test_no_workspace(self):
+        """Verify that omitting workspace_id returns a 400 error."""
         data = {
             "role_id": self.role.id,
             "start_time": self.time1,
@@ -86,6 +90,7 @@ class CreateShiftTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace(self):
+        """Verify that a non-existent workspace_id returns a 404 error."""
         data = {
             "workspace_id": 999,
             "role_id": self.role.id,
@@ -96,6 +101,7 @@ class CreateShiftTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_no_role(self):
+        """Verify that omitting role_id returns a 400 error."""
         data = {
             "workspace_id": self.workspace.id,
             "start_time": self.time1,
@@ -105,6 +111,7 @@ class CreateShiftTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_role(self):
+        """Verify that a non-existent role_id returns a 404 error."""
         data = {
             "workspace_id": self.workspace.id,
             "role_id": 999,
@@ -115,11 +122,13 @@ class CreateShiftTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_no_time(self):
+        """Verify that omitting start_time and end_time returns a 400 error."""
         data = {"workspace_id": self.workspace.id, "role_id": self.role.id}
         response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_end_time_before_start(self):
+        """Verify that an end_time earlier than start_time returns a 400 error."""
         data = {
             "workspace_id": self.workspace.id,
             "role_id": self.role.id,
@@ -130,6 +139,7 @@ class CreateShiftTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_without_permissions(self):
+        """Verify that a member without manage_schedules permission cannot create a shift."""
         self.client.force_authenticate(user=self.member2.user)
         data = {
             "workspace_id": self.workspace.id,
@@ -154,6 +164,7 @@ class CreateShiftTests(APITestCase):
             self.assertTrue(True)
 
     def test_valid(self):
+        """Verify that a valid payload creates a shift and returns 201."""
         data = {
             "workspace_id": self.workspace.id,
             "role_id": self.role.id,
@@ -176,6 +187,7 @@ class CreateShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_with_member(self):
+        """Verify that providing a member_id creates an assigned (non-open) shift."""
         data = {
             "workspace_id": self.workspace.id,
             "role_id": self.role.id,
@@ -200,6 +212,7 @@ class CreateShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_with_invalid_member(self):
+        """Verify that a non-existent member_id returns a 404 and no shift is created."""
         data = {
             "workspace_id": self.workspace.id,
             "role_id": self.role.id,
@@ -224,7 +237,10 @@ class CreateShiftTests(APITestCase):
 
 
 class ModifyShiftTests(APITestCase):
+    """Integration tests for the shift modification endpoint."""
+
     def setUp(self):
+        """Create users, workspace, members with permissions, roles, and an existing shift."""
         self.url = reverse("modify_shift")
         self.user = User.objects.create_user(
             email="testuser@example.com",
@@ -256,11 +272,11 @@ class ModifyShiftTests(APITestCase):
         self.permissions = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         self.member2 = WorkspaceMember.objects.create(
@@ -269,11 +285,11 @@ class ModifyShiftTests(APITestCase):
         self.permissions2 = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member2,
-            IS_OWNER=False,
-            MANAGE_WORKSPACE_MEMBERS=False,
-            MANAGE_WORKSPACE_ROLES=False,
-            MANAGE_SCHEDULES=False,
-            MANAGE_TIME_OFF=False,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
         )
 
         self.role = WorkspaceRole.objects.create(
@@ -300,16 +316,19 @@ class ModifyShiftTests(APITestCase):
         self.client.force_authenticate(user=self.member.user)
 
     def test_no_shift(self):
+        """Verify that omitting shift_id returns a 400 error."""
         data = {}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_shift(self):
+        """Verify that a non-existent shift_id returns a 404 error."""
         data = {"shift_id": 999}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_without_permissions(self):
+        """Verify that a member without manage_schedules permission cannot modify a shift."""
         self.client.force_authenticate(user=self.member2.user)
 
         data = {
@@ -329,6 +348,7 @@ class ModifyShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_invalid_start_and_end(self):
+        """Verify that non-datetime start_time and end_time values return a 400 error."""
         data = {"shift_id": self.shift.id, "start_time": 100, "end_time": 100}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -342,6 +362,7 @@ class ModifyShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_invalid_start_and_end_order(self):
+        """Verify that a start_time after end_time returns a 400 error."""
         data = {
             "shift_id": self.shift.id,
             "start_time": self.time3,
@@ -359,6 +380,7 @@ class ModifyShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_invalid_start(self):
+        """Verify that a new start_time after the existing end_time returns a 400 error."""
         data = {"shift_id": self.shift.id, "start_time": self.time3}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -372,6 +394,7 @@ class ModifyShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_invalid_end(self):
+        """Verify that a new end_time before the existing start_time returns a 400 error."""
         data = {"shift_id": self.shift.id, "end_time": self.time4}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -385,6 +408,7 @@ class ModifyShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_valid_start_and_end(self):
+        """Verify that updating both start_time and end_time succeeds and persists the changes."""
         data = {
             "shift_id": self.shift.id,
             "start_time": self.time4,
@@ -402,6 +426,7 @@ class ModifyShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_valid_start(self):
+        """Verify that updating only start_time succeeds and persists the change."""
         data = {"shift_id": self.shift.id, "start_time": self.time4}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -415,6 +440,7 @@ class ModifyShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_valid_end(self):
+        """Verify that updating only end_time succeeds and persists the change."""
         data = {"shift_id": self.shift.id, "end_time": self.time3}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -428,6 +454,7 @@ class ModifyShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_invalid_member(self):
+        """Verify that a non-existent member_id returns a 404 and the shift is unchanged."""
         data = {"shift_id": self.shift.id, "member_id": 999}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -439,6 +466,7 @@ class ModifyShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_valid_member(self):
+        """Verify that assigning a valid member marks the shift as non-open."""
         data = {"shift_id": self.shift.id, "member_id": self.member.id}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -450,6 +478,7 @@ class ModifyShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_invalid_role(self):
+        """Verify that a non-existent role_id returns a 404 and the shift role is unchanged."""
         data = {"shift_id": self.shift.id, "role_id": 999}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -461,6 +490,7 @@ class ModifyShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_valid_role(self):
+        """Verify that updating to a valid role_id succeeds and persists the change."""
         data = {"shift_id": self.shift.id, "role_id": self.role2.id}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -472,6 +502,7 @@ class ModifyShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_modify_multiple(self):
+        """Verify that updating role, member, and times together all persist correctly."""
         data = {
             "shift_id": self.shift.id,
             "role_id": self.role2.id,
@@ -496,7 +527,10 @@ class ModifyShiftTests(APITestCase):
 
 
 class DeleteShiftTests(APITestCase):
+    """Integration tests for the shift deletion endpoint."""
+
     def setUp(self):
+        """Create users, workspace, members with permissions, roles, and two existing shifts."""
         self.url = reverse("delete_shift")
         self.user = User.objects.create_user(
             email="testuser@example.com",
@@ -528,11 +562,11 @@ class DeleteShiftTests(APITestCase):
         self.permissions = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         self.member2 = WorkspaceMember.objects.create(
@@ -541,11 +575,11 @@ class DeleteShiftTests(APITestCase):
         self.permissions2 = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member2,
-            IS_OWNER=False,
-            MANAGE_WORKSPACE_MEMBERS=False,
-            MANAGE_WORKSPACE_ROLES=False,
-            MANAGE_SCHEDULES=False,
-            MANAGE_TIME_OFF=False,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
         )
 
         self.role = WorkspaceRole.objects.create(
@@ -582,16 +616,19 @@ class DeleteShiftTests(APITestCase):
         self.client.force_authenticate(user=self.member.user)
 
     def test_no_shift(self):
+        """Verify that omitting shift_id returns a 400 error."""
         data = {}
         response = self.client.delete(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_shift(self):
+        """Verify that a non-existent shift_id returns a 404 error."""
         data = {"shift_id": 999}
         response = self.client.delete(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_without_permissions(self):
+        """Verify that a member without manage_schedules permission cannot delete a shift."""
         # change to send from user 2
         self.client.force_authenticate(user=self.member2.user)
 
@@ -606,6 +643,7 @@ class DeleteShiftTests(APITestCase):
             self.assertTrue(False)
 
     def test_valid(self):
+        """Verify that a valid delete request removes the target shift and leaves others intact."""
         data = {"shift_id": self.shift1.id}
         response = self.client.delete(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
