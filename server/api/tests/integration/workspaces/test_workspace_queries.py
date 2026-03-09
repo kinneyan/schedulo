@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from ....models import Workspace, WorkspaceMember, User, MemberPermissions
+from ....models import Workspace, WorkspaceMember, User, MemberPermissions, WorkspaceRole, MemberRole
 
 
 class GetWorkspaceTests(APITestCase):
@@ -120,3 +120,139 @@ class GetWorkspaceTests(APITestCase):
 
         response = self.client.get(self.url, {"workspace_id": 999})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+class GetWorkspaceMembersTests(APITestCase):
+    def setUp(self):
+        self.url = reverse("get_workspace_members")
+        self.user3 = User.objects.create_user(
+            email="testuser3@example.com",
+            password="testpassword",
+            first_name="Test3",
+            last_name="User3",
+            phone="1234567890",
+        )
+        self.user = User.objects.create_user(
+            email="testuser@example.com",
+            password="testpassword",
+            first_name="Test",
+            last_name="User",
+            phone="1234567890",
+        )
+        self.user2 = User.objects.create_user(
+            email="testuser2@example.com",
+            password="testpassword",
+            first_name="Test2",
+            last_name="User2",
+            phone="1234567890",
+        )
+
+        self.workspace = Workspace.objects.create(owner=self.user, created_by=self.user)
+
+        self.member = WorkspaceMember.objects.create(
+            user=self.user, workspace=self.workspace, added_by=self.user
+        )
+        self.permissions = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member,
+            IS_OWNER=True,
+            MANAGE_WORKSPACE_MEMBERS=True,
+            MANAGE_WORKSPACE_ROLES=True,
+            MANAGE_SCHEDULES=True,
+            MANAGE_TIME_OFF=True,
+        )
+
+        self.member2 = WorkspaceMember.objects.create(
+            user=self.user2, workspace=self.workspace, added_by=self.user
+        )
+        self.permissions2 = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member2,
+            IS_OWNER=False,
+            MANAGE_WORKSPACE_MEMBERS=False,
+            MANAGE_WORKSPACE_ROLES=False,
+            MANAGE_SCHEDULES=False,
+            MANAGE_TIME_OFF=False,
+        )
+        self.client.force_authenticate(user=self.member.user)
+
+        self.role = WorkspaceRole.objects.create(
+            workspace=self.workspace, name="test role", pay_rate=10
+        )
+        self.role2 = WorkspaceRole.objects.create(
+            workspace=self.workspace, name="test role2", pay_rate=10
+        )
+        self.role3 = WorkspaceRole.objects.create(
+            workspace=self.workspace, name="test role3", pay_rate=10
+        )
+
+        self.member_role1 = MemberRole.objects.create(
+            member=self.member, workspace_role=self.role
+        )
+        self.member2_role1 = MemberRole.objects.create(
+            member=self.member2, workspace_role=self.role
+        )
+        self.member2_role2 = MemberRole.objects.create(
+            member=self.member2, workspace_role=self.role2
+        )
+
+    def test_no_workspace(self):
+        response = self.client.post(
+            self.url, {}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_workspace(self):
+        response = self.client.post(
+            self.url, {"workspace_id": 999}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_as_non_member(self):
+        self.client.force_authenticate(user=self.user3)
+
+        response = self.client.post(
+            self.url, {"workspace_id": self.workspace.id}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_valid(self):
+        response = self.client.post(
+            self.url, {"workspace_id": self.workspace.id}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        result = response.data["members"]
+        self.assertEqual(len(result), 2)
+
+        self.assertEqual(result[0]["member_id"], self.member.id)
+        self.assertEqual(result[0]["user_id"], self.user.id)
+        self.assertEqual(result[0]["first_name"], self.user.first_name)
+        self.assertEqual(result[0]["last_name"], self.user.last_name)
+        self.assertEqual(result[0]["email"], self.user.email)
+        self.assertEqual(len(result[0]["roles"]), 1)
+        self.assertEqual(result[0]["roles"][0]["role_id"], self.role.id)
+        self.assertEqual(result[0]["roles"][0]["name"], self.role.name)
+        self.assertEqual(result[0]["roles"][0]["pay_rate"], self.role.pay_rate)
+        self.assertEqual(result[0]["permissions"]["IS_OWNER"], self.permissions.IS_OWNER)
+        self.assertEqual(result[0]["permissions"]["MANAGE_WORKSPACE_MEMBERS"], self.permissions.MANAGE_WORKSPACE_MEMBERS)
+        self.assertEqual(result[0]["permissions"]["MANAGE_WORKSPACE_ROLES"], self.permissions.MANAGE_WORKSPACE_ROLES)
+        self.assertEqual(result[0]["permissions"]["MANAGE_SCHEDULES"], self.permissions.MANAGE_SCHEDULES)
+        self.assertEqual(result[0]["permissions"]["MANAGE_TIME_OFF"], self.permissions.MANAGE_TIME_OFF)
+
+        self.assertEqual(result[1]["member_id"], self.member2.id)
+        self.assertEqual(result[1]["user_id"], self.user2.id)
+        self.assertEqual(result[1]["first_name"], self.user2.first_name)
+        self.assertEqual(result[1]["last_name"], self.user2.last_name)
+        self.assertEqual(result[1]["email"], self.user2.email)
+        self.assertEqual(len(result[1]["roles"]), 2)
+        self.assertEqual(result[1]["roles"][0]["role_id"], self.role.id)
+        self.assertEqual(result[1]["roles"][0]["name"], self.role.name)
+        self.assertEqual(result[1]["roles"][0]["pay_rate"], self.role.pay_rate)
+        self.assertEqual(result[1]["roles"][1]["role_id"], self.role2.id)
+        self.assertEqual(result[1]["roles"][1]["name"], self.role2.name)
+        self.assertEqual(result[1]["roles"][1]["pay_rate"], self.role2.pay_rate)
+        self.assertEqual(result[1]["permissions"]["IS_OWNER"], self.permissions2.IS_OWNER)
+        self.assertEqual(result[1]["permissions"]["MANAGE_WORKSPACE_MEMBERS"], self.permissions2.MANAGE_WORKSPACE_MEMBERS)
+        self.assertEqual(result[1]["permissions"]["MANAGE_WORKSPACE_ROLES"], self.permissions2.MANAGE_WORKSPACE_ROLES)
+        self.assertEqual(result[1]["permissions"]["MANAGE_SCHEDULES"], self.permissions2.MANAGE_SCHEDULES)
+        self.assertEqual(result[1]["permissions"]["MANAGE_TIME_OFF"], self.permissions2.MANAGE_TIME_OFF)
