@@ -2,7 +2,14 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from ....models import Workspace, WorkspaceMember, User, MemberPermissions, WorkspaceRole, MemberRole
+from ....models import (
+    Workspace,
+    WorkspaceMember,
+    User,
+    MemberPermissions,
+    WorkspaceRole,
+    MemberRole,
+)
 
 
 class GetWorkspaceTests(APITestCase):
@@ -129,6 +136,7 @@ class GetWorkspaceTests(APITestCase):
         response = self.client.get(self.url, {"workspace_id": 999})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+
 class GetWorkspaceMembersTests(APITestCase):
     def setUp(self):
         self.url = reverse("get_workspace_members")
@@ -204,15 +212,11 @@ class GetWorkspaceMembersTests(APITestCase):
         )
 
     def test_no_workspace(self):
-        response = self.client.post(
-            self.url, {}, format="json"
-        )
+        response = self.client.post(self.url, {}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace(self):
-        response = self.client.post(
-            self.url, {"workspace_id": 999}, format="json"
-        )
+        response = self.client.post(self.url, {"workspace_id": 999}, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_as_non_member(self):
@@ -241,11 +245,25 @@ class GetWorkspaceMembersTests(APITestCase):
         self.assertEqual(result[0]["roles"][0]["role_id"], self.role.id)
         self.assertEqual(result[0]["roles"][0]["name"], self.role.name)
         self.assertEqual(result[0]["roles"][0]["pay_rate"], self.role.pay_rate)
-        self.assertEqual(result[0]["permissions"]["IS_OWNER"], self.permissions.IS_OWNER)
-        self.assertEqual(result[0]["permissions"]["MANAGE_WORKSPACE_MEMBERS"], self.permissions.MANAGE_WORKSPACE_MEMBERS)
-        self.assertEqual(result[0]["permissions"]["MANAGE_WORKSPACE_ROLES"], self.permissions.MANAGE_WORKSPACE_ROLES)
-        self.assertEqual(result[0]["permissions"]["MANAGE_SCHEDULES"], self.permissions.MANAGE_SCHEDULES)
-        self.assertEqual(result[0]["permissions"]["MANAGE_TIME_OFF"], self.permissions.MANAGE_TIME_OFF)
+        self.assertEqual(
+            result[0]["permissions"]["IS_OWNER"], self.permissions.IS_OWNER
+        )
+        self.assertEqual(
+            result[0]["permissions"]["MANAGE_WORKSPACE_MEMBERS"],
+            self.permissions.MANAGE_WORKSPACE_MEMBERS,
+        )
+        self.assertEqual(
+            result[0]["permissions"]["MANAGE_WORKSPACE_ROLES"],
+            self.permissions.MANAGE_WORKSPACE_ROLES,
+        )
+        self.assertEqual(
+            result[0]["permissions"]["MANAGE_SCHEDULES"],
+            self.permissions.MANAGE_SCHEDULES,
+        )
+        self.assertEqual(
+            result[0]["permissions"]["MANAGE_TIME_OFF"],
+            self.permissions.MANAGE_TIME_OFF,
+        )
 
         self.assertEqual(result[1]["member_id"], self.member2.id)
         self.assertEqual(result[1]["user_id"], self.user2.id)
@@ -259,8 +277,22 @@ class GetWorkspaceMembersTests(APITestCase):
         self.assertEqual(result[1]["roles"][1]["role_id"], self.role2.id)
         self.assertEqual(result[1]["roles"][1]["name"], self.role2.name)
         self.assertEqual(result[1]["roles"][1]["pay_rate"], self.role2.pay_rate)
-        self.assertEqual(result[1]["permissions"]["IS_OWNER"], self.permissions2.IS_OWNER)
-        self.assertEqual(result[1]["permissions"]["MANAGE_WORKSPACE_MEMBERS"], self.permissions2.MANAGE_WORKSPACE_MEMBERS)
-        self.assertEqual(result[1]["permissions"]["MANAGE_WORKSPACE_ROLES"], self.permissions2.MANAGE_WORKSPACE_ROLES)
-        self.assertEqual(result[1]["permissions"]["MANAGE_SCHEDULES"], self.permissions2.MANAGE_SCHEDULES)
-        self.assertEqual(result[1]["permissions"]["MANAGE_TIME_OFF"], self.permissions2.MANAGE_TIME_OFF)
+        self.assertEqual(
+            result[1]["permissions"]["IS_OWNER"], self.permissions2.IS_OWNER
+        )
+        self.assertEqual(
+            result[1]["permissions"]["MANAGE_WORKSPACE_MEMBERS"],
+            self.permissions2.MANAGE_WORKSPACE_MEMBERS,
+        )
+        self.assertEqual(
+            result[1]["permissions"]["MANAGE_WORKSPACE_ROLES"],
+            self.permissions2.MANAGE_WORKSPACE_ROLES,
+        )
+        self.assertEqual(
+            result[1]["permissions"]["MANAGE_SCHEDULES"],
+            self.permissions2.MANAGE_SCHEDULES,
+        )
+        self.assertEqual(
+            result[1]["permissions"]["MANAGE_TIME_OFF"],
+            self.permissions2.MANAGE_TIME_OFF,
+        )
