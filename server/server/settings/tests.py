@@ -1,4 +1,4 @@
-from .default import *
+from .base import *
 
 DATABASES = {
     "default": {
