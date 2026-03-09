@@ -1,3 +1,5 @@
+"""Development settings — overrides base with debug-friendly defaults."""
+
 import os
 
 from .base import *
