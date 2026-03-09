@@ -381,11 +381,11 @@ class GetWorkspaceMembers(APIView):
                 "email": user.email,
                 "roles": roles_list,
                 "permissions": {
-                    "IS_OWNER": member_perms.IS_OWNER,
-                    "MANAGE_WORKSPACE_MEMBERS": member_perms.MANAGE_WORKSPACE_MEMBERS,
-                    "MANAGE_WORKSPACE_ROLES": member_perms.MANAGE_WORKSPACE_ROLES,
-                    "MANAGE_SCHEDULES": member_perms.MANAGE_SCHEDULES,
-                    "MANAGE_TIME_OFF": member_perms.MANAGE_TIME_OFF,
+                    "is_owner": member_perms.is_owner,
+                    "manage_workspace_members": member_perms.manage_workspace_members,
+                    "manage_workspace_roles": member_perms.manage_workspace_roles,
+                    "manage_schedules": member_perms.manage_schedules,
+                    "manage_time_off": member_perms.manage_time_off,
                 },
             }
             members_list.append(entry)
