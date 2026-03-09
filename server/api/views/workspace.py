@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from ..serializers import WorkspaceSerializer
-from ..models import Workspace, WorkspaceMember, User, MemberPermissions
+from ..models import Workspace, WorkspaceMember, User, MemberPermissions, MemberRole, WorkspaceRole
 
 
 class CreateWorkspace(APIView):
@@ -284,7 +284,73 @@ class GetWorkspace(APIView):
 
         return Response(response, status=status.HTTP_200_OK)
         """
+class GetWorkspaceMembers(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
+    def post(self, request):
+        """
+        workspace_id (required)
+        """
+        response = {"error": {}}
+
+        # Verify parameters contains required fields
+        if "workspace_id" not in request.data:
+            response["error"]["message"] = "Workspace ID is required."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verify workspace exists
+        try:
+            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
+        except Workspace.DoesNotExist:
+            response["error"]["message"] = "Workspace does not exists."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # Verify user is member of workspace
+        try:
+            member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "User is not a member of this workspace."
+            return Response(response, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Get members of workspace
+        member_results = WorkspaceMember.objects.filter(workspace=workspace)
+
+        members_list = []
+        for member in member_results:
+            user = User.objects.get(pk=member.user.id)
+            member_perms = MemberPermissions.objects.get(member=member)
+
+            member_roles = MemberRole.objects.filter(member=member).values_list("workspace_role")
+            roles = WorkspaceRole.objects.filter(pk__in=member_roles)
+            roles_list = [
+                {
+                    "role_id": role.id,
+                    "name": role.name,
+                    "pay_rate": role.pay_rate,
+                }
+                for role in roles
+            ]
+
+            entry = {
+                "member_id": member.id,
+                "user_id": user.id,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email,
+                "roles": roles_list,
+                "permissions": {
+                    "IS_OWNER": member_perms.IS_OWNER,
+                    "MANAGE_WORKSPACE_MEMBERS": member_perms.MANAGE_WORKSPACE_MEMBERS,
+                    "MANAGE_WORKSPACE_ROLES": member_perms.MANAGE_WORKSPACE_ROLES,
+                    "MANAGE_SCHEDULES": member_perms.MANAGE_SCHEDULES,
+                    "MANAGE_TIME_OFF": member_perms.MANAGE_TIME_OFF,
+                }
+            }
+            members_list.append(entry)
+
+        response["members"] = members_list
+        return Response(response, status=status.HTTP_200_OK)
 
 class DeleteWorkspace(APIView):
     authentication_classes = [JWTAuthentication]
