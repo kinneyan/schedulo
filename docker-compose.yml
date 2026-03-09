@@ -2,39 +2,33 @@ services:
   db:
     image: postgres:15
     container_name: postgres
-    restart: unless-stopped
     env_file:
-      - ./.env.dev
+      - ./.env
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   app:
+    image: schedulo:latest
     build:
-      context: ./server
-    container_name: django
-    restart: unless-stopped
+      context: .
+    container_name: schedulo
     env_file:
-      - ./.env.dev
-    ports: 
-      - "8000:8000"
-    volumes: 
-      - ./server:/app
-    depends_on: 
-      - db
-
-  frontend:
-    build:
-      context: ./client
-    container_name: react
-    restart: unless-stopped
-    env_file:
-      - ./.env.dev
+      - ./.env
+    environment:
+      POSTGRES_HOST: db
+      DJANGO_SETTINGS_MODULE: server.settings.prod
     ports:
-      - "${REACT_PORT:-5173}:${REACT_PORT:-5173}"
+      - "80:8000"
     depends_on:
-      - app
+      db:
+        condition: service_healthy
 
 volumes:
   postgres_data:
