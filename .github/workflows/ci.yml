@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  python-lint:
+    name: Python Lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        cd server && pip install -e ".[dev]"
+    - name: Formatting
+      run: cd server && black --check .
+    - name: Linting
+      run: cd server && flake8 .
+
+  js-lint:
+    name: JS Lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+    - name: Install dependencies
+      run: cd client && npm ci
+    - name: Linting
+      run: cd client && npm run lint
+
+  django-unit-tests:
+    name: Django Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        cd server && pip install -e ".[dev]"
+    - name: Run migrations
+      run: cd server && python manage.py migrate --settings=server.settings.tests
+    - name: Run unit tests
+      run: cd server && python manage.py test api.tests.unit --settings=server.settings.tests
+
+  django-integration-tests:
+    name: Django Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        cd server && pip install -e ".[dev]"
+    - name: Run migrations
+      run: cd server && python manage.py migrate --settings=server.settings.tests
+    - name: Run integration tests
+      run: cd server && python manage.py test api.tests.integration --settings=server.settings.tests
+
+  react-unit-tests:
+    name: React Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+    - name: Install dependencies
+      run: cd client && npm ci
+    - name: Run unit tests
+      run: cd client && npm test

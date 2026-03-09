@@ -15,7 +15,10 @@ from ....models import (
 
 
 class GetShiftsTest(APITestCase):
+    """Integration tests for the get shifts query endpoint."""
+
     def setUp(self):
+        """Create users, workspace, members, roles, and a set of shifts for filtering tests."""
         self.url = reverse("get_shifts")
         self.user = User.objects.create_user(
             email="testuser@example.com",
@@ -54,11 +57,11 @@ class GetShiftsTest(APITestCase):
         self.permissions = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         self.member2 = WorkspaceMember.objects.create(
@@ -67,11 +70,11 @@ class GetShiftsTest(APITestCase):
         self.permissions2 = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member2,
-            IS_OWNER=False,
-            MANAGE_WORKSPACE_MEMBERS=False,
-            MANAGE_WORKSPACE_ROLES=False,
-            MANAGE_SCHEDULES=False,
-            MANAGE_TIME_OFF=False,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
         )
         self.member3 = WorkspaceMember.objects.create(
             user=self.user2, workspace=self.workspace, added_by=self.user
@@ -79,11 +82,11 @@ class GetShiftsTest(APITestCase):
         self.permissions3 = MemberPermissions.objects.create(
             workspace=self.workspace,
             member=self.member3,
-            IS_OWNER=False,
-            MANAGE_WORKSPACE_MEMBERS=False,
-            MANAGE_WORKSPACE_ROLES=False,
-            MANAGE_SCHEDULES=False,
-            MANAGE_TIME_OFF=False,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
         )
 
         self.role1 = WorkspaceRole.objects.create(
@@ -142,6 +145,7 @@ class GetShiftsTest(APITestCase):
         self.client.force_authenticate(user=self.member.user)
 
     def test_member(self):
+        """Verify that filtering by member_id returns only that member's shifts."""
         data = {"member_id": self.member3.id}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -153,6 +157,7 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(shifts[1]["id"], self.shift4.id)
 
     def test_member_and_role(self):
+        """Verify that filtering by both member_id and role_id narrows results correctly."""
         data = {"member_id": self.member3.id, "role_id": self.role2.id}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -163,11 +168,13 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(shifts[0]["id"], self.shift4.id)
 
     def test_date_range_invalid(self):
+        """Verify that malformed date range values return a 400 error."""
         data = {"range_start": 999, "range_end": "999"}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_date_range(self):
+        """Verify that providing both range_start and range_end returns only shifts within that window."""
         # add new shift
         self.shift5 = Shift.objects.create(
             workspace=self.workspace,
@@ -189,6 +196,7 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(shifts[0]["id"], self.shift5.id)
 
     def test_date_range_only_start(self):
+        """Verify that providing only range_start returns shifts on or after that date."""
         # add new shift
         self.shift5 = Shift.objects.create(
             workspace=self.workspace,
@@ -210,6 +218,7 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(shifts[0]["id"], self.shift5.id)
 
     def test_date_range_only_end(self):
+        """Verify that providing only range_end returns all shifts on or before that date."""
         # add new shift
         self.shift5 = Shift.objects.create(
             workspace=self.workspace,
@@ -236,6 +245,7 @@ class GetShiftsTest(APITestCase):
         self.assertTrue(self.shift5.id in ids)
 
     def test_within_user_workspaces(self):
+        """Verify that shifts from workspaces the requester does not belong to are excluded."""
         self.workspace2 = Workspace.objects.create(
             owner=self.user4, created_by=self.user4
         )
@@ -246,11 +256,11 @@ class GetShiftsTest(APITestCase):
         self.permissions4 = MemberPermissions.objects.create(
             workspace=self.workspace2,
             member=self.member4,
-            IS_OWNER=True,
-            MANAGE_WORKSPACE_MEMBERS=True,
-            MANAGE_WORKSPACE_ROLES=True,
-            MANAGE_SCHEDULES=True,
-            MANAGE_TIME_OFF=True,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
         )
 
         self.role3 = WorkspaceRole.objects.create(

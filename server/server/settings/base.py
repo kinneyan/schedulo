@@ -75,7 +75,9 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOWED_ORIGINS = [h for h in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if h]
+CORS_ALLOWED_ORIGINS = [
+    h for h in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if h
+]
 
 CORS_ALLOW_CREDENTIALS = True  # Allow cookies and credentials
 

@@ -3,6 +3,8 @@ from .users import User, Group, Workspace
 
 
 class Message(models.Model):
+    """A message sent by a user."""
+
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -10,6 +12,8 @@ class Message(models.Model):
 
 
 class MessageRecipient(models.Model):
+    """A record linking a Message to a recipient User within a Group conversation."""
+
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     conversation = models.ForeignKey(Group, on_delete=models.CASCADE)
@@ -18,6 +22,8 @@ class MessageRecipient(models.Model):
 
 
 class Announcement(models.Model):
+    """A broadcast message sent to all members of a workspace."""
+
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     sender = models.ForeignKey(User, on_delete=models.CASCADE)

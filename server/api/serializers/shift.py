@@ -3,7 +3,11 @@ from ..models import Shift
 
 
 class ShiftSerializer(serializers.ModelSerializer):
+    """Serializer for Shift creation that requires both start_time and end_time."""
+
     class Meta:
+        """Meta options for ShiftSerializer."""
+
         model = Shift
         fields = ["start_time", "end_time"]
 
@@ -14,7 +18,11 @@ class ShiftSerializer(serializers.ModelSerializer):
 
 
 class ModifyShiftSerializer(serializers.ModelSerializer):
+    """Serializer for Shift modification where start_time and end_time are optional."""
+
     class Meta:
+        """Meta options for ModifyShiftSerializer."""
+
         model = Shift
         fields = ["start_time", "end_time"]
 

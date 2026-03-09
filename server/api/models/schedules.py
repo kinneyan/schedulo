@@ -5,6 +5,8 @@ from .roles import WorkspaceRole
 
 
 class Shift(models.Model):
+    """A scheduled shift within a workspace, optionally assigned to a member."""
+
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     member = models.ForeignKey(
@@ -21,6 +23,8 @@ class Shift(models.Model):
 
 
 class ShiftRequest(models.Model):
+    """A request from one member to swap shifts with another member."""
+
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     sender = models.ForeignKey(
@@ -42,6 +46,8 @@ class ShiftRequest(models.Model):
 
 
 class TimeOffRequest(models.Model):
+    """A request from a member for time off within a workspace."""
+
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     member = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
@@ -60,6 +66,8 @@ class TimeOffRequest(models.Model):
 
 
 class Unavailability(models.Model):
+    """A recurring weekly time window when a member is unavailable."""
+
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     member = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
@@ -70,6 +78,8 @@ class Unavailability(models.Model):
     )
 
     class Meta:
+        """Meta options for Unavailability."""
+
         constraints = [
             models.CheckConstraint(
                 check=models.Q(day_of_week__gte=0) & models.Q(day_of_week__lte=6),

@@ -1,3 +1,5 @@
+"""Production settings — requires all sensitive values to be set via environment variables."""
+
 from typing import List
 
 from .base import *
