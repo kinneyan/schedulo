@@ -225,7 +225,7 @@ class GetWorkspaceMembersTests(APITestCase):
         response = self.client.post(
             self.url, {"workspace_id": self.workspace.id}, format="json"
         )
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_valid(self):
         response = self.client.post(

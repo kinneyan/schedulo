@@ -350,7 +350,7 @@ class GetWorkspaceMembers(APIView):
             member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "User is not a member of this workspace."
-            return Response(response, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         # Get members of workspace
         member_results = WorkspaceMember.objects.filter(workspace=workspace)
