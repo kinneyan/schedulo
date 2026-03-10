@@ -318,13 +318,13 @@ class ModifyShiftTests(APITestCase):
     def test_no_shift(self):
         """Verify that omitting shift_id returns a 400 error."""
         data = {}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_shift(self):
         """Verify that a non-existent shift_id returns a 404 error."""
         data = {"shift_id": 999}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_without_permissions(self):
@@ -336,7 +336,7 @@ class ModifyShiftTests(APITestCase):
             "start_time": self.time4,
             "end_time": self.time3,
         }
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # ensure shift was not modified
@@ -350,7 +350,7 @@ class ModifyShiftTests(APITestCase):
     def test_invalid_start_and_end(self):
         """Verify that non-datetime start_time and end_time values return a 400 error."""
         data = {"shift_id": self.shift.id, "start_time": 100, "end_time": 100}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         # ensure shift was not modified
@@ -368,7 +368,7 @@ class ModifyShiftTests(APITestCase):
             "start_time": self.time3,
             "end_time": self.time4,
         }
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         # ensure shift was not modified
@@ -382,7 +382,7 @@ class ModifyShiftTests(APITestCase):
     def test_invalid_start(self):
         """Verify that a new start_time after the existing end_time returns a 400 error."""
         data = {"shift_id": self.shift.id, "start_time": self.time3}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         # ensure shift was not modified
@@ -396,7 +396,7 @@ class ModifyShiftTests(APITestCase):
     def test_invalid_end(self):
         """Verify that a new end_time before the existing start_time returns a 400 error."""
         data = {"shift_id": self.shift.id, "end_time": self.time4}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         # ensure shift was not modified
@@ -414,7 +414,7 @@ class ModifyShiftTests(APITestCase):
             "start_time": self.time4,
             "end_time": self.time3,
         }
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # ensure shift was modified
@@ -428,7 +428,7 @@ class ModifyShiftTests(APITestCase):
     def test_valid_start(self):
         """Verify that updating only start_time succeeds and persists the change."""
         data = {"shift_id": self.shift.id, "start_time": self.time4}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # ensure shift was modified
@@ -442,7 +442,7 @@ class ModifyShiftTests(APITestCase):
     def test_valid_end(self):
         """Verify that updating only end_time succeeds and persists the change."""
         data = {"shift_id": self.shift.id, "end_time": self.time3}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # ensure shift was modified
@@ -456,7 +456,7 @@ class ModifyShiftTests(APITestCase):
     def test_invalid_member(self):
         """Verify that a non-existent member_id returns a 404 and the shift is unchanged."""
         data = {"shift_id": self.shift.id, "member_id": 999}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         # ensure shift was not modified
@@ -468,7 +468,7 @@ class ModifyShiftTests(APITestCase):
     def test_valid_member(self):
         """Verify that assigning a valid member marks the shift as non-open."""
         data = {"shift_id": self.shift.id, "member_id": self.member.id}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # ensure shift was modified
@@ -480,7 +480,7 @@ class ModifyShiftTests(APITestCase):
     def test_invalid_role(self):
         """Verify that a non-existent role_id returns a 404 and the shift role is unchanged."""
         data = {"shift_id": self.shift.id, "role_id": 999}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         # ensure shift was not modified
@@ -492,7 +492,7 @@ class ModifyShiftTests(APITestCase):
     def test_valid_role(self):
         """Verify that updating to a valid role_id succeeds and persists the change."""
         data = {"shift_id": self.shift.id, "role_id": self.role2.id}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # ensure shift was modified
@@ -510,7 +510,7 @@ class ModifyShiftTests(APITestCase):
             "start_time": self.time4,
             "end_time": self.time3,
         }
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # ensure shift was modified

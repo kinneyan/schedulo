@@ -134,7 +134,7 @@ class ModifyShift(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def put(self, request):
         """Update one or more fields on an existing Shift.
 
         Requires manage_schedules permission. Accepted body fields: shift_id
