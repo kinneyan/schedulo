@@ -353,23 +353,17 @@ class GetWorkspaceMembers(APIView):
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         # Get members of workspace
-        member_results = WorkspaceMember.objects.filter(workspace=workspace)
+        member_results = WorkspaceMember.objects.filter(workspace=workspace).select_related("memberpermissions").prefetch_related("memberrole_set__workspace_role")
 
         members_list = []
         for member in member_results:
-            member_perms = MemberPermissions.objects.get(member=member)
-
-            member_roles = MemberRole.objects.filter(member=member).values_list(
-                "workspace_role"
-            )
-            roles = WorkspaceRole.objects.filter(pk__in=member_roles)
             roles_list = [
                 {
-                    "role_id": role.id,
-                    "name": role.name,
-                    "pay_rate": role.pay_rate,
+                    "role_id": role.workspace_role.id,
+                    "name": role.workspace_role.name,
+                    "pay_rate": role.workspace_role.pay_rate,
                 }
-                for role in roles
+                for role in member.memberrole_set.all()
             ]
 
             entry = {
@@ -380,11 +374,11 @@ class GetWorkspaceMembers(APIView):
                 "email": member.user.email,
                 "roles": roles_list,
                 "permissions": {
-                    "is_owner": member_perms.is_owner,
-                    "manage_workspace_members": member_perms.manage_workspace_members,
-                    "manage_workspace_roles": member_perms.manage_workspace_roles,
-                    "manage_schedules": member_perms.manage_schedules,
-                    "manage_time_off": member_perms.manage_time_off,
+                    "is_owner": member.memberpermissions.is_owner,
+                    "manage_workspace_members": member.memberpermissions.manage_workspace_members,
+                    "manage_workspace_roles": member.memberpermissions.manage_workspace_roles,
+                    "manage_schedules": member.memberpermissions.manage_schedules,
+                    "manage_time_off": member.memberpermissions.manage_time_off,
                 },
             }
             members_list.append(entry)
