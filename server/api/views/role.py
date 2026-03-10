@@ -313,7 +313,7 @@ class AddMemberRole(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def put(self, request):
+    def post(self, request):
         """Assign a WorkspaceRole to a workspace member.
 
         Requires manage_workspace_roles permission. Accepted body fields:

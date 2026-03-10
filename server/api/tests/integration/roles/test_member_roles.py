@@ -82,32 +82,32 @@ class AddMemberRoleTests(APITestCase):
     def test_no_role(self):
         """Verify that omitting workspace_role_id returns 400."""
         data = {"member_id": self.member2.id}
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_role(self):
         """Verify that a nonexistent workspace_role_id returns 404."""
         data = {"workspace_role_id": 999, "member_id": self.member2.id}
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_no_member(self):
         """Verify that omitting member_id returns 400."""
         data = {"workspace_role_id": self.role.id}
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_member(self):
         """Verify that a nonexistent member_id returns 404."""
         data = {"workspace_role_id": self.role.id, "member_id": 999}
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_add_single(self):
         """Verify that assigning a single valid role returns 201 and persists the MemberRole."""
         data = {"workspace_role_id": self.role.id, "member_id": self.member2.id}
 
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         try:  # this is probably a bad way to handle this since the fail doesnt give any info but idk :(
@@ -123,7 +123,7 @@ class AddMemberRoleTests(APITestCase):
         data.append({"workspace_role_id": self.role3.id, "member_id": self.member2.id})
 
         for i in range(3):
-            response = self.client.put(self.url, data[i], format="json")
+            response = self.client.post(self.url, data[i], format="json")
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         try:  # this is probably a bad way to handle this since the fail doesnt give any info but idk :(
@@ -147,7 +147,7 @@ class AddMemberRoleTests(APITestCase):
         self.client.force_authenticate(user=self.member2.user)
         data = {"workspace_role_id": self.role.id, "member_id": self.member2.id}
 
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         try:  # this is probably a bad way to handle this since the fail doesnt give any info but idk :(
