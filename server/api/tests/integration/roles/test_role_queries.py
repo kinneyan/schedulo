@@ -92,7 +92,7 @@ class GetRolesTests(APITestCase):
             "name": "test name1",
             "pay_rate": 15.00,
         }
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.url = reverse("get_workspace_roles")
@@ -118,7 +118,7 @@ class GetRolesTests(APITestCase):
         )
 
         for i in range(3):
-            response = self.client.put(self.url, data[i], format="json")
+            response = self.client.post(self.url, data[i], format="json")
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.url = reverse("get_workspace_roles")
@@ -176,7 +176,7 @@ class GetRolesTests(APITestCase):
         )
 
         for i in range(3):
-            response = self.client.put(self.url, data[i], format="json")
+            response = self.client.post(self.url, data[i], format="json")
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.url = reverse("get_workspace_roles")

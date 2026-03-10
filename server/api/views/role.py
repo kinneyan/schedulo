@@ -23,7 +23,7 @@ class CreateRole(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def put(self, request):
+    def post(self, request):
         """Create a new WorkspaceRole in the given workspace.
 
         Requires manage_workspace_roles permission. Accepted body fields:

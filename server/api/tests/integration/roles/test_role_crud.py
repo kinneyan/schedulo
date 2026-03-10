@@ -72,13 +72,13 @@ class CreateRoleTests(APITestCase):
     def test_no_workspace(self):
         """Verify that omitting workspace_id returns 400."""
         data = {"name": "test name1", "pay_rate": 15.00}
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace(self):
         """Verify that a nonexistent workspace_id returns 404."""
         data = {"workspace_id": 999, "name": "test name1", "pay_rate": 15.00}
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_workspace_role_valid(self):
@@ -88,7 +88,7 @@ class CreateRoleTests(APITestCase):
             "name": "test name1",
             "pay_rate": 15.00,
         }
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         role = WorkspaceRole.objects.get(workspace=self.workspace, name=data["name"])
@@ -100,7 +100,7 @@ class CreateRoleTests(APITestCase):
     def test_create_workspace_role_no_name_or_payrate(self):
         """Verify that omitting name and pay_rate creates a role with defaults of 'Unnamed Role' and no pay rate."""
         data = {"workspace_id": self.workspace.id}
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         role = WorkspaceRole.objects.get(workspace=self.workspace)
@@ -121,7 +121,7 @@ class CreateRoleTests(APITestCase):
             user=self.user2
         )  # change to send request from user 2
 
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -137,7 +137,7 @@ class CreateRoleTests(APITestCase):
             user=self.user3
         )  # change to send request from user 2
 
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
