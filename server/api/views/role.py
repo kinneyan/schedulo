@@ -149,7 +149,7 @@ class ModifyWorkspaceRole(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def put(self, request):
         """Update name and/or pay_rate for an existing WorkspaceRole.
 
         Requires manage_workspace_roles permission. Accepted body fields:

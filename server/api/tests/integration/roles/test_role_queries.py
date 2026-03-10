@@ -154,7 +154,7 @@ class GetRolesTests(APITestCase):
             manage_time_off=True,
         )
 
-        response = self.client.put(
+        response = self.client.post(
             self.url,
             {
                 "workspace_id": self.workspace2.id,

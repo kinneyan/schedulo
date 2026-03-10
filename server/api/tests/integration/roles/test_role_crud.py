@@ -329,19 +329,19 @@ class ModifyWorkspaceRoleTests(APITestCase):
     def test_no_workspace_role_id(self):
         """Verify that omitting workspace_role_id returns 400."""
         data = {}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace_role_id(self):
         """Verify that a nonexistent workspace_role_id returns 404."""
         data = {"workspace_role_id": 999}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_modify_valid(self):
         """Verify that a valid modification request returns 200 and updates the role's name and pay rate."""
         data = {"workspace_role_id": self.role.id, "name": "new name", "pay_rate": 25}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # check that role was modified
@@ -353,7 +353,7 @@ class ModifyWorkspaceRoleTests(APITestCase):
         """Verify that a member without manage_workspace_roles permission receives 403 and the role is unchanged."""
         self.client.force_authenticate(user=self.member2.user)
         data = {"workspace_role_id": self.role.id, "name": "new name", "pay_rate": 25}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # check that role did not change
