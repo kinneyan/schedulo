@@ -357,7 +357,6 @@ class GetWorkspaceMembers(APIView):
 
         members_list = []
         for member in member_results:
-            user = User.objects.get(pk=member.user.id)
             member_perms = MemberPermissions.objects.get(member=member)
 
             member_roles = MemberRole.objects.filter(member=member).values_list(
@@ -375,10 +374,10 @@ class GetWorkspaceMembers(APIView):
 
             entry = {
                 "member_id": member.id,
-                "user_id": user.id,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "email": user.email,
+                "user_id": member.user.id,
+                "first_name": member.user.first_name,
+                "last_name": member.user.last_name,
+                "email": member.user.email,
                 "roles": roles_list,
                 "permissions": {
                     "is_owner": member_perms.is_owner,
