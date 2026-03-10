@@ -24,7 +24,7 @@ class CreateShift(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def put(self, request):
+    def post(self, request):
         """Create a new Shift in the given workspace.
 
         Requires manage_schedules permission. Accepted body fields:

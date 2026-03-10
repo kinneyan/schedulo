@@ -86,7 +86,7 @@ class CreateShiftTests(APITestCase):
             "start_time": self.time1,
             "end_time": self.time2,
         }
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace(self):
@@ -97,7 +97,7 @@ class CreateShiftTests(APITestCase):
             "start_time": self.time1,
             "end_time": self.time2,
         }
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_no_role(self):
@@ -107,7 +107,7 @@ class CreateShiftTests(APITestCase):
             "start_time": self.time1,
             "end_time": self.time2,
         }
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_role(self):
@@ -118,13 +118,13 @@ class CreateShiftTests(APITestCase):
             "start_time": self.time1,
             "end_time": self.time2,
         }
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_no_time(self):
         """Verify that omitting start_time and end_time returns a 400 error."""
         data = {"workspace_id": self.workspace.id, "role_id": self.role.id}
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_end_time_before_start(self):
@@ -135,7 +135,7 @@ class CreateShiftTests(APITestCase):
             "start_time": self.time2,
             "end_time": self.time1,
         }
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_without_permissions(self):
@@ -147,7 +147,7 @@ class CreateShiftTests(APITestCase):
             "start_time": self.time2,
             "end_time": self.time1,
         }
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # check that shift was not created in db
@@ -171,7 +171,7 @@ class CreateShiftTests(APITestCase):
             "start_time": self.time1,
             "end_time": self.time2,
         }
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # check that shift was created in db
@@ -195,7 +195,7 @@ class CreateShiftTests(APITestCase):
             "end_time": self.time2,
             "member_id": self.member2.id,
         }
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # check that shift was created in db
@@ -220,7 +220,7 @@ class CreateShiftTests(APITestCase):
             "end_time": self.time2,
             "member_id": 999,
         }
-        response = self.client.put(self.url, data, format="json")
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         # check that shift not was created in db
