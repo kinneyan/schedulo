@@ -66,7 +66,7 @@ class CreateRoleViewTest(TestCase):
         request = self._create_drf_request("/create-role/", request_data, method="put")
 
         # Call view method
-        response = self.view.put(request)
+        response = self.view.post(request)
 
         # Assertions
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -87,7 +87,7 @@ class CreateRoleViewTest(TestCase):
         request_data = {"invalid": "data"}
         request = self._create_drf_request("/create-role/", request_data, method="put")
 
-        response = self.view.put(request)
+        response = self.view.post(request)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["error"]["code"], 400)
@@ -103,7 +103,7 @@ class CreateRoleViewTest(TestCase):
         request_data = {"name": "Manager"}  # Missing workspace_id
         request = self._create_drf_request("/create-role/", request_data, method="put")
 
-        response = self.view.put(request)
+        response = self.view.post(request)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["error"]["message"], "Workspace ID is required.")
@@ -121,7 +121,7 @@ class CreateRoleViewTest(TestCase):
         request_data = {"workspace_id": 999, "name": "Manager"}
         request = self._create_drf_request("/create-role/", request_data, method="put")
 
-        response = self.view.put(request)
+        response = self.view.post(request)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["error"]["message"], "Workspace does not exist.")
@@ -149,7 +149,7 @@ class CreateRoleViewTest(TestCase):
         request_data = {"workspace_id": 1, "name": "Manager"}
         request = self._create_drf_request("/create-role/", request_data, method="put")
 
-        response = self.view.put(request)
+        response = self.view.post(request)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(
@@ -314,7 +314,7 @@ class ModifyWorkspaceRoleViewTest(TestCase):
         }
         request = self._create_drf_request("/modify-role/", request_data, method="post")
 
-        response = self.view.post(request)
+        response = self.view.put(request)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -328,7 +328,7 @@ class ModifyWorkspaceRoleViewTest(TestCase):
         request_data = {"name": "Updated Name"}  # Missing workspace_role_id
         request = self._create_drf_request("/modify-role/", request_data, method="post")
 
-        response = self.view.post(request)
+        response = self.view.put(request)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -345,7 +345,7 @@ class ModifyWorkspaceRoleViewTest(TestCase):
         request_data = {"workspace_role_id": 1, "invalid": "data"}
         request = self._create_drf_request("/modify-role/", request_data, method="post")
 
-        response = self.view.post(request)
+        response = self.view.put(request)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["error"]["code"], 400)
@@ -364,7 +364,7 @@ class ModifyWorkspaceRoleViewTest(TestCase):
         request_data = {"workspace_role_id": 999, "name": "Updated Name"}
         request = self._create_drf_request("/modify-role/", request_data, method="post")
 
-        response = self.view.post(request)
+        response = self.view.put(request)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
@@ -404,7 +404,7 @@ class ModifyWorkspaceRoleViewTest(TestCase):
         request_data = {"workspace_role_id": 1, "name": "Updated Name"}
         request = self._create_drf_request("/modify-role/", request_data, method="post")
 
-        response = self.view.post(request)
+        response = self.view.put(request)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(
@@ -451,7 +451,7 @@ class ModifyWorkspaceRoleViewTest(TestCase):
         request_data = {"workspace_role_id": 1, "name": "New Name Only"}
         request = self._create_drf_request("/modify-role/", request_data, method="post")
 
-        response = self.view.post(request)
+        response = self.view.put(request)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
