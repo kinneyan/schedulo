@@ -236,63 +236,36 @@ class GetWorkspaceMembersTests(APITestCase):
         result = response.data["members"]
         self.assertEqual(len(result), 2)
 
-        self.assertEqual(result[0]["member_id"], self.member.id)
-        self.assertEqual(result[0]["user_id"], self.user.id)
-        self.assertEqual(result[0]["first_name"], self.user.first_name)
-        self.assertEqual(result[0]["last_name"], self.user.last_name)
-        self.assertEqual(result[0]["email"], self.user.email)
-        self.assertEqual(len(result[0]["roles"]), 1)
-        self.assertEqual(result[0]["roles"][0]["role_id"], self.role.id)
-        self.assertEqual(result[0]["roles"][0]["name"], self.role.name)
-        self.assertEqual(result[0]["roles"][0]["pay_rate"], self.role.pay_rate)
-        self.assertEqual(
-            result[0]["permissions"]["is_owner"], self.permissions.is_owner
+        def build_expected_member(member, user, permissions, roles):
+            return {
+                "member_id": member.id,
+                "user_id": user.id,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email,
+                "roles": [
+                    {
+                        "role_id": role.id,
+                        "name": role.name,
+                        "pay_rate": role.pay_rate,
+                    }
+                    for role in roles
+                ],
+                "permissions": {
+                    "is_owner": permissions.is_owner,
+                    "manage_workspace_members": permissions.manage_workspace_members,
+                    "manage_workspace_roles": permissions.manage_workspace_roles,
+                    "manage_schedules": permissions.manage_schedules,
+                    "manage_time_off": permissions.manage_time_off,
+                },
+            }
+
+        expected_member1 = build_expected_member(
+            self.member, self.user, self.permissions, [self.role]
         )
-        self.assertEqual(
-            result[0]["permissions"]["manage_workspace_members"],
-            self.permissions.manage_workspace_members,
-        )
-        self.assertEqual(
-            result[0]["permissions"]["manage_workspace_roles"],
-            self.permissions.manage_workspace_roles,
-        )
-        self.assertEqual(
-            result[0]["permissions"]["manage_schedules"],
-            self.permissions.manage_schedules,
-        )
-        self.assertEqual(
-            result[0]["permissions"]["manage_time_off"],
-            self.permissions.manage_time_off,
+        expected_member2 = build_expected_member(
+            self.member2, self.user2, self.permissions2, [self.role, self.role2]
         )
 
-        self.assertEqual(result[1]["member_id"], self.member2.id)
-        self.assertEqual(result[1]["user_id"], self.user2.id)
-        self.assertEqual(result[1]["first_name"], self.user2.first_name)
-        self.assertEqual(result[1]["last_name"], self.user2.last_name)
-        self.assertEqual(result[1]["email"], self.user2.email)
-        self.assertEqual(len(result[1]["roles"]), 2)
-        self.assertEqual(result[1]["roles"][0]["role_id"], self.role.id)
-        self.assertEqual(result[1]["roles"][0]["name"], self.role.name)
-        self.assertEqual(result[1]["roles"][0]["pay_rate"], self.role.pay_rate)
-        self.assertEqual(result[1]["roles"][1]["role_id"], self.role2.id)
-        self.assertEqual(result[1]["roles"][1]["name"], self.role2.name)
-        self.assertEqual(result[1]["roles"][1]["pay_rate"], self.role2.pay_rate)
-        self.assertEqual(
-            result[1]["permissions"]["is_owner"], self.permissions2.is_owner
-        )
-        self.assertEqual(
-            result[1]["permissions"]["manage_workspace_members"],
-            self.permissions2.manage_workspace_members,
-        )
-        self.assertEqual(
-            result[1]["permissions"]["manage_workspace_roles"],
-            self.permissions2.manage_workspace_roles,
-        )
-        self.assertEqual(
-            result[1]["permissions"]["manage_schedules"],
-            self.permissions2.manage_schedules,
-        )
-        self.assertEqual(
-            result[1]["permissions"]["manage_time_off"],
-            self.permissions2.manage_time_off,
-        )
+        self.assertEqual(result[0], expected_member1)
+        self.assertEqual(result[1], expected_member2)
