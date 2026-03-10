@@ -353,7 +353,11 @@ class GetWorkspaceMembers(APIView):
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         # Get members of workspace
-        member_results = WorkspaceMember.objects.filter(workspace=workspace).select_related("memberpermissions").prefetch_related("memberrole_set__workspace_role")
+        member_results = (
+            WorkspaceMember.objects.filter(workspace=workspace)
+            .select_related("memberpermissions")
+            .prefetch_related("memberrole_set__workspace_role")
+        )
 
         members_list = []
         for member in member_results:
