@@ -18,3 +18,4 @@ from .role import (
     ModifyWorkspaceRole,
 )
 from .shift import CreateShift, ModifyShift, DeleteShift, GetShifts
+from .shiftRequest import CreateShiftRequest

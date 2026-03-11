@@ -26,6 +26,7 @@ from .integration.shifts.test_shift_crud import (
     DeleteShiftTests,
 )
 from .integration.shifts.test_shift_queries import GetShiftsTest
+from .integration.shiftRequests.test_shift_request_crud import CreateShiftRequestTests
 
 # Import from unit tests
 from .unit.models.test_user_models import (

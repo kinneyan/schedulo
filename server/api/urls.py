@@ -22,6 +22,7 @@ from .views import (
     ModifyShift,
     DeleteShift,
     GetShifts,
+    CreateShiftRequest,
 )
 
 urlpatterns = [
@@ -67,4 +68,5 @@ urlpatterns = [
     path("workspace/modify-shift", ModifyShift.as_view(), name="modify_shift"),
     path("workspace/delete-shift", DeleteShift.as_view(), name="delete_shift"),
     path("workspace/get-shifts", GetShifts.as_view(), name="get_shifts"),
+    path("workspace/shift-request/create", CreateShiftRequest.as_view(), name="create_shift_request"),
 ]
