@@ -27,6 +27,7 @@ class ShiftRequest(models.Model):
 
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, null=True)
     sender = models.ForeignKey(
         WorkspaceMember, on_delete=models.CASCADE, related_name="sent_shift_requests"
     )
