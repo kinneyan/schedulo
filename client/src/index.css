@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --color-background: #F0ECE2;
+    --color-foreground: #2C2C2C;
+    --color-card: #FFFFFF;
+    --color-card-foreground: #2C2C2C;
+    --color-popover: #FFFFFF;
+    --color-popover-foreground: #2C2C2C;
+    --color-primary: #003366;
+    --color-primary-foreground: #FFFFFF;
+    --color-secondary: #DDD8CC;
+    --color-secondary-foreground: #2C2C2C;
+    --color-muted: #DDD8CC;
+    --color-muted-foreground: #7A7168;
+    --color-accent: #DDD8CC;
+    --color-accent-foreground: #2C2C2C;
+    --color-destructive: #DC2626;
+    --color-border: #DDD8CC;
+    --color-input: #DDD8CC;
+    --color-ring: #003366;
+    --radius: 0.5rem;
+    --font-sans: 'Plus Jakarta Sans', sans-serif;
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground pt-[52px];
+        font-family: var(--font-sans);
+    }
+}
