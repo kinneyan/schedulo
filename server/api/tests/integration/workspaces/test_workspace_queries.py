@@ -10,7 +10,7 @@ class GetWorkspaceTests(APITestCase):
 
     def setUp(self):
         """Create two workspaces with members and authenticate test users."""
-        self.url = reverse("get_workspace")
+        self.url = reverse("workspace")
         self.user = User.objects.create_user(
             email="testuser@example.com",
             password="testpassword",
@@ -81,6 +81,7 @@ class GetWorkspaceTests(APITestCase):
         """Verify that a 400 is returned when no workspace_id is provided and the user has no memberships."""
         self.client.force_authenticate(user=self.user3)
 
+        self.url = reverse("workspace")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("Workspace ID is required", response.data["error"]["message"])
@@ -89,7 +90,8 @@ class GetWorkspaceTests(APITestCase):
         """Verify that a workspace owner can retrieve workspace details with membership set to owner."""
         self.client.force_authenticate(user=self.user)
 
-        response = self.client.get(self.url, {"workspace_id": self.workspace1.id})
+        self.url = reverse("workspace_parameters", args=[self.workspace1.id])
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["name"], self.workspace1.name)
         self.assertEqual(
@@ -102,7 +104,8 @@ class GetWorkspaceTests(APITestCase):
         """Verify that a non-owner member can retrieve workspace details with membership set to employee."""
         self.client.force_authenticate(user=self.user2)
 
-        response = self.client.get(self.url, {"workspace_id": self.workspace1.id})
+        self.url = reverse("workspace_parameters", args=[self.workspace1.id])
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["name"], self.workspace1.name)
         self.assertEqual(
@@ -115,7 +118,8 @@ class GetWorkspaceTests(APITestCase):
         """Verify that a 400 is returned when workspace_id is omitted from the request."""
         self.client.force_authenticate(user=self.user)
 
-        response = self.client.get(self.url, {})
+        self.url = reverse("workspace")
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         response = self.client.get(self.url)
@@ -126,5 +130,6 @@ class GetWorkspaceTests(APITestCase):
         """Verify that a 404 is returned when the requested workspace does not exist."""
         self.client.force_authenticate(user=self.user)
 
-        response = self.client.get(self.url, {"workspace_id": 999})
+        self.url = reverse("workspace_parameters", args=[999])
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

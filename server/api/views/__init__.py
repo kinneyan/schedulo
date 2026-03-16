@@ -2,11 +2,8 @@ from .auth import Login, Register
 from .user import GetUser
 from .permissions import GetPermissions, UpdatePermissions
 from .workspace import (
-    CreateWorkspace,
+    WorkspaceView,
     AddWorkspaceMember,
-    ModifyWorkspace,
-    GetWorkspace,
-    DeleteWorkspace,
 )
 from .role import (
     CreateRole,

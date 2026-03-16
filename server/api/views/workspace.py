@@ -8,7 +8,7 @@ from ..serializers import WorkspaceSerializer
 from ..models import Workspace, WorkspaceMember, User, MemberPermissions
 
 
-class CreateWorkspace(APIView):
+class WorkspaceView(APIView):
     """API view for creating a new workspace owned by the authenticated user."""
 
     authentication_classes = [JWTAuthentication]
@@ -60,19 +60,15 @@ class CreateWorkspace(APIView):
         )
 
         return Response(response, status=status.HTTP_201_CREATED)
-
-
-class ModifyWorkspace(APIView):
+    
+    
     """API view for renaming a workspace or transferring ownership. Owner only."""
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def put(self, request):
+    def put(self, request, workspace_id=None):
         """Update the name or owner of a workspace.
 
-        Requires the authenticated user to be the workspace owner. Accepted body
-        fields: workspace_id (required), new_owner_id (optional), name (optional).
+        Requires the authenticated user to be the workspace owner. 
+        Aceepected parameters fields: workspace_id (required)
+        Accepted body fields: new_owner_id (optional), name (optional).
 
         :param request: Authenticated HTTP request with workspace_id and optional
             new_owner_id or name in the body.
@@ -80,7 +76,7 @@ class ModifyWorkspace(APIView):
         :return: Empty success response, or an error response describing the failure.
         :rtype: rest_framework.response.Response
         """
-        response = {"error": {}}
+        response = {"error": {}}   
 
         serializer = WorkspaceSerializer(data=request.data)
         if not serializer.is_valid():
@@ -89,13 +85,13 @@ class ModifyWorkspace(APIView):
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify body contains required fields
-        if "workspace_id" not in request.data:
+        if workspace_id is None:
             response["error"]["message"] = "Workspace ID is required."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify workspace exists
         try:
-            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
+            workspace = Workspace.objects.get(pk=workspace_id)
         except Workspace.DoesNotExist:
             response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -103,10 +99,10 @@ class ModifyWorkspace(APIView):
         # Verify user is owner
         try:
             old_owner_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=request.data["workspace_id"]
+                user=request.user, workspace=workspace
             )
             MemberPermissions.objects.get(
-                workspace=request.data["workspace_id"],
+                workspace=workspace,
                 member=old_owner_member,
                 is_owner=True,
             )
@@ -130,7 +126,7 @@ class ModifyWorkspace(APIView):
 
                 # set current owner to no longer be owner
                 old_owner_perms = MemberPermissions.objects.get(
-                    member=old_owner_member, workspace=request.data["workspace_id"]
+                    member=old_owner_member, workspace=workspace
                 )
 
                 if (
@@ -167,6 +163,103 @@ class ModifyWorkspace(APIView):
             workspace.name = serializer.validated_data["name"]
             workspace.save()
 
+        return Response(response, status=status.HTTP_200_OK)
+    
+    """API view for retrieving details about a workspace the user belongs to."""
+    def get(self, request, workspace_id=None):
+        """Return workspace details and the authenticated user's membership role.
+
+        :param request: Authenticated HTTP request with workspace_id as a query
+            parameter.
+        :type request: rest_framework.request.Request
+        :return: Workspace name, owner info, membership level, or an error response.
+        :rtype: rest_framework.response.Response
+        """
+        response = {"error": {}}
+
+        # Verify parameters contains required fields
+        if workspace_id is None:
+            response["error"]["message"] = "Workspace ID is required."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verify workspace exists
+        try:
+            workspace = Workspace.objects.get(pk=workspace_id)
+        except Workspace.DoesNotExist:
+            response["error"]["message"] = "Workspace does not exists."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # Verify user is member of workspace
+        try:
+            member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "User is not a member of this workspace."
+            return Response(response, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Get user's perms
+        permissions = MemberPermissions.objects.get(workspace=workspace, member=member)
+
+        if permissions.is_owner:
+            response["membership"] = "owner"
+        # UNCOMMENT WHEN MANAGER MEMBERSHIP ADDED!!
+        # elif (permissions.IS_MANAGER):
+        #   response["membership"] = "manager"
+        else:
+            response["membership"] = "employee"
+
+        response["owner_name"] = (
+            workspace.owner.first_name + " " + workspace.owner.last_name
+        )
+        response["owner_id"] = workspace.owner.id
+        response["name"] = workspace.name
+        response["workspace_id"] = workspace.id
+
+        return Response(response, status=status.HTTP_200_OK)
+    
+    
+    """API view for deleting a workspace. Requires the authenticated user to be owner."""
+    def delete(self, request, workspace_id=None):
+        """Delete a workspace by ID.
+
+        :param request: Authenticated HTTP request containing workspace_id in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response on deletion, or an error response.
+        :rtype: rest_framework.response.Response
+        """
+        response = {"error": {}}
+
+        # Verify body contains required fields
+        if workspace_id is None:
+            response["error"]["message"] = "Workspace ID is required."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verify workspace exists
+        try:
+            workspace = Workspace.objects.get(pk=workspace_id)
+        except Workspace.DoesNotExist:
+            response["error"]["message"] = "Workspace does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # Verify user is owner
+        try:
+            owner_member = WorkspaceMember.objects.get(
+                user=request.user, workspace=workspace
+            )
+            MemberPermissions.objects.get(
+                workspace=workspace,
+                member=owner_member,
+                is_owner=True,
+            )
+        except MemberPermissions.DoesNotExist:
+            response["error"][
+                "message"
+            ] = "You do not have permission modify this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "You are not a member of this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+
+        workspace = Workspace.objects.get(id=workspace.id).delete()
         return Response(response, status=status.HTTP_200_OK)
 
 
@@ -231,137 +324,3 @@ class AddWorkspaceMember(APIView):
         else:
             response["error"] = "User is already member of this workspace"
             return Response(response, status=status.HTTP_409_CONFLICT)
-
-
-class GetWorkspace(APIView):
-    """API view for retrieving details about a workspace the user belongs to."""
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        """Return workspace details and the authenticated user's membership role.
-
-        :param request: Authenticated HTTP request with workspace_id as a query
-            parameter.
-        :type request: rest_framework.request.Request
-        :return: Workspace name, owner info, membership level, or an error response.
-        :rtype: rest_framework.response.Response
-        """
-        response = {"error": {}}
-
-        # Verify parameters contains required fields
-        if request.GET.get("workspace_id") is None:
-            response["error"]["message"] = "Workspace ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-        # Verify workspace exists
-        try:
-            workspace = Workspace.objects.get(pk=request.GET.get("workspace_id"))
-        except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exists."
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-        # Verify user is member of workspace
-        try:
-            member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
-        except WorkspaceMember.DoesNotExist:
-            response["error"]["message"] = "User is not a member of this workspace."
-            return Response(response, status=status.HTTP_401_UNAUTHORIZED)
-
-        # Get user's perms
-        permissions = MemberPermissions.objects.get(workspace=workspace, member=member)
-
-        if permissions.is_owner:
-            response["membership"] = "owner"
-        # UNCOMMENT WHEN MANAGER MEMBERSHIP ADDED!!
-        # elif (permissions.IS_MANAGER):
-        #   response["membership"] = "manager"
-        else:
-            response["membership"] = "employee"
-
-        response["owner_name"] = (
-            workspace.owner.first_name + " " + workspace.owner.last_name
-        )
-        response["owner_id"] = workspace.owner.id
-        response["name"] = workspace.name
-        response["workspace_id"] = workspace.id
-
-        return Response(response, status=status.HTTP_200_OK)
-        """
-        DECPRICATED
-        # Verify user exists
-        try:
-            user = User.objects.get(pk=request.user.id)
-        except User.DoesNotExist:
-            response["error"]["message"] = "User does not exist."
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-        members = WorkspaceMember.objects.filter(user=user).values_list("workspace")
-        results = Workspace.objects.filter(pk__in=members)
-
-        workspace_list = [
-            {
-                "id": workspace.id,
-                "created_by": workspace.created_by.id,
-                "owner": workspace.owner.id,
-                "name": workspace.name,
-            }
-            for workspace in results
-        ]
-
-        response["workspaces"] = workspace_list
-
-        return Response(response, status=status.HTTP_200_OK)
-        """
-
-
-class DeleteWorkspace(APIView):
-    """API view for deleting a workspace. Requires the authenticated user to be owner."""
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def delete(self, request):
-        """Delete a workspace by ID.
-
-        :param request: Authenticated HTTP request containing workspace_id in the body.
-        :type request: rest_framework.request.Request
-        :return: Empty success response on deletion, or an error response.
-        :rtype: rest_framework.response.Response
-        """
-        response = {"error": {}}
-
-        # Verify body contains required fields
-        if "workspace_id" not in request.data:
-            response["error"]["message"] = "Workspace ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-        # Verify workspace exists
-        try:
-            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
-        except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exist."
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-        # Verify user is owner
-        try:
-            owner_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=request.data["workspace_id"]
-            )
-            MemberPermissions.objects.get(
-                workspace=request.data["workspace_id"],
-                member=owner_member,
-                is_owner=True,
-            )
-        except MemberPermissions.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "You do not have permission modify this workspace."
-            return Response(response, status=status.HTTP_403_FORBIDDEN)
-        except WorkspaceMember.DoesNotExist:
-            response["error"]["message"] = "You are not a member of this workspace."
-            return Response(response, status=status.HTTP_403_FORBIDDEN)
-
-        workspace = Workspace.objects.get(id=workspace.id).delete()
-        return Response(response, status=status.HTTP_200_OK)

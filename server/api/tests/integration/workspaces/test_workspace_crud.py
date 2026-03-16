@@ -10,7 +10,7 @@ class ModifyWorkspaceTests(APITestCase):
 
     def setUp(self):
         """Create a workspace with an authenticated owner and two additional users."""
-        self.url = reverse("modify_workspace")
+        self.url = reverse("workspace")
         self.user = User.objects.create_user(
             email="testuser@example.com",
             password="testpassword",
@@ -56,8 +56,9 @@ class ModifyWorkspaceTests(APITestCase):
 
     def test_member_not_found(self):
         """Verify that a 404 is returned when the target new owner does not exist."""
+        self.url = reverse("workspace_parameters", args=[self.workspace.id])
         response = self.client.put(
-            self.url, {"workspace_id": self.workspace.id, "new_owner_id": 999}
+            self.url, {"new_owner_id": 999}
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
@@ -76,9 +77,9 @@ class ModifyWorkspaceTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # set user2 to owner
-        self.url = reverse("modify_workspace")
+        self.url = reverse("workspace_parameters", args=[self.workspace.id])
         response = self.client.put(
-            self.url, {"workspace_id": self.workspace.id, "new_owner_id": self.user2.id}
+            self.url, {"new_owner_id": self.user2.id}
         )
 
         self.permissions.refresh_from_db()
@@ -96,9 +97,9 @@ class ModifyWorkspaceTests(APITestCase):
     def test_change_owner_to_non_workplace_member(self):
         """Verify that ownership cannot be transferred to a user who is not a workspace member."""
         # set user2 to owner
-        self.url = reverse("modify_workspace")
+        self.url = reverse("workspace_parameters", args=[self.workspace.id])
         response = self.client.put(
-            self.url, {"workspace_id": self.workspace.id, "new_owner_id": self.user2.id}
+            self.url, {"new_owner_id": self.user2.id}
         )
 
         self.permissions.refresh_from_db()
@@ -109,9 +110,9 @@ class ModifyWorkspaceTests(APITestCase):
     def test_change_owner_to_self(self):
         """Verify that an owner cannot transfer ownership to themselves."""
         # set user to owner
-        self.url = reverse("modify_workspace")
+        self.url = reverse("workspace_parameters", args=[self.workspace.id])
         response = self.client.put(
-            self.url, {"workspace_id": self.workspace.id, "new_owner_id": self.user.id}
+            self.url, {"new_owner_id": self.user.id}
         )
 
         self.permissions.refresh_from_db()
@@ -137,14 +138,14 @@ class ModifyWorkspaceTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        self.url = reverse("modify_workspace")
+        self.url = reverse("workspace_parameters", args=[self.workspace.id])
         self.client.force_authenticate(
             user=self.user2
         )  # change to send request from user 2
 
         # try to change user 3 to owner
         response = self.client.put(
-            self.url, {"workspace_id": self.workspace.id, "new_owner_id": self.user3.id}
+            self.url, {"new_owner_id": self.user3.id}
         )
 
         perms = MemberPermissions.objects.get(
@@ -160,9 +161,9 @@ class ModifyWorkspaceTests(APITestCase):
 
     def test_change_name_valid(self):
         """Verify that a workspace owner can rename the workspace."""
-        self.url = reverse("modify_workspace")
+        self.url = reverse("workspace_parameters", args=[self.workspace.id])
         response = self.client.put(
-            self.url, {"workspace_id": self.workspace.id, "name": "new name"}
+            self.url, {"name": "new name"}
         )
 
         self.workspace.refresh_from_db()
@@ -171,10 +172,10 @@ class ModifyWorkspaceTests(APITestCase):
 
     def test_change_name_as_non_member(self):
         """Verify that a user who is not a workspace member cannot rename the workspace."""
-        self.url = reverse("modify_workspace")
+        self.url = reverse("workspace_parameters", args=[self.workspace.id])
         self.client.force_authenticate(user=self.user2)
         response = self.client.put(
-            self.url, {"workspace_id": self.workspace.id, "name": "new name"}
+            self.url, {"name": "new name"}
         )
 
         self.workspace.refresh_from_db()
@@ -191,10 +192,10 @@ class ModifyWorkspaceTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        self.url = reverse("modify_workspace")
+        self.url = reverse("workspace_parameters", args=[self.workspace.id])
         self.client.force_authenticate(user=self.user2)
         response = self.client.put(
-            self.url, {"workspace_id": self.workspace.id, "name": "new name"}
+            self.url, {"name": "new name"}
         )
 
         self.workspace.refresh_from_db()
@@ -207,7 +208,7 @@ class DeleteWorkspaceTests(APITestCase):
 
     def setUp(self):
         """Create two workspaces with members and authenticate as the owner."""
-        self.url = reverse("delete_workspace")
+        self.url = reverse("workspace")
         self.user = User.objects.create_user(
             email="testuser@example.com",
             password="testpassword",
@@ -277,18 +278,20 @@ class DeleteWorkspaceTests(APITestCase):
 
     def test_no_workspace_id(self):
         """Verify that a 400 is returned when workspace_id is absent from the request."""
-        response = self.client.delete(self.url, {})
+        response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace_id(self):
         """Verify that a 404 is returned when the requested workspace does not exist."""
-        response = self.client.delete(self.url, {"workspace_id": 999})
+        self.url = reverse("workspace_parameters", args=[999])
+        response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_not_owner(self):
         """Verify that a non-owner member cannot delete the workspace."""
         self.client.force_authenticate(user=self.user2)
-        response = self.client.delete(self.url, {"workspace_id": self.workspace1.id})
+        self.url = reverse("workspace_parameters", args=[self.workspace1.id])
+        response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # ensure workspace was not deleted
@@ -300,7 +303,8 @@ class DeleteWorkspaceTests(APITestCase):
     def test_not_member(self):
         """Verify that a user who is not a workspace member cannot delete the workspace."""
         self.client.force_authenticate(user=self.user3)
-        response = self.client.delete(self.url, {"workspace_id": self.workspace1.id})
+        self.url = reverse("workspace_parameters", args=[self.workspace1.id])
+        response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # ensure workspace was not deleted
@@ -311,7 +315,8 @@ class DeleteWorkspaceTests(APITestCase):
 
     def test_valid(self):
         """Verify that a workspace owner can successfully delete the workspace."""
-        response = self.client.delete(self.url, {"workspace_id": self.workspace1.id})
+        self.url = reverse("workspace_parameters", args=[self.workspace1.id])
+        response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # ensure workspace was deleted
