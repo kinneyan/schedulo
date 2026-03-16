@@ -4,6 +4,7 @@ from .permissions import GetPermissions, UpdatePermissions
 from .workspace import (
     WorkspaceView,
     AddWorkspaceMember,
+    GetWorkspaceMembers,
 )
 from .role import (
     CreateRole,

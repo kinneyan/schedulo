@@ -19,6 +19,7 @@ from .views import (
     ModifyShift,
     DeleteShift,
     GetShifts,
+    GetWorkspaceMembers,
 )
 
 urlpatterns = [
@@ -28,6 +29,11 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("workspace/", WorkspaceView.as_view(), name="workspace"),
     path("workspace/<int:workspace_id>/", WorkspaceView.as_view(), name="workspace_parameters"),
+    path(
+        "workspace/get-members/",
+        GetWorkspaceMembers.as_view(),
+        name="get_workspace_members",
+    ),
     path("workspace/permissions/", GetPermissions.as_view(), name="get_permissions"),
     path(
         "workspace/permissions/update/",
