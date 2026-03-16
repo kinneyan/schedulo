@@ -239,7 +239,7 @@ class GetWorkspace(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def get(self, request):
         """Return workspace details and the authenticated user's membership role.
 
         :param request: Authenticated HTTP request with workspace_id as a query
@@ -251,13 +251,13 @@ class GetWorkspace(APIView):
         response = {"error": {}}
 
         # Verify parameters contains required fields
-        if "workspace_id" not in request.data:
+        if request.GET.get("workspace_id") is None:
             response["error"]["message"] = "Workspace ID is required."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify workspace exists
         try:
-            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
+            workspace = Workspace.objects.get(pk=request.GET.get("workspace_id"))
         except Workspace.DoesNotExist:
             response["error"]["message"] = "Workspace does not exists."
             return Response(response, status=status.HTTP_404_NOT_FOUND)

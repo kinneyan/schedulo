@@ -81,9 +81,7 @@ class GetWorkspaceTests(APITestCase):
         """Verify that a 400 is returned when no workspace_id is provided and the user has no memberships."""
         self.client.force_authenticate(user=self.user3)
 
-        data = {}
-        response = self.client.post(self.url, data, format="json")
-
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("Workspace ID is required", response.data["error"]["message"])
 
@@ -91,8 +89,7 @@ class GetWorkspaceTests(APITestCase):
         """Verify that a workspace owner can retrieve workspace details with membership set to owner."""
         self.client.force_authenticate(user=self.user)
 
-        data = {"workspace_id": self.workspace1.id}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.get(self.url, {"workspace_id": self.workspace1.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["name"], self.workspace1.name)
         self.assertEqual(
@@ -105,8 +102,7 @@ class GetWorkspaceTests(APITestCase):
         """Verify that a non-owner member can retrieve workspace details with membership set to employee."""
         self.client.force_authenticate(user=self.user2)
 
-        data = {"workspace_id": self.workspace1.id}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.get(self.url, {"workspace_id": self.workspace1.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["name"], self.workspace1.name)
         self.assertEqual(
@@ -119,8 +115,10 @@ class GetWorkspaceTests(APITestCase):
         """Verify that a 400 is returned when workspace_id is omitted from the request."""
         self.client.force_authenticate(user=self.user)
 
-        data = {}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.get(self.url, {})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("Workspace ID is required", response.data["error"]["message"])
 
@@ -128,6 +126,5 @@ class GetWorkspaceTests(APITestCase):
         """Verify that a 404 is returned when the requested workspace does not exist."""
         self.client.force_authenticate(user=self.user)
 
-        data = {"workspace_id": 999}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.get(self.url, {"workspace_id": 999})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
