@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import SubmitButton from "../../buttons/submitButton/SubmitButton";
 
 /**
@@ -32,82 +32,82 @@ const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, 
                 <CardTitle>Create an account</CardTitle>
             </CardHeader>
             <CardContent>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="first-name-form">First Name</Label>
-                    <Input
-                        type="text"
-                        name="first-name"
-                        id="first-name-form"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="last-name-form">Last Name</Label>
-                    <Input
-                        type="text"
-                        name="last-name"
-                        id="last-name-form"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="email-form">Email</Label>
-                    <Input
-                        type="email"
-                        name="email"
-                        id="email-form"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="phone-form">Phone Number</Label>
-                    <Input
-                        type="tel"
-                        name="phone"
-                        id="phone-form"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="password-form">Password</Label>
-                    <Input
-                        type="password"
-                        name="password"
-                        id="password-form"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="confirm-password-form">Confirm Password</Label>
-                    <Input
-                        type="password"
-                        name="confirm-password"
-                        id="confirm-password-form"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                <SubmitButton buttonText="Sign up" />
-                {error && (
-                    <p className="text-destructive text-sm">{error}</p>
-                )}
-                <hr className="border-border" />
-                <p className="text-sm text-center">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="first-name-form">First Name</Label>
+                        <Input
+                            type="text"
+                            name="first-name"
+                            id="first-name-form"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="last-name-form">Last Name</Label>
+                        <Input
+                            type="text"
+                            name="last-name"
+                            id="last-name-form"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="email-form">Email</Label>
+                        <Input
+                            type="email"
+                            name="email"
+                            id="email-form"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="phone-form">Phone Number</Label>
+                        <Input
+                            type="tel"
+                            name="phone"
+                            id="phone-form"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="password-form">Password</Label>
+                        <Input
+                            type="password"
+                            name="password"
+                            id="password-form"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="confirm-password-form">Confirm Password</Label>
+                        <Input
+                            type="password"
+                            name="confirm-password"
+                            id="confirm-password-form"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <SubmitButton buttonText="Sign up" />
+                    {error && (
+                        <p className="text-destructive text-sm">{error}</p>
+                    )}
+                    <hr className="border-border" />
+                    <p className="text-sm text-center">
                     Already have an account? <a href="login" className="text-primary underline">Log in</a>
-                </p>
-            </form>
+                    </p>
+                </form>
             </CardContent>
         </Card>
     );

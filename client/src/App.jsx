@@ -7,6 +7,7 @@ import DashboardPage from "./pages/dashboard/DashboardPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import CreateWorkspacePage from "./pages/createWorkspace/CreateWorkspacePage";
 import NotFoundPage from "./pages/notFound/NotFoundPage";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 /**
  * Redirects to /dashboard if a token cookie exists, otherwise to /login.
@@ -33,10 +34,12 @@ function App()
                 <Routes>
                     <Route index element={<RootRedirect />} />
                     <Route path="login" element={<LoginPage />} />
-                    <Route path="dashboard" element={<DashboardPage />} />
-                    <Route path="profile" element={<ProfilePage />} />
                     <Route path="register" element={<RegisterPage />} />
-                    <Route path="create-workspace" element={<CreateWorkspacePage />} />
+                    <Route element={<ProtectedRoute />}>
+                        <Route path="dashboard" element={<DashboardPage />} />
+                        <Route path="profile" element={<ProfilePage />} />
+                        <Route path="create-workspace" element={<CreateWorkspacePage />} />
+                    </Route>
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </BrowserRouter>

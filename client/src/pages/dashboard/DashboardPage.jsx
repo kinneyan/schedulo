@@ -1,5 +1,4 @@
 import NavbarContainer from "../../containers/navbar/NavbarContainer";
-import WithAuth from "../../components/auth/WithAuth";
 
 /**
  * Main authenticated dashboard page.
@@ -18,4 +17,4 @@ const DashboardPage = () =>
     );
 };
 
-export default WithAuth(DashboardPage);
+export default DashboardPage;

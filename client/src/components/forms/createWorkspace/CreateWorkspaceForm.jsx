@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
 import SubmitButton from "../../buttons/submitButton/SubmitButton";
 
 /**

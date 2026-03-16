@@ -1,6 +1,5 @@
 import NavbarContainer from "../../containers/navbar/NavbarContainer";
 import CreateWorkspaceContainer from "../../containers/createWorkspace/CreateWorkspaceContainer";
-import WithAuth from "../../components/auth/WithAuth";
 
 /**
  * Authenticated page for creating a new workspace.
@@ -19,4 +18,4 @@ const CreateWorkspacePage = () =>
     );
 };
 
-export default WithAuth(CreateWorkspacePage);
+export default CreateWorkspacePage;

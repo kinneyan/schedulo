@@ -1,6 +1,5 @@
 import NavbarContainer from "../../containers/navbar/NavbarContainer";
 import Profile from "../../containers/profile/Profile";
-import WithAuth from "../../components/auth/WithAuth";
 
 /**
  * Authenticated profile/settings page.
@@ -17,4 +16,4 @@ const ProfilePage = () =>
     );
 };
 
-export default WithAuth(ProfilePage);
+export default ProfilePage;
