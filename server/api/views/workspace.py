@@ -67,13 +67,13 @@ class WorkspaceView(APIView):
         )
 
         return Response(response, status=status.HTTP_201_CREATED)
-    
-    
+
     """API view for renaming a workspace or transferring ownership. Owner only."""
+
     def put(self, request, workspace_id=None):
         """Update the name or owner of a workspace.
 
-        Requires the authenticated user to be the workspace owner. 
+        Requires the authenticated user to be the workspace owner.
         Aceepected parameters fields: workspace_id (required)
         Accepted body fields: new_owner_id (optional), name (optional).
 
@@ -83,7 +83,7 @@ class WorkspaceView(APIView):
         :return: Empty success response, or an error response describing the failure.
         :rtype: rest_framework.response.Response
         """
-        response = {"error": {}}   
+        response = {"error": {}}
 
         serializer = WorkspaceSerializer(data=request.data)
         if not serializer.is_valid():
@@ -171,8 +171,9 @@ class WorkspaceView(APIView):
             workspace.save()
 
         return Response(response, status=status.HTTP_200_OK)
-    
+
     """API view for retrieving details about a workspace the user belongs to."""
+
     def get(self, request, workspace_id=None):
         """Return workspace details and the authenticated user's membership role.
 
@@ -222,9 +223,9 @@ class WorkspaceView(APIView):
         response["workspace_id"] = workspace.id
 
         return Response(response, status=status.HTTP_200_OK)
-    
-    
+
     """API view for deleting a workspace. Requires the authenticated user to be owner."""
+
     def delete(self, request, workspace_id=None):
         """Delete a workspace by ID.
 
@@ -332,24 +333,25 @@ class AddWorkspaceMember(APIView):
             response["error"] = "User is already member of this workspace"
             return Response(response, status=status.HTTP_409_CONFLICT)
 
+
 class GetWorkspaceMembers(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def get(self, request, workspace_id=None):
         """
         workspace_id (required)
         """
         response = {"error": {}}
 
         # Verify parameters contains required fields
-        if "workspace_id" not in request.data:
+        if workspace_id is None:
             response["error"]["message"] = "Workspace ID is required."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify workspace exists
         try:
-            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
+            workspace = Workspace.objects.get(pk=workspace_id)
         except Workspace.DoesNotExist:
             response["error"]["message"] = "Workspace does not exists."
             return Response(response, status=status.HTTP_404_NOT_FOUND)

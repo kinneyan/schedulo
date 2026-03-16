@@ -144,7 +144,7 @@ class GetWorkspaceTests(APITestCase):
 
 class GetWorkspaceMembersTests(APITestCase):
     def setUp(self):
-        self.url = reverse("get_workspace_members")
+        self.url = reverse("get_workspace_members_no_id")
         self.user3 = User.objects.create_user(
             email="testuser3@example.com",
             password="testpassword",
@@ -217,25 +217,25 @@ class GetWorkspaceMembersTests(APITestCase):
         )
 
     def test_no_workspace(self):
-        response = self.client.post(self.url, {}, format="json")
+        self.url = reverse("get_workspace_members_no_id", args=[])
+        response = self.client.get(self.url, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_workspace(self):
-        response = self.client.post(self.url, {"workspace_id": 999}, format="json")
+        self.url = reverse("get_workspace_members", args=[999])
+        response = self.client.get(self.url, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_as_non_member(self):
         self.client.force_authenticate(user=self.user3)
 
-        response = self.client.post(
-            self.url, {"workspace_id": self.workspace.id}, format="json"
-        )
+        self.url = reverse("get_workspace_members", args=[self.workspace.id])
+        response = self.client.get(self.url, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_valid(self):
-        response = self.client.post(
-            self.url, {"workspace_id": self.workspace.id}, format="json"
-        )
+        self.url = reverse("get_workspace_members", args=[self.workspace.id])
+        response = self.client.get(self.url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         result = response.data["members"]

@@ -28,11 +28,20 @@ urlpatterns = [
     path("user", GetUser.as_view(), name="get_user"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("workspace/", WorkspaceView.as_view(), name="workspace"),
-    path("workspace/<int:workspace_id>/", WorkspaceView.as_view(), name="workspace_parameters"),
+    path(
+        "workspace/<int:workspace_id>/",
+        WorkspaceView.as_view(),
+        name="workspace_parameters",
+    ),
+    path(
+        "workspace/get-members/<int:workspace_id>/",
+        GetWorkspaceMembers.as_view(),
+        name="get_workspace_members",
+    ),
     path(
         "workspace/get-members/",
         GetWorkspaceMembers.as_view(),
-        name="get_workspace_members",
+        name="get_workspace_members_no_id",
     ),
     path("workspace/permissions/", GetPermissions.as_view(), name="get_permissions"),
     path(

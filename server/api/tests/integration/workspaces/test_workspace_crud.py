@@ -57,9 +57,7 @@ class ModifyWorkspaceTests(APITestCase):
     def test_member_not_found(self):
         """Verify that a 404 is returned when the target new owner does not exist."""
         self.url = reverse("workspace_parameters", args=[self.workspace.id])
-        response = self.client.put(
-            self.url, {"new_owner_id": 999}
-        )
+        response = self.client.put(self.url, {"new_owner_id": 999})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
             response.data["error"]["message"], "Could not find member with provided ID."
@@ -78,9 +76,7 @@ class ModifyWorkspaceTests(APITestCase):
 
         # set user2 to owner
         self.url = reverse("workspace_parameters", args=[self.workspace.id])
-        response = self.client.put(
-            self.url, {"new_owner_id": self.user2.id}
-        )
+        response = self.client.put(self.url, {"new_owner_id": self.user2.id})
 
         self.permissions.refresh_from_db()
         perms = MemberPermissions.objects.get(
@@ -98,9 +94,7 @@ class ModifyWorkspaceTests(APITestCase):
         """Verify that ownership cannot be transferred to a user who is not a workspace member."""
         # set user2 to owner
         self.url = reverse("workspace_parameters", args=[self.workspace.id])
-        response = self.client.put(
-            self.url, {"new_owner_id": self.user2.id}
-        )
+        response = self.client.put(self.url, {"new_owner_id": self.user2.id})
 
         self.permissions.refresh_from_db()
 
@@ -111,9 +105,7 @@ class ModifyWorkspaceTests(APITestCase):
         """Verify that an owner cannot transfer ownership to themselves."""
         # set user to owner
         self.url = reverse("workspace_parameters", args=[self.workspace.id])
-        response = self.client.put(
-            self.url, {"new_owner_id": self.user.id}
-        )
+        response = self.client.put(self.url, {"new_owner_id": self.user.id})
 
         self.permissions.refresh_from_db()
 
@@ -144,9 +136,7 @@ class ModifyWorkspaceTests(APITestCase):
         )  # change to send request from user 2
 
         # try to change user 3 to owner
-        response = self.client.put(
-            self.url, {"new_owner_id": self.user3.id}
-        )
+        response = self.client.put(self.url, {"new_owner_id": self.user3.id})
 
         perms = MemberPermissions.objects.get(
             member=WorkspaceMember.objects.get(
@@ -162,9 +152,7 @@ class ModifyWorkspaceTests(APITestCase):
     def test_change_name_valid(self):
         """Verify that a workspace owner can rename the workspace."""
         self.url = reverse("workspace_parameters", args=[self.workspace.id])
-        response = self.client.put(
-            self.url, {"name": "new name"}
-        )
+        response = self.client.put(self.url, {"name": "new name"})
 
         self.workspace.refresh_from_db()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -174,9 +162,7 @@ class ModifyWorkspaceTests(APITestCase):
         """Verify that a user who is not a workspace member cannot rename the workspace."""
         self.url = reverse("workspace_parameters", args=[self.workspace.id])
         self.client.force_authenticate(user=self.user2)
-        response = self.client.put(
-            self.url, {"name": "new name"}
-        )
+        response = self.client.put(self.url, {"name": "new name"})
 
         self.workspace.refresh_from_db()
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -194,9 +180,7 @@ class ModifyWorkspaceTests(APITestCase):
 
         self.url = reverse("workspace_parameters", args=[self.workspace.id])
         self.client.force_authenticate(user=self.user2)
-        response = self.client.put(
-            self.url, {"name": "new name"}
-        )
+        response = self.client.put(self.url, {"name": "new name"})
 
         self.workspace.refresh_from_db()
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
