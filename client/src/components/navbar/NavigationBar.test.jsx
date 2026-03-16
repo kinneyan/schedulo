@@ -37,11 +37,10 @@ describe("NavigationBar", () =>
         expect(screen.getByText("About")).toBeInTheDocument();
     });
 
-    it("shows \"Log in\" link in the Account dropdown when loggedIn=false", async () => 
+    it("does not show the Account dropdown when loggedIn=false", () =>
     {
         renderWithRouter(<NavigationBar loggedIn={false} />);
-        await userEvent.click(screen.getByText("Account"));
-        expect(screen.getByRole("link", {name: /log in/i})).toBeInTheDocument();
+        expect(screen.queryByText("Account")).not.toBeInTheDocument();
     });
 
     it("shows Dashboard, Settings, and Log out links in the Account dropdown when loggedIn=true", async () => 

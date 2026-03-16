@@ -37,22 +37,18 @@ const NavigationBar = ({loggedIn}) =>
                 <a href="#" className="text-white/80 hover:text-white text-sm no-underline transition-colors">About</a>
             </div>
 
-            <DropdownMenu>
-                <DropdownMenuTrigger className="text-white/80 hover:text-white text-sm transition-colors outline-none">
-                    Account
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    {!loggedIn ? (
-                        <a href="/login" className={menuItemClass}>Log in</a>
-                    ) : (
-                        <>
-                            <a href="/dashboard" className={menuItemClass}>Dashboard</a>
-                            <a href="/profile" className={menuItemClass}>Settings</a>
-                            <a href="/" onClick={logOut} className={menuItemClass}>Log out</a>
-                        </>
-                    )}
-                </DropdownMenuContent>
-            </DropdownMenu>
+            {loggedIn && (
+                <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger className="text-white/80 hover:text-white text-sm transition-colors outline-none">
+                        Account
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <a href="/dashboard" className={menuItemClass}>Dashboard</a>
+                        <a href="/profile" className={menuItemClass}>Settings</a>
+                        <a href="/" onClick={logOut} className={menuItemClass}>Log out</a>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            )}
         </nav>
     );
 };
