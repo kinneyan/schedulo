@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import SubmitButton from "../../buttons/submitButton/SubmitButton";
 
 /**
@@ -26,7 +27,11 @@ import SubmitButton from "../../buttons/submitButton/SubmitButton";
 const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, firstName, setFirstName, lastName, setLastName, phone, setPhone, error, handleSubmit}) =>
 {
     return (
-        <div className="w-full max-w-sm">
+        <Card className="w-full max-w-xl">
+            <CardHeader>
+                <CardTitle>Create an account</CardTitle>
+            </CardHeader>
+            <CardContent>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
                     <Label htmlFor="first-name-form">First Name</Label>
@@ -103,7 +108,8 @@ const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, 
                     Already have an account? <a href="login" className="text-primary underline">Log in</a>
                 </p>
             </form>
-        </div>
+            </CardContent>
+        </Card>
     );
 };
 

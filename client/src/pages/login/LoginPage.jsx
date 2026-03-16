@@ -12,7 +12,9 @@ const LoginPage = () =>
         <div>
             <NavbarContainer />
             <div className="flex justify-center pt-16 px-4">
-                <LoginContainer />
+                <div className="w-full max-w-md">
+                    <LoginContainer />
+                </div>
             </div>
         </div>
     );

@@ -12,7 +12,9 @@ const RegisterPage = () =>
         <div>
             <NavbarContainer />
             <div className="flex justify-center pt-16 px-4">
-                <RegisterContainer />
+                <div className="w-full max-w-md">
+                    <RegisterContainer />
+                </div>
             </div>
         </div>
     );
