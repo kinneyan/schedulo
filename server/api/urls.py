@@ -50,7 +50,14 @@ urlpatterns = [
         name="update_permissions",
     ),
     path(
-        "workspace/add-user/", AddWorkspaceMember.as_view(), name="add_workspace_member"
+        "workspace/add-user/<int:workspace_id>/",
+        AddWorkspaceMember.as_view(),
+        name="add_workspace_member",
+    ),
+    path(
+        "workspace/add-user/",
+        AddWorkspaceMember.as_view(),
+        name="add_workspace_member_no_id",
     ),
     path("workspace/create-role/", CreateRole.as_view(), name="create_workspace_role"),
     path(

@@ -10,7 +10,7 @@ class AddMemberTests(APITestCase):
 
     def setUp(self):
         """Create a workspace with an authenticated owner member and one additional user."""
-        self.url = reverse("add_workspace_member")
+        self.url = reverse("add_workspace_member_no_id")
 
         # add users
         self.user_data = {
@@ -47,7 +47,8 @@ class AddMemberTests(APITestCase):
 
     def test_add_workspace_member_permission(self):
         """Verify that a member with the manage_workspace_members permission can add a new member."""
-        data = {"added_user_id": self.other_user.id, "workspace_id": self.workspace.id}
+        self.url = reverse("add_workspace_member", args=[self.workspace.id])
+        data = {"added_user_id": self.other_user.id}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -55,7 +56,9 @@ class AddMemberTests(APITestCase):
         """Verify that a member without manage_workspace_members permission is denied with a 403."""
         self.permission.manage_workspace_members = False
         self.permission.save()
-        data = {"added_user_id": self.other_user.id, "workspace_id": self.workspace.id}
+
+        self.url = reverse("add_workspace_member", args=[self.workspace.id])
+        data = {"added_user_id": self.other_user.id}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(
@@ -66,7 +69,8 @@ class AddMemberTests(APITestCase):
     def test_add_duplicate_workspace_member(self):
         """Verify that adding an already existing workspace member returns a 409 conflict."""
         # Add the user as a workspace member for the first time
-        data = {"added_user_id": self.other_user.id, "workspace_id": self.workspace.id}
+        self.url = reverse("add_workspace_member", args=[self.workspace.id])
+        data = {"added_user_id": self.other_user.id}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 

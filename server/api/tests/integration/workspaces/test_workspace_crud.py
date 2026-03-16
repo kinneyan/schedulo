@@ -32,8 +32,16 @@ class ModifyWorkspaceTests(APITestCase):
             last_name="User3",
             phone="1234567890",
         )
+        self.user4 = User.objects.create_user(
+            email="testuser4@example.com",
+            password="testpassword",
+            first_name="Test4",
+            last_name="User4",
+            phone="1234567890",
+        )
 
         self.workspace = Workspace.objects.create(owner=self.user, created_by=self.user)
+
         self.member = WorkspaceMember.objects.create(
             user=self.user, workspace=self.workspace, added_by=self.user
         )
@@ -46,11 +54,38 @@ class ModifyWorkspaceTests(APITestCase):
             manage_schedules=True,
             manage_time_off=True,
         )
+
+        self.member2 = WorkspaceMember.objects.create(
+            user=self.user2, workspace=self.workspace, added_by=self.user
+        )
+        self.permissions2 = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member2,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
+        )
+
+        self.member3 = WorkspaceMember.objects.create(
+            user=self.user3, workspace=self.workspace, added_by=self.user
+        )
+        self.permissions3 = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member3,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
+        )
+
         self.client.force_authenticate(user=self.member.user)
 
     def test_missing_workspace_id(self):
         """Verify that a 400 is returned when workspace_id is absent from the request."""
-        response = self.client.put(self.url, {"member_id": self.member.id})
+        response = self.client.put(self.url, {"new_owner_id": self.member.id})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["error"]["message"], "Workspace ID is required.")
 
@@ -65,15 +100,6 @@ class ModifyWorkspaceTests(APITestCase):
 
     def test_change_owner_valid(self):
         """Verify that an owner can transfer ownership to an existing workspace member."""
-        # add user2 to workspace
-        self.url = reverse("add_workspace_member")
-        response = self.client.post(
-            self.url,
-            {"workspace_id": self.workspace.id, "added_user_id": self.user2.id},
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
         # set user2 to owner
         self.url = reverse("workspace_parameters", args=[self.workspace.id])
         response = self.client.put(self.url, {"new_owner_id": self.user2.id})
@@ -92,9 +118,9 @@ class ModifyWorkspaceTests(APITestCase):
 
     def test_change_owner_to_non_workplace_member(self):
         """Verify that ownership cannot be transferred to a user who is not a workspace member."""
-        # set user2 to owner
+        # set user3 to owner
         self.url = reverse("workspace_parameters", args=[self.workspace.id])
-        response = self.client.put(self.url, {"new_owner_id": self.user2.id})
+        response = self.client.put(self.url, {"new_owner_id": self.user4.id})
 
         self.permissions.refresh_from_db()
 
@@ -114,21 +140,6 @@ class ModifyWorkspaceTests(APITestCase):
 
     def test_change_owner_as_not_owner(self):
         """Verify that a non-owner member cannot transfer workspace ownership."""
-        # add user2 to workspace
-        self.url = reverse("add_workspace_member")
-        response = self.client.post(
-            self.url,
-            {"workspace_id": self.workspace.id, "added_user_id": self.user2.id},
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        # add user3 to workspace
-        self.url = reverse("add_workspace_member")
-        response = self.client.post(
-            self.url,
-            {"workspace_id": self.workspace.id, "added_user_id": self.user3.id},
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.url = reverse("workspace_parameters", args=[self.workspace.id])
         self.client.force_authenticate(
@@ -161,7 +172,7 @@ class ModifyWorkspaceTests(APITestCase):
     def test_change_name_as_non_member(self):
         """Verify that a user who is not a workspace member cannot rename the workspace."""
         self.url = reverse("workspace_parameters", args=[self.workspace.id])
-        self.client.force_authenticate(user=self.user2)
+        self.client.force_authenticate(user=self.user4)
         response = self.client.put(self.url, {"name": "new name"})
 
         self.workspace.refresh_from_db()
@@ -170,13 +181,6 @@ class ModifyWorkspaceTests(APITestCase):
 
     def test_change_name_as_not_owner(self):
         """Verify that a non-owner member cannot rename the workspace."""
-        # add user2 to workspace
-        self.url = reverse("add_workspace_member")
-        response = self.client.post(
-            self.url,
-            {"workspace_id": self.workspace.id, "added_user_id": self.user2.id},
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.url = reverse("workspace_parameters", args=[self.workspace.id])
         self.client.force_authenticate(user=self.user2)

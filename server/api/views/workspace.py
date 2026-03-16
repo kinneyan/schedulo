@@ -277,28 +277,34 @@ class AddWorkspaceMember(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def post(self, request, workspace_id):
         """Add a user to a workspace as a new member.
 
         Accepted body fields: added_user_id (required), workspace_id (required),
         pay_rate (optional).
 
-        :param request: Authenticated HTTP request with added_user_id and
-            workspace_id in the body.
+        :param request: Authenticated HTTP request with added_user_id in the body, and workspace_id in url params
         :type request: rest_framework.request.Request
         :return: Empty success response on creation, or an error response.
         :rtype: rest_framework.response.Response
         """
         response = {"error": {}}
 
+        # ensure workspace exists
+        try:
+            workspace = Workspace.objects.get(pk=workspace_id)
+        except Workspace.DoesNotExist:
+            response["error"]["message"] = "Workspace does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
         # Verify user is permitted to add members to workspace
         try:
             workspace_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=request.data["workspace_id"]
+                user=request.user, workspace=workspace
             )
             MemberPermissions.objects.get(
                 member=workspace_member,
-                workspace=request.data["workspace_id"],
+                workspace=workspace,
                 manage_workspace_members=True,
             )
         except MemberPermissions.DoesNotExist:
@@ -307,15 +313,22 @@ class AddWorkspaceMember(APIView):
             )
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
+        # get added user
+        try:
+            added_user = User.objects.get(pk=request.data["added_user_id"])
+        except User.DoesNotExist:
+            response["error"]["message"] = "Added user does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
         if not (
             WorkspaceMember.objects.filter(
-                user=User.objects.get(pk=request.data["added_user_id"]),
-                workspace=Workspace.objects.get(pk=request.data["workspace_id"]),
+                user=added_user,
+                workspace=workspace,
             ).exists()
         ):  # check if user is already member of workspace
             workspace_member = WorkspaceMember.objects.create(
-                workspace=Workspace.objects.get(pk=request.data["workspace_id"]),
-                user=User.objects.get(pk=request.data["added_user_id"]),
+                workspace=workspace,
+                user=added_user,
                 added_by=request.user,
             )
 
@@ -324,7 +337,7 @@ class AddWorkspaceMember(APIView):
                 workspace_member.save()
 
             MemberPermissions.objects.create(
-                workspace=Workspace.objects.get(pk=request.data["workspace_id"]),
+                workspace=workspace,
                 member=workspace_member,
             )
 
