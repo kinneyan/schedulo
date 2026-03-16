@@ -22,6 +22,7 @@ from .views import (
     ModifyShift,
     DeleteShift,
     GetShifts,
+    GetWorkspaceMembers,
 )
 
 urlpatterns = [
@@ -32,6 +33,11 @@ urlpatterns = [
     path("workspace/create/", CreateWorkspace.as_view(), name="create_workspace"),
     path("workspace/modify/", ModifyWorkspace.as_view(), name="modify_workspace"),
     path("workspace/get/", GetWorkspace.as_view(), name="get_workspace"),
+    path(
+        "workspace/get-members/",
+        GetWorkspaceMembers.as_view(),
+        name="get_workspace_members",
+    ),
     path("workspace/delete/", DeleteWorkspace.as_view(), name="delete_workspace"),
     path("workspace/permissions/", GetPermissions.as_view(), name="get_permissions"),
     path(

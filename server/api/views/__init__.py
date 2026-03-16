@@ -7,6 +7,7 @@ from .workspace import (
     ModifyWorkspace,
     GetWorkspace,
     DeleteWorkspace,
+    GetWorkspaceMembers,
 )
 from .role import (
     CreateRole,
