@@ -1,22 +1,20 @@
-import "./index.scss";
-
-import withAuth from "../../components/auth/WithAuth";
 import NavbarContainer from "../../containers/navbar/NavbarContainer";
 import Profile from "../../containers/profile/Profile";
+import WithAuth from "../../components/auth/WithAuth";
 
 /**
- * User profile/settings page, protected by authentication.
+ * Authenticated profile/settings page.
  *
  * @returns {JSX.Element}
  */
 const ProfilePage = () =>
 {
     return (
-        <div id="profile-page">
+        <div>
             <NavbarContainer />
             <Profile />
         </div>
     );
 };
 
-export default withAuth(ProfilePage);
+export default WithAuth(ProfilePage);

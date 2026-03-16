@@ -1,5 +1,3 @@
-import "./index.scss";
-
 import NavbarContainer from "../../containers/navbar/NavbarContainer";
 import LoginContainer from "../../containers/login/LoginContainer";
 
@@ -11,9 +9,9 @@ import LoginContainer from "../../containers/login/LoginContainer";
 const LoginPage = () =>
 {
     return (
-        <div id="login-page">
+        <div>
             <NavbarContainer />
-            <div id="login-form-container">
+            <div className="flex justify-center pt-16 px-4">
                 <LoginContainer />
             </div>
         </div>

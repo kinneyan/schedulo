@@ -1,20 +1,21 @@
-import "./index.scss";
-
 import NavbarContainer from "../../containers/navbar/NavbarContainer";
-import withAuth from "../../components/auth/WithAuth";
+import WithAuth from "../../components/auth/WithAuth";
 
 /**
- * Main dashboard page, protected by authentication.
+ * Main authenticated dashboard page.
  *
  * @returns {JSX.Element}
  */
 const DashboardPage = () =>
 {
     return (
-        <div id="dash-page">
+        <div>
             <NavbarContainer />
+            <div className="max-w-screen-lg mx-auto px-4 py-8">
+                <h1 className="text-2xl font-semibold">Dashboard</h1>
+            </div>
         </div>
     );
 };
 
-export default withAuth(DashboardPage);
+export default WithAuth(DashboardPage);

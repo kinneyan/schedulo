@@ -1,5 +1,3 @@
-import "./index.scss";
-
 import NavbarContainer from "../../containers/navbar/NavbarContainer";
 
 /**
@@ -10,7 +8,7 @@ import NavbarContainer from "../../containers/navbar/NavbarContainer";
 const HomePage = () =>
 {
     return (
-        <div id="home-page">
+        <div>
             <NavbarContainer />
         </div>
     );

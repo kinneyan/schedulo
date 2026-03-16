@@ -20,6 +20,7 @@ const Profile = () =>
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState(false);
     const states = {
         fname,
         setFname,
@@ -35,6 +36,8 @@ const Profile = () =>
         setNewPassword,
         error,
         setError,
+        success,
+        setSuccess,
     };
 
     useEffect(() =>
@@ -122,11 +125,13 @@ const Profile = () =>
                 throw new Error("Failed to update user information.");
             }
 
-            window.location.reload();
+            setSuccess(true);
+            setOldPassword("");
+            setNewPassword("");
         }
         catch (error)
         {
-            setError(error);
+            setError(error.message);
         }
     };
 
