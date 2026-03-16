@@ -33,8 +33,8 @@ const NavigationBar = ({loggedIn}) =>
                     <img src="/schedulo.png" alt="logo" className="h-7 w-7" />
                     Schedulo
                 </a>
-                <a href="/" className="text-white/80 hover:text-white text-sm mr-4 no-underline transition-colors">Home</a>
-                <a href="#" className="text-white/80 hover:text-white text-sm no-underline transition-colors">About</a>
+                <a href="/" className="text-white/80 hover:text-white text-sm mr-4 no-underline transition-colors">Dashboard</a>
+                <a href="/about" className="text-white/80 hover:text-white text-sm no-underline transition-colors">About</a>
             </div>
 
             {loggedIn && (
@@ -43,7 +43,6 @@ const NavigationBar = ({loggedIn}) =>
                         Account
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <a href="/dashboard" className={menuItemClass}>Dashboard</a>
                         <a href="/profile" className={menuItemClass}>Settings</a>
                         <a href="/" onClick={logOut} className={menuItemClass}>Log out</a>
                     </DropdownMenuContent>

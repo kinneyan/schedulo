@@ -6,6 +6,7 @@ import ProfilePage from "./pages/profile/ProfilePage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import CreateWorkspacePage from "./pages/createWorkspace/CreateWorkspacePage";
+import NotFoundPage from "./pages/notFound/NotFoundPage";
 
 /**
  * Redirects to /dashboard if a token cookie exists, otherwise to /login.
@@ -36,6 +37,7 @@ function App()
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="register" element={<RegisterPage />} />
                     <Route path="create-workspace" element={<CreateWorkspacePage />} />
+                    <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </BrowserRouter>
         </>

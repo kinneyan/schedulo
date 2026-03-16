@@ -30,10 +30,10 @@ describe("NavigationBar", () =>
         expect(screen.getByText("Schedulo")).toBeInTheDocument();
     });
 
-    it("renders Home and About nav links", () => 
+    it("renders Dashboard and About nav links", () =>
     {
         renderWithRouter(<NavigationBar loggedIn={false} />);
-        expect(screen.getByText("Home")).toBeInTheDocument();
+        expect(screen.getByText("Dashboard")).toBeInTheDocument();
         expect(screen.getByText("About")).toBeInTheDocument();
     });
 
@@ -43,11 +43,10 @@ describe("NavigationBar", () =>
         expect(screen.queryByText("Account")).not.toBeInTheDocument();
     });
 
-    it("shows Dashboard, Settings, and Log out links in the Account dropdown when loggedIn=true", async () => 
+    it("shows Settings and Log out links in the Account dropdown when loggedIn=true", async () =>
     {
         renderWithRouter(<NavigationBar loggedIn={true} />);
         await userEvent.click(screen.getByText("Account"));
-        expect(screen.getByRole("link", {name: /dashboard/i})).toBeInTheDocument();
         expect(screen.getByRole("link", {name: /settings/i})).toBeInTheDocument();
         expect(screen.getByRole("link", {name: /log out/i})).toBeInTheDocument();
     });
