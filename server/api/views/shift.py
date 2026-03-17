@@ -28,11 +28,10 @@ class ShiftView(APIView):
         # TODO
         return None
 
-    def put(self, request):
+    def put(self, request, shift_id):
         """Update one or more fields on an existing Shift.
 
-        Requires manage_schedules permission. Accepted body fields: shift_id
-        (required), member_id (optional), role_id (optional), start_time (optional),
+        Requires manage_schedules permission. Accepted body fields: member_id (optional), role_id (optional), start_time (optional),
         end_time (optional).
 
         :param request: Authenticated HTTP request with shift_id and optional
@@ -48,17 +47,12 @@ class ShiftView(APIView):
             response["error"]["code"] = 400
             response["error"][
                 "message"
-            ] = "Invalid request data, start and end time are required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-        # Ensure that shift ID present
-        if "shift_id" not in request.data:
-            response["error"]["message"] = "Shift ID is required."
+            ] = "Invalid request data, start or end time invalid."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # ensure shift id is valid
         try:
-            shift = Shift.objects.get(pk=request.data["shift_id"])
+            shift = Shift.objects.get(pk=shift_id)
         except Shift.DoesNotExist:
             response["error"]["message"] = "Shift could not be found."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -150,7 +144,7 @@ class ShiftView(APIView):
 
         return Response(response, status=status.HTTP_200_OK)
 
-    def delete(self, request):
+    def delete(self, request, shift_id):
         """Delete a Shift by ID.
 
         Requires manage_schedules permission. Accepted body fields:
@@ -163,14 +157,9 @@ class ShiftView(APIView):
         """
         response = {"error": {}}
 
-        # Ensure that shift ID present
-        if "shift_id" not in request.data:
-            response["error"]["message"] = "Shift ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
         # ensure shift id is valid
         try:
-            shift = Shift.objects.get(pk=request.data["shift_id"])
+            shift = Shift.objects.get(pk=shift_id)
         except Shift.DoesNotExist:
             response["error"]["message"] = "Shift could not be found."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -194,7 +183,7 @@ class ShiftView(APIView):
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         # delete shift
-        shift = Shift.objects.get(id=request.data["shift_id"]).delete()
+        shift = Shift.objects.get(id=shift_id).delete()
         return Response(response, status=status.HTTP_200_OK)
 
 
