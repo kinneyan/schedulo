@@ -40,14 +40,14 @@ class MemberPermissionsView(APIView):
         # TODO
         return None
 
-    def put(self, request):
+    def put(self, request, member_id):
         """Update permission flags for a specific workspace member.
 
         Requires manage_workspace_members permission. Accepted body fields:
-        workspace_id (required), member_id (required), manage_workspace_members,
+        manage_workspace_members,
         manage_workspace_roles, manage_schedules, manage_time_off.
 
-        :param request: Authenticated HTTP request with workspace_id, member_id,
+        :param request: Authenticated HTTP request with
             and optional permission flags in the body.
         :type request: rest_framework.request.Request
         :return: Empty success response, or an error response describing the failure.
@@ -55,22 +55,19 @@ class MemberPermissionsView(APIView):
         """
         response = {"error": {}}
 
-        # Verify body contains required fields
-        if "workspace_id" not in request.data:
-            response["error"]["message"] = "Workspace ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-        if "member_id" not in request.data:
-            response["error"]["message"] = "Member ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
+        try:
+            member = WorkspaceMember.objects.get(id=member_id)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "Could not find member with provided ID."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        
         # Verify user has required permissions
         try:
             workspace_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=request.data["workspace_id"]
+                user=request.user, workspace=member.workspace
             )
             permissions = MemberPermissions.objects.get(
-                workspace=request.data["workspace_id"],
+                workspace=member.workspace,
                 member=workspace_member,
                 manage_workspace_members=True,
             )
@@ -81,28 +78,14 @@ class MemberPermissionsView(APIView):
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         try:
-            member = WorkspaceMember.objects.get(id=request.data["member_id"])
-
-            # Verify user belongs to correct workspace
-            if member.workspace.id != int(request.data["workspace_id"]):
-                response["error"][
-                    "message"
-                ] = "Member does not belong to provided workspace."
-                return Response(response, status=status.HTTP_404_NOT_FOUND)
-
             # Check if permissions already exist
             permissions = MemberPermissions.objects.get(
-                workspace=request.data["workspace_id"], member=member
+                workspace=member.workspace, member=member
             )
-
-        except WorkspaceMember.DoesNotExist:
-            response["error"]["message"] = "Could not find member with provided ID."
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-
         except MemberPermissions.DoesNotExist:
             # Create permissions if they do not exist
             permissions = MemberPermissions.objects.create(
-                workspace=Workspace.objects.get(id=request.data["workspace_id"]),
+                workspace=member.workspace,
                 member=member,
             )
 
