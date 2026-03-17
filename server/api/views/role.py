@@ -25,11 +25,11 @@ class RoleView(APIView):
         # TODO
         return None
 
-    def put(self, request):
+    def put(self, request, role_id):
         """Update name and/or pay_rate for an existing WorkspaceRole.
 
         Requires manage_workspace_roles permission. Accepted body fields:
-        workspace_role_id (required), name (optional), pay_rate (optional).
+        name (optional), pay_rate (optional).
 
         :param request: Authenticated HTTP request with workspace_role_id and
             optional update fields in the body.
@@ -38,10 +38,6 @@ class RoleView(APIView):
         :rtype: rest_framework.response.Response
         """
         response = {"error": {}}
-
-        if "workspace_role_id" not in request.data:
-            response["error"]["message"] = "Workspace role ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = RoleSerializer(data=request.data)
         if not serializer.is_valid():
@@ -52,7 +48,7 @@ class RoleView(APIView):
         # Verify role exists
         try:
             workspace_role = WorkspaceRole.objects.get(
-                pk=request.data["workspace_role_id"]
+                pk=role_id
             )
         except WorkspaceRole.DoesNotExist:
             response["error"]["message"] = "Workspace role does not exist."
@@ -90,7 +86,7 @@ class RoleView(APIView):
 
         return Response(response, status=status.HTTP_200_OK)
 
-    def delete(self, request):
+    def delete(self, request, role_id):
         """Delete a WorkspaceRole by ID.
 
         :param request: Authenticated HTTP request containing workspace_role_id
@@ -101,13 +97,9 @@ class RoleView(APIView):
         """
         response = {"error": {}}
 
-        if "workspace_role_id" not in request.data:
-            response["error"]["message"] = "Workspace role ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
         # Verify role exists
         try:
-            role = WorkspaceRole.objects.get(id=request.data["workspace_role_id"])
+            role = WorkspaceRole.objects.get(id=role_id)
         except WorkspaceRole.DoesNotExist:
             response["error"][
                 "message"
@@ -137,5 +129,5 @@ class RoleView(APIView):
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         # delete role
-        role = WorkspaceRole.objects.get(id=request.data["workspace_role_id"]).delete()
+        role.delete()
         return Response(response, status=status.HTTP_200_OK)
