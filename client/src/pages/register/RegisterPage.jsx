@@ -1,6 +1,4 @@
-import "./index.scss";
-
-import NavigationBar from "../../components/navbar/NavigationBar";
+import NavbarContainer from "../../containers/navbar/NavbarContainer";
 import RegisterContainer from "../../containers/register/RegisterContainer";
 
 /**
@@ -11,10 +9,12 @@ import RegisterContainer from "../../containers/register/RegisterContainer";
 const RegisterPage = () =>
 {
     return (
-        <div id="register-page">
-            <NavigationBar />
-            <div id="register-form-container">
-                <RegisterContainer />
+        <div>
+            <NavbarContainer />
+            <div className="flex justify-center pt-16 px-4">
+                <div className="w-full max-w-md">
+                    <RegisterContainer />
+                </div>
             </div>
         </div>
     );

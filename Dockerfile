@@ -12,9 +12,8 @@ FROM python:3.12.9-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 WORKDIR /server
-COPY server/requirements.txt /server/
-RUN pip install --no-cache-dir -r requirements.txt
 COPY server/ /server/
+RUN pip install --no-cache-dir .
 COPY --from=build /app/dist /server/server/static_build
 RUN python manage.py collectstatic --noinput && test -f /server/server/static_build/index.html
 RUN adduser --disabled-password --no-create-home appuser

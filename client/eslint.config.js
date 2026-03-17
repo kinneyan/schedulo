@@ -13,7 +13,8 @@ export default [
       '.venv',
       '**/*.min.js',
       'eslint.config.js',
-      'vite.config.js'
+      'vite.config.js',
+      'src/components/ui/**',
     ],
   },
   {
