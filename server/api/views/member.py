@@ -56,7 +56,7 @@ class MemberPermissionsView(APIView):
         response = {"error": {}}
 
         try:
-            member = WorkspaceMember.objects.get(id=member_id)
+            member = WorkspaceMember.objects.get(pk=member_id)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Could not find member with provided ID."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -126,13 +126,13 @@ class MemberRolesView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def post(self, request, member_id):
         """Assign a WorkspaceRole to a workspace member.
 
         Requires manage_workspace_roles permission. Accepted body fields:
-        member_id (required), workspace_role_id (required).
+        workspace_role_id (required).
 
-        :param request: Authenticated HTTP request with member_id and
+        :param request: Authenticated HTTP request with member_id in url and
             workspace_role_id in the body.
         :type request: rest_framework.request.Request
         :return: Empty success response on assignment, or an error response.
@@ -140,17 +140,13 @@ class MemberRolesView(APIView):
         """
         response = {"error": {}}
 
-        if "member_id" not in request.data:
-            response["error"]["message"] = "Member ID is required"
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
         if "workspace_role_id" not in request.data:
             response["error"]["message"] = "Role ID is required"
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify member exists
         try:
-            modify_member = WorkspaceMember.objects.get(id=request.data["member_id"])
+            modify_member = WorkspaceMember.objects.get(pk=member_id)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Member does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -178,7 +174,7 @@ class MemberRolesView(APIView):
         # Verify that role exists and is part of workspace
         try:
             workspace_role = WorkspaceRole.objects.get(
-                id=request.data["workspace_role_id"], workspace=workspace
+                pk=request.data["workspace_role_id"], workspace=workspace
             )
         except WorkspaceRole.DoesNotExist:
             response["error"][
@@ -189,7 +185,7 @@ class MemberRolesView(APIView):
         # Verify that member does not already have this role
         try:
             MemberRole.objects.get(
-                member=request.data["member_id"],
+                member=modify_member,
                 workspace_role=request.data["workspace_role_id"],
             )
         except MemberRole.DoesNotExist:
@@ -203,7 +199,7 @@ class MemberRolesView(APIView):
         response["error"]["message"] = "Member already has this role."
         return Response(response, status=status.HTTP_409_CONFLICT)
 
-    def get(self, request):
+    def get(self, request, member_id):
         """Return the list of WorkspaceRoles assigned to a given workspace member.
 
         :param request: Authenticated HTTP request containing member_id in the body.
@@ -213,13 +209,9 @@ class MemberRolesView(APIView):
         """
         response = {"error": {}}
 
-        if "member_id" not in request.data:
-            response["error"]["message"] = "Member ID is required"
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
         # Verify that member exists
         try:
-            member = WorkspaceMember.objects.get(id=request.data["member_id"])
+            member = WorkspaceMember.objects.get(pk=member_id)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Member does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -241,7 +233,7 @@ class MemberRolesView(APIView):
 
         return Response(response, status=status.HTTP_200_OK)
 
-    def delete(self, request):
+    def delete(self, request, member_id):
         """Remove a WorkspaceRole from a workspace member.
 
         Requires manage_workspace_roles permission. Accepted body fields:
@@ -255,17 +247,13 @@ class MemberRolesView(APIView):
         """
         response = {"error": {}}
 
-        if "member_id" not in request.data:
-            response["error"]["message"] = "Member ID is required"
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
         if "workspace_role_id" not in request.data:
             response["error"]["message"] = "Role ID is required"
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify member exists
         try:
-            modify_member = WorkspaceMember.objects.get(id=request.data["member_id"])
+            modify_member = WorkspaceMember.objects.get(pk=member_id)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Member does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -304,7 +292,7 @@ class MemberRolesView(APIView):
         # Verify that member already has this role
         try:
             MemberRole.objects.get(
-                member=request.data["member_id"],
+                member=modify_member,
                 workspace_role=request.data["workspace_role_id"],
             )
         except MemberRole.DoesNotExist:
@@ -314,7 +302,7 @@ class MemberRolesView(APIView):
 
         # remove role
         MemberRole.objects.get(
-            member=request.data["member_id"],
+            member=modify_member,
             workspace_role=request.data["workspace_role_id"],
         ).delete()
         return Response(response, status=status.HTTP_200_OK)
