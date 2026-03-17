@@ -10,7 +10,7 @@ class AddMemberTests(APITestCase):
 
     def setUp(self):
         """Create a workspace with an authenticated owner member and one additional user."""
-        self.url = reverse("add_workspace_member_no_id")
+        self.url = reverse("add_workspace_member")
 
         # add users
         self.user_data = {

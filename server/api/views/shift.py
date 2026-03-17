@@ -18,121 +18,15 @@ from ..models import (
 )
 
 
-class CreateShift(APIView):
-    """API view for creating a new shift in a workspace."""
+class ShiftView(APIView):
+    """API view for shifts."""
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        """Create a new Shift in the given workspace.
-
-        Requires manage_schedules permission. Accepted body fields:
-        workspace_id (required), role_id (required), start_time (required),
-        end_time (required), member_id (optional).
-
-        :param request: Authenticated HTTP request with shift details in the body.
-        :type request: rest_framework.request.Request
-        :return: Empty success response on creation, or an error response.
-        :rtype: rest_framework.response.Response
-        """
-        response = {"error": {}}
-
-        serializer = ShiftSerializer(data=request.data)
-        if not serializer.is_valid():
-            response["error"]["code"] = 400
-            response["error"][
-                "message"
-            ] = "Invalid request data, start and end time are required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-        # Verify body contains required fields
-        if "role_id" not in request.data:
-            response["error"]["message"] = "Role ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-        if "workspace_id" not in request.data:
-            response["error"]["message"] = "Workspace ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-        # Verify workspace exists
-        try:
-            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
-        except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exist."
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-        # Verify user is part of workspace and has perms to manage schedules
-        try:
-            creator_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
-            MemberPermissions.objects.get(member=creator_member, manage_schedules=True)
-        except WorkspaceMember.DoesNotExist:
-            response["error"]["message"] = "You are not a member of this workspace."
-            return Response(response, status=status.HTTP_403_FORBIDDEN)
-        except MemberPermissions.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "You do not have permissions to manage schedules in this workspace."
-            return Response(response, status=status.HTTP_403_FORBIDDEN)
-
-        # Verify role exists and is part of workspace
-        try:
-            role = WorkspaceRole.objects.get(
-                pk=request.data["role_id"], workspace=workspace
-            )
-        except WorkspaceRole.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "Workspace role does not exist or is not part of workspace."
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-        # Verify member is valid if present
-        if "member_id" in request.data:
-            try:
-                member = WorkspaceMember.objects.get(
-                    pk=request.data["member_id"], workspace=workspace
-                )
-            except WorkspaceMember.DoesNotExist:
-                response["error"][
-                    "message"
-                ] = "Member does not exist or is not part of workspace."
-                return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-        # verify dates are valid
-        start_time = serializer.validated_data["start_time"]
-        end_time = serializer.validated_data["end_time"]
-
-        if start_time > end_time:
-            response["error"]["message"] = "Start time cannot be after end time."
-            return Response(
-                response, status=status.HTTP_400_BAD_REQUEST
-            )  # idk if this is the right status code but wtvr
-
-        # could check if start time is before current time if we want to prevent creating shifts in the past, but i think we should allow that since a workplace might want to do that for recordkeeping or smth
-        shift = Shift.objects.create(
-            workspace=workspace,
-            start_time=start_time,
-            end_time=end_time,
-            created_by=creator_member,
-            role=role,
-            open=True,
-        )
-
-        # Add member to shift if present
-        if "member_id" in request.data:
-            shift.member = member
-            shift.open = False
-            shift.save()
-
-        return Response(response, status=status.HTTP_201_CREATED)
-
-
-class ModifyShift(APIView):
-    """API view for updating fields on an existing shift."""
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    def get(self, request, shift_id):
+        # TODO
+        return None
 
     def put(self, request):
         """Update one or more fields on an existing Shift.
@@ -256,13 +150,6 @@ class ModifyShift(APIView):
 
         return Response(response, status=status.HTTP_200_OK)
 
-
-class DeleteShift(APIView):
-    """API view for deleting an existing shift."""
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
     def delete(self, request):
         """Delete a Shift by ID.
 
@@ -311,7 +198,7 @@ class DeleteShift(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 
-class GetShifts(APIView):
+class ShiftFilterView(APIView):
     """API view for querying shifts across the authenticated user's workspaces."""
 
     authentication_classes = [JWTAuthentication]

@@ -5,21 +5,17 @@ from .views import (
     Register,
     GetUser,
     WorkspaceView,
-    GetPermissions,
-    UpdatePermissions,
-    AddWorkspaceMember,
-    CreateRole,
-    GetWorkspaceRoles,
-    AddMemberRole,
-    RemoveMemberRole,
-    DeleteWorkspaceRole,
-    GetMemberRoles,
-    ModifyWorkspaceRole,
-    CreateShift,
-    ModifyShift,
-    DeleteShift,
-    GetShifts,
-    GetWorkspaceMembers,
+    WorkspaceMembersView,
+    WorkspaceRolesView,
+    WorkspaceShiftsView,
+    MemberView,
+    MemberPermissionsView,
+    MemberRolesView,
+    MemberShiftsView,
+    PermissionsView,
+    ShiftView,
+    ShiftFilterView,
+    RoleView
 )
 
 urlpatterns = [
@@ -28,60 +24,16 @@ urlpatterns = [
     path("user", GetUser.as_view(), name="get_user"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("workspace/", WorkspaceView.as_view(), name="workspace"),
-    path(
-        "workspace/<int:workspace_id>/",
-        WorkspaceView.as_view(),
-        name="workspace_parameters",
-    ),
-    path(
-        "workspace/get-members/<int:workspace_id>/",
-        GetWorkspaceMembers.as_view(),
-        name="get_workspace_members",
-    ),
-    path(
-        "workspace/get-members/",
-        GetWorkspaceMembers.as_view(),
-        name="get_workspace_members_no_id",
-    ),
-    path("workspace/permissions/", GetPermissions.as_view(), name="get_permissions"),
-    path(
-        "workspace/permissions/update/",
-        UpdatePermissions.as_view(),
-        name="update_permissions",
-    ),
-    path(
-        "workspace/add-user/<int:workspace_id>/",
-        AddWorkspaceMember.as_view(),
-        name="add_workspace_member",
-    ),
-    path(
-        "workspace/add-user/",
-        AddWorkspaceMember.as_view(),
-        name="add_workspace_member_no_id",
-    ),
-    path("workspace/create-role/", CreateRole.as_view(), name="create_workspace_role"),
-    path(
-        "workspace/delete-role",
-        DeleteWorkspaceRole.as_view(),
-        name="delete_workspace_role",
-    ),
-    path(
-        "workspace/modify-role/",
-        ModifyWorkspaceRole.as_view(),
-        name="modify_workspace_role",
-    ),
-    path(
-        "workspace/get-roles/", GetWorkspaceRoles.as_view(), name="get_workspace_roles"
-    ),
-    path(
-        "workspace/get-member-roles/", GetMemberRoles.as_view(), name="get_member_roles"
-    ),
-    path("workspace/add-role/", AddMemberRole.as_view(), name="add_member_role"),
-    path(
-        "workspace/remove-role", RemoveMemberRole.as_view(), name="remove_member_role"
-    ),
-    path("workspace/create-shift", CreateShift.as_view(), name="create_shift"),
-    path("workspace/modify-shift", ModifyShift.as_view(), name="modify_shift"),
-    path("workspace/delete-shift", DeleteShift.as_view(), name="delete_shift"),
-    path("workspace/get-shifts", GetShifts.as_view(), name="get_shifts"),
+    path("workspace/<int:workspace_id>/", WorkspaceView.as_view(), name="workspace_parameters"),
+    path("workspace/<int:workspace_id>/members/", WorkspaceMembersView.as_view(), name="workspace_members"),
+    path("workspace/<int:workspace_id>/shifts/", WorkspaceShiftsView.as_view(), name="workspace_shifts"),
+    path("workspace/<int:workspace_id>/roles/", WorkspaceRolesView.as_view(), name="workspace_roles"),
+    path("member/<int:member_id>/", MemberView.as_view(), name="member"),
+    path("member/<int:member_id>/permissions/", MemberPermissionsView.as_view(), name="member_permissions"),
+    path("member/<int:member_id>/roles/", MemberRolesView.as_view(), name="member_roles"),
+    path("member/<int:member_id>/shifts/", MemberShiftsView.as_view(), name="member_shifts"),
+    path("permissions/", PermissionsView.as_view(), name="permissions"),
+    path("shift/<int:shift_id/", ShiftView.as_view(), name="shift"),
+    path("shift/filter/", ShiftFilterView.as_view(), name="shift_filter"),
+    path("role/<int:role_id>/", RoleView.as_view(), name="role")
 ]

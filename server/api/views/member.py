@@ -1,0 +1,346 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+from ..models import (
+    Workspace,
+    WorkspaceMember,
+    User,
+    MemberPermissions,
+    WorkspaceRole,
+    MemberRole,
+)
+
+
+class MemberView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, member_id):
+        # TODO
+        return None
+
+    def put(self, request, member_id):
+        # TODO
+        return None
+
+    def delete(self, request, member_id):
+        # TODO
+        return None
+
+
+class MemberPermissionsView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, member_id):
+        # TODO
+        return None
+
+    def put(self, request):
+        """Update permission flags for a specific workspace member.
+
+        Requires manage_workspace_members permission. Accepted body fields:
+        workspace_id (required), member_id (required), manage_workspace_members,
+        manage_workspace_roles, manage_schedules, manage_time_off.
+
+        :param request: Authenticated HTTP request with workspace_id, member_id,
+            and optional permission flags in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response, or an error response describing the failure.
+        :rtype: rest_framework.response.Response
+        """
+        response = {"error": {}}
+
+        # Verify body contains required fields
+        if "workspace_id" not in request.data:
+            response["error"]["message"] = "Workspace ID is required."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        if "member_id" not in request.data:
+            response["error"]["message"] = "Member ID is required."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verify user has required permissions
+        try:
+            workspace_member = WorkspaceMember.objects.get(
+                user=request.user, workspace=request.data["workspace_id"]
+            )
+            permissions = MemberPermissions.objects.get(
+                workspace=request.data["workspace_id"],
+                member=workspace_member,
+                manage_workspace_members=True,
+            )
+        except MemberPermissions.DoesNotExist:
+            response["error"][
+                "message"
+            ] = "You do not have permission to manage permissions for this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            member = WorkspaceMember.objects.get(id=request.data["member_id"])
+
+            # Verify user belongs to correct workspace
+            if member.workspace.id != int(request.data["workspace_id"]):
+                response["error"][
+                    "message"
+                ] = "Member does not belong to provided workspace."
+                return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+            # Check if permissions already exist
+            permissions = MemberPermissions.objects.get(
+                workspace=request.data["workspace_id"], member=member
+            )
+
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "Could not find member with provided ID."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        except MemberPermissions.DoesNotExist:
+            # Create permissions if they do not exist
+            permissions = MemberPermissions.objects.create(
+                workspace=Workspace.objects.get(id=request.data["workspace_id"]),
+                member=member,
+            )
+
+        # Check if user is owner, cannot update owner permissions as they are fixed (all)
+        if permissions.is_owner:
+            response["error"][
+                "message"
+            ] = "Cannot update permissions for workspace owner."
+            return Response(response, status=status.HTTP_409_CONFLICT)
+
+        # Check if user is trying to update owner permissions
+        if "is_owner" in request.data:
+            response["error"]["message"] = "Cannot update owner permission."
+            return Response(response, status=status.HTTP_409_CONFLICT)
+
+        # Update permissions
+        if "manage_workspace_members" in request.data:
+            permissions.manage_workspace_members = request.data[
+                "manage_workspace_members"
+            ]
+
+        if "manage_workspace_roles" in request.data:
+            permissions.manage_workspace_roles = request.data["manage_workspace_roles"]
+
+        if "manage_schedules" in request.data:
+            permissions.manage_schedules = request.data["manage_schedules"]
+
+        if "manage_time_off" in request.data:
+            permissions.manage_time_off = request.data["manage_time_off"]
+
+        # Save permissions to db
+        permissions.save()
+
+        return Response(response, status=status.HTTP_200_OK)
+
+
+class MemberRolesView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        """Assign a WorkspaceRole to a workspace member.
+
+        Requires manage_workspace_roles permission. Accepted body fields:
+        member_id (required), workspace_role_id (required).
+
+        :param request: Authenticated HTTP request with member_id and
+            workspace_role_id in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response on assignment, or an error response.
+        :rtype: rest_framework.response.Response
+        """
+        response = {"error": {}}
+
+        if "member_id" not in request.data:
+            response["error"]["message"] = "Member ID is required"
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        if "workspace_role_id" not in request.data:
+            response["error"]["message"] = "Role ID is required"
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verify member exists
+        try:
+            modify_member = WorkspaceMember.objects.get(id=request.data["member_id"])
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "Member does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # Get workspace
+        workspace = Workspace.objects.get(id=modify_member.workspace.id)
+
+        # Verify user has permissions to manage workspace roles
+        try:
+            request_member = WorkspaceMember.objects.get(
+                user=request.user, workspace=workspace
+            )
+            MemberPermissions.objects.get(
+                workspace=workspace, member=request_member, manage_workspace_roles=True
+            )
+        except MemberPermissions.DoesNotExist:
+            response["error"][
+                "message"
+            ] = "You do not have permission modify roles in this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "You are not a member of this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+
+        # Verify that role exists and is part of workspace
+        try:
+            workspace_role = WorkspaceRole.objects.get(
+                id=request.data["workspace_role_id"], workspace=workspace
+            )
+        except WorkspaceRole.DoesNotExist:
+            response["error"][
+                "message"
+            ] = "Role is not part of this workspace or does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # Verify that member does not already have this role
+        try:
+            MemberRole.objects.get(
+                member=request.data["member_id"],
+                workspace_role=request.data["workspace_role_id"],
+            )
+        except MemberRole.DoesNotExist:
+            # add role to member if they did not have it
+            MemberRole.objects.create(
+                member=modify_member, workspace_role=workspace_role
+            )
+            return Response(response, status=status.HTTP_201_CREATED)
+
+        # member already had role
+        response["error"]["message"] = "Member already has this role."
+        return Response(response, status=status.HTTP_409_CONFLICT)
+
+    def get(self, request):
+        """Return the list of WorkspaceRoles assigned to a given workspace member.
+
+        :param request: Authenticated HTTP request containing member_id in the body.
+        :type request: rest_framework.request.Request
+        :return: List of roles with id, name, and pay_rate, or an error response.
+        :rtype: rest_framework.response.Response
+        """
+        response = {"error": {}}
+
+        if "member_id" not in request.data:
+            response["error"]["message"] = "Member ID is required"
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verify that member exists
+        try:
+            member = WorkspaceMember.objects.get(id=request.data["member_id"])
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "Member does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # get list of roles
+        member_roles = MemberRole.objects.filter(member=member)
+        results = WorkspaceRole.objects.filter(pk__in=member_roles)
+
+        role_list = [
+            {
+                "id": role.id,
+                "name": role.name,
+                "pay_rate": role.pay_rate,
+            }
+            for role in results
+        ]
+
+        response["roles"] = role_list
+
+        return Response(response, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        """Remove a WorkspaceRole from a workspace member.
+
+        Requires manage_workspace_roles permission. Accepted body fields:
+        member_id (required), workspace_role_id (required).
+
+        :param request: Authenticated HTTP request with member_id and
+            workspace_role_id in the body.
+        :type request: rest_framework.request.Request
+        :return: Empty success response on removal, or an error response.
+        :rtype: rest_framework.response.Response
+        """
+        response = {"error": {}}
+
+        if "member_id" not in request.data:
+            response["error"]["message"] = "Member ID is required"
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        if "workspace_role_id" not in request.data:
+            response["error"]["message"] = "Role ID is required"
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verify member exists
+        try:
+            modify_member = WorkspaceMember.objects.get(id=request.data["member_id"])
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "Member does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # Get workspace
+        workspace = Workspace.objects.get(id=modify_member.workspace.id)
+
+        # Verify user has permissions to manage workspace roles
+        try:
+            request_member = WorkspaceMember.objects.get(
+                user=request.user, workspace=workspace
+            )
+            MemberPermissions.objects.get(
+                workspace=workspace, member=request_member, manage_workspace_roles=True
+            )
+        except MemberPermissions.DoesNotExist:
+            response["error"][
+                "message"
+            ] = "You do not have permission modify roles in this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "You are not a member of this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+
+        # Verify that role exists and is part of workspace
+        try:
+            WorkspaceRole.objects.get(
+                id=request.data["workspace_role_id"], workspace=workspace
+            )
+        except WorkspaceRole.DoesNotExist:
+            response["error"][
+                "message"
+            ] = "Role is not part of this workspace or does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # Verify that member already has this role
+        try:
+            MemberRole.objects.get(
+                member=request.data["member_id"],
+                workspace_role=request.data["workspace_role_id"],
+            )
+        except MemberRole.DoesNotExist:
+            # add role to member if they did not have it
+            response["error"]["message"] = "Member does not have this role."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # remove role
+        MemberRole.objects.get(
+            member=request.data["member_id"],
+            workspace_role=request.data["workspace_role_id"],
+        ).delete()
+        return Response(response, status=status.HTTP_200_OK)
+
+
+class MemberShiftsView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, member_id):
+        # TODO
+        return None
