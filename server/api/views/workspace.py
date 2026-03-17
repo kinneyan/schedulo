@@ -269,7 +269,7 @@ class WorkspaceView(APIView):
             response["error"]["message"] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
-        workspace = Workspace.objects.get(id=workspace.id).delete()
+        workspace.delete()
         return Response(response, status=status.HTTP_200_OK)
 
 
@@ -348,16 +348,11 @@ class WorkspaceMembersView(APIView):
             response["error"] = "User is already member of this workspace"
             return Response(response, status=status.HTTP_409_CONFLICT)
 
-    def get(self, request, workspace_id=None):
+    def get(self, request, workspace_id):
         """
         workspace_id (required)
         """
         response = {"error": {}}
-
-        # Verify parameters contains required fields
-        if workspace_id is None:
-            response["error"]["message"] = "Workspace ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify workspace exists
         try:
@@ -418,14 +413,14 @@ class WorkspaceShiftsView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def post(self, request, workspace_id):
         """Create a new Shift in the given workspace.
 
         Requires manage_schedules permission. Accepted body fields:
-        workspace_id (required), role_id (required), start_time (required),
+        role_id (required), start_time (required),
         end_time (required), member_id (optional).
 
-        :param request: Authenticated HTTP request with shift details in the body.
+        :param request: Authenticated HTTP request with workspace_id in url and shift details in the body.
         :type request: rest_framework.request.Request
         :return: Empty success response on creation, or an error response.
         :rtype: rest_framework.response.Response
@@ -444,13 +439,10 @@ class WorkspaceShiftsView(APIView):
         if "role_id" not in request.data:
             response["error"]["message"] = "Role ID is required."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
-        if "workspace_id" not in request.data:
-            response["error"]["message"] = "Workspace ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify workspace exists
         try:
-            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
+            workspace = Workspace.objects.get(pk=workspace_id)
         except Workspace.DoesNotExist:
             response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
