@@ -524,13 +524,13 @@ class WorkspaceRolesView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def post(self, request, workspace_id):
         """Create a new WorkspaceRole in the given workspace.
 
         Requires manage_workspace_roles permission. Accepted body fields:
-        workspace_id (required), name (optional), pay_rate (optional).
+        name (optional), pay_rate (optional).
 
-        :param request: Authenticated HTTP request with workspace_id and optional
+        :param request: Authenticated HTTP request with workspace_id in url and optional
             role fields in the body.
         :type request: rest_framework.request.Request
         :return: Empty success response on creation, or an error response.
@@ -544,14 +544,9 @@ class WorkspaceRolesView(APIView):
             response["error"]["message"] = "Invalid request data"
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-        # Verify body contains required fields
-        if "workspace_id" not in request.data:
-            response["error"]["message"] = "Workspace ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
         # Verify workspace exists
         try:
-            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
+            workspace = Workspace.objects.get(pk=workspace_id)
         except Workspace.DoesNotExist:
             response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -559,10 +554,10 @@ class WorkspaceRolesView(APIView):
         # Verify user has permissions to manage workspace roles
         try:
             member = WorkspaceMember.objects.get(
-                user=request.user, workspace=request.data["workspace_id"]
+                user=request.user, workspace=workspace
             )
             MemberPermissions.objects.get(
-                workspace=request.data["workspace_id"],
+                workspace=workspace,
                 member=member,
                 manage_workspace_roles=True,
             )
@@ -586,24 +581,19 @@ class WorkspaceRolesView(APIView):
 
         return Response(response, status=status.HTTP_201_CREATED)
 
-    def get(self, request):
+    def get(self, request, workspace_id):
         """Return a list of all WorkspaceRoles in the given workspace.
 
-        :param request: Authenticated HTTP request containing workspace_id in the body.
+        :param request: Authenticated HTTP request containing workspace_id in the url.
         :type request: rest_framework.request.Request
         :return: List of roles with id, name, and pay_rate, or an error response.
         :rtype: rest_framework.response.Response
         """
         response = {"error": {}}
 
-        # Verify body contains required fields
-        if "workspace_id" not in request.data:
-            response["error"]["message"] = "Workspace ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
         # Verify workspace exists
         try:
-            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
+            workspace = Workspace.objects.get(pk=workspace_id)
         except Workspace.DoesNotExist:
             response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
