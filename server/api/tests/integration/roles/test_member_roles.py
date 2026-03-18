@@ -17,7 +17,6 @@ class AddMemberRoleTests(APITestCase):
 
     def setUp(self):
         """Create a workspace, owner, and member with manage_workspace_roles permission."""
-        self.url = reverse("add_member_role")
         self.user = User.objects.create_user(
             email="testuser@example.com",
             password="testpassword",
@@ -78,83 +77,85 @@ class AddMemberRoleTests(APITestCase):
         self.role3 = WorkspaceRole.objects.create(
             workspace=self.workspace, name="test role3", pay_rate=10
         )
+        self.url = reverse("member_roles", kwargs={"member_id": self.member2.id})
 
     def test_no_role(self):
         """Verify that omitting workspace_role_id returns 400."""
-        data = {"member_id": self.member2.id}
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.post(self.url, {}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_role(self):
         """Verify that a nonexistent workspace_role_id returns 404."""
-        data = {"workspace_role_id": 999, "member_id": self.member2.id}
+        data = {"workspace_role_id": 999}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_no_member(self):
-        """Verify that omitting member_id returns 400."""
-        data = {"workspace_role_id": self.role.id}
-        response = self.client.post(self.url, data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
     def test_invalid_member(self):
         """Verify that a nonexistent member_id returns 404."""
-        data = {"workspace_role_id": self.role.id, "member_id": 999}
-        response = self.client.post(self.url, data, format="json")
+        url = reverse("member_roles", kwargs={"member_id": 999})
+        data = {"workspace_role_id": self.role.id}
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_add_single(self):
         """Verify that assigning a single valid role returns 201 and persists the MemberRole."""
-        data = {"workspace_role_id": self.role.id, "member_id": self.member2.id}
+        data = {"workspace_role_id": self.role.id}
 
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        try:  # this is probably a bad way to handle this since the fail doesnt give any info but idk :(
-            MemberRole.objects.get(workspace_role=self.role, member=self.member2)
-        except MemberRole.DoesNotExist:
-            self.assertTrue(False)
+        self.assertTrue(
+            MemberRole.objects.filter(workspace_role=self.role, member=self.member2).exists()
+        )
 
     def test_add_multiple(self):
         """Verify that assigning multiple roles in sequence returns 201 each time and persists all MemberRoles."""
         data = []
-        data.append({"workspace_role_id": self.role.id, "member_id": self.member2.id})
-        data.append({"workspace_role_id": self.role2.id, "member_id": self.member2.id})
-        data.append({"workspace_role_id": self.role3.id, "member_id": self.member2.id})
+        data.append({"workspace_role_id": self.role.id})
+        data.append({"workspace_role_id": self.role2.id})
+        data.append({"workspace_role_id": self.role3.id})
 
         for i in range(3):
             response = self.client.post(self.url, data[i], format="json")
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        try:  # this is probably a bad way to handle this since the fail doesnt give any info but idk :(
-            roles = list(MemberRole.objects.filter(member=self.member2))
-        except MemberRole.DoesNotExist:
-            self.assertTrue(False)
-
-        role = []
-        for i in range(len(roles)):
-            try:
-                role.append(WorkspaceRole.objects.get(id=roles[i].workspace_role.id))
-            except WorkspaceRole.DoesNotExist:
-                self.assertTrue(False)
-
-        self.assertEqual(self.role.id, role[0].id)
-        self.assertEqual(self.role2.id, role[1].id)
-        self.assertEqual(self.role3.id, role[2].id)
+        roles = list(MemberRole.objects.filter(member=self.member2).order_by("id"))
+        self.assertEqual(len(roles), 3)
+        self.assertEqual(roles[0].workspace_role.id, self.role.id)
+        self.assertEqual(roles[1].workspace_role.id, self.role2.id)
+        self.assertEqual(roles[2].workspace_role.id, self.role3.id)
 
     def test_add_without_permissions(self):
         """Verify that a member without manage_workspace_roles permission receives 403 and no role is assigned."""
         self.client.force_authenticate(user=self.member2.user)
-        data = {"workspace_role_id": self.role.id, "member_id": self.member2.id}
+        data = {"workspace_role_id": self.role.id}
 
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        try:  # this is probably a bad way to handle this since the fail doesnt give any info but idk :(
-            MemberRole.objects.get(workspace_role=self.role, member=self.member2)
-            self.assertTrue(False)
-        except MemberRole.DoesNotExist:
-            self.assertTrue(True)
+        self.assertFalse(
+            MemberRole.objects.filter(workspace_role=self.role, member=self.member2).exists()
+        )
+
+    def test_add_cross_workspace_isolation(self):
+        """Verify that a privileged member of another workspace cannot assign a role in this workspace."""
+        other_workspace = Workspace.objects.create(owner=self.user3, created_by=self.user3)
+        other_member = WorkspaceMember.objects.create(
+            user=self.user3, workspace=other_workspace, added_by=self.user3
+        )
+        MemberPermissions.objects.create(
+            workspace=other_workspace,
+            member=other_member,
+            is_owner=True,
+            manage_workspace_roles=True,
+        )
+        self.client.force_authenticate(user=self.user3)
+
+        response = self.client.post(self.url, {"workspace_role_id": self.role.id}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(
+            MemberRole.objects.filter(workspace_role=self.role, member=self.member2).exists()
+        )
 
 
 class RemoveMemberRoleTests(APITestCase):
@@ -162,7 +163,6 @@ class RemoveMemberRoleTests(APITestCase):
 
     def setUp(self):
         """Create a workspace, owner, member with manage_workspace_roles permission, and pre-assigned member roles."""
-        self.url = reverse("remove_member_role")
         self.user = User.objects.create_user(
             email="testuser@example.com",
             password="testpassword",
@@ -230,65 +230,72 @@ class RemoveMemberRoleTests(APITestCase):
         self.member_role2 = MemberRole.objects.create(
             workspace_role=self.role2, member=self.member2
         )
+        self.url = reverse("member_roles", kwargs={"member_id": self.member2.id})
 
     def test_no_role(self):
         """Verify that omitting workspace_role_id returns 400."""
-        data = {"member_id": self.member2.id}
-        response = self.client.delete(self.url, data, format="json")
+        response = self.client.delete(self.url, {}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_role(self):
         """Verify that a nonexistent workspace_role_id returns 404."""
-        data = {"workspace_role_id": 999, "member_id": self.member2.id}
+        data = {"workspace_role_id": 999}
         response = self.client.delete(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_no_member(self):
-        """Verify that omitting member_id returns 400."""
-        data = {"workspace_role_id": self.role.id}
-        response = self.client.delete(self.url, data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
     def test_invalid_member(self):
         """Verify that a nonexistent member_id returns 404."""
-        data = {"workspace_role_id": self.role.id, "member_id": 999}
-        response = self.client.delete(self.url, data, format="json")
+        url = reverse("member_roles", kwargs={"member_id": 999})
+        data = {"workspace_role_id": self.role.id}
+        response = self.client.delete(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_remove_valid(self):
         """Verify that removing an assigned role returns 200, deletes the MemberRole, and leaves other roles intact."""
-        data = {"workspace_role_id": self.role.id, "member_id": self.member2.id}
+        data = {"workspace_role_id": self.role.id}
         response = self.client.delete(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # check that member role was deleted
-        try:
-            MemberRole.objects.get(member=self.member2, workspace_role=self.role)
-            self.assertTrue(False)
-        except MemberRole.DoesNotExist:
-            self.assertTrue(True)
-
-        # check that member still has other role
-        try:
-            MemberRole.objects.get(member=self.member2, workspace_role=self.role2)
-        except MemberRole.DoesNotExist:
-            self.assertTrue(False)
+        self.assertFalse(
+            MemberRole.objects.filter(member=self.member2, workspace_role=self.role).exists()
+        )
+        self.assertTrue(
+            MemberRole.objects.filter(member=self.member2, workspace_role=self.role2).exists()
+        )
 
     def test_remove_role_member_doesnt_have(self):
         """Verify that removing a role not assigned to the member returns 404."""
-        data = {"workspace_role_id": self.role3.id, "member_id": self.member2.id}
+        data = {"workspace_role_id": self.role3.id}
         response = self.client.delete(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_remove_without_permissions(self):
         """Verify that a member without manage_workspace_roles permission receives 403 and the role is not removed."""
         self.client.force_authenticate(user=self.member2.user)
-        data = {"workspace_role_id": self.role.id, "member_id": self.member2.id}
+        data = {"workspace_role_id": self.role.id}
         response = self.client.delete(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        # check that member role wasnt deleted
-        try:
-            MemberRole.objects.get(member=self.member2, workspace_role=self.role)
-        except MemberRole.DoesNotExist:
-            self.assertTrue(False)
+        self.assertTrue(
+            MemberRole.objects.filter(member=self.member2, workspace_role=self.role).exists()
+        )
+
+    def test_remove_cross_workspace_isolation(self):
+        """Verify that a privileged member of another workspace cannot remove a role in this workspace."""
+        other_workspace = Workspace.objects.create(owner=self.user3, created_by=self.user3)
+        other_member = WorkspaceMember.objects.create(
+            user=self.user3, workspace=other_workspace, added_by=self.user3
+        )
+        MemberPermissions.objects.create(
+            workspace=other_workspace,
+            member=other_member,
+            is_owner=True,
+            manage_workspace_roles=True,
+        )
+        self.client.force_authenticate(user=self.user3)
+
+        response = self.client.delete(self.url, {"workspace_role_id": self.role.id}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(
+            MemberRole.objects.filter(member=self.member2, workspace_role=self.role).exists()
+        )

@@ -33,7 +33,7 @@ urlpatterns = [
     path("member/<int:member_id>/roles/", MemberRolesView.as_view(), name="member_roles"),
     path("member/<int:member_id>/shifts/", MemberShiftsView.as_view(), name="member_shifts"),
     path("permissions/", PermissionsView.as_view(), name="permissions"),
-    path("shift/<int:shift_id/", ShiftView.as_view(), name="shift"),
+    path("shift/<int:shift_id>/", ShiftView.as_view(), name="shift"),
     path("shift/filter/", ShiftFilterView.as_view(), name="shift_filter"),
     path("role/<int:role_id>/", RoleView.as_view(), name="role")
 ]

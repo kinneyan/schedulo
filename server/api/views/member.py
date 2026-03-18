@@ -71,7 +71,7 @@ class MemberPermissionsView(APIView):
                 member=workspace_member,
                 manage_workspace_members=True,
             )
-        except MemberPermissions.DoesNotExist:
+        except (WorkspaceMember.DoesNotExist, MemberPermissions.DoesNotExist):
             response["error"][
                 "message"
             ] = "You do not have permission to manage permissions for this workspace."

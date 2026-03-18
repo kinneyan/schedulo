@@ -19,7 +19,7 @@ class GetShiftsTest(APITestCase):
 
     def setUp(self):
         """Create users, workspace, members, roles, and a set of shifts for filtering tests."""
-        self.url = reverse("get_shifts")
+        self.url = reverse("shift_filter")
         self.user = User.objects.create_user(
             email="testuser@example.com",
             password="testpassword",

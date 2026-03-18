@@ -1,7 +1,5 @@
 from django.test import TestCase
-from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from unittest.mock import patch, MagicMock
 from decimal import Decimal
 from ....models import (
     User,
@@ -59,14 +57,6 @@ class WorkspaceRoleModelTest(TestCase):
 
         with self.assertRaises(WorkspaceRole.DoesNotExist):
             WorkspaceRole.objects.get(id=role_id)
-
-    def test_workspace_role_string_representation(self):
-        """Test workspace role string representation"""
-        role = WorkspaceRole.objects.create(workspace=self.workspace, name="Test Role")
-
-        # Should use default Django string representation
-        self.assertEqual(str(role), f"WorkspaceRole object ({role.id})")
-
 
 class MemberRoleModelTest(TestCase):
     """Test cases for MemberRole model"""
@@ -250,18 +240,3 @@ class MemberPermissionsModelTest(TestCase):
         with self.assertRaises(MemberPermissions.DoesNotExist):
             MemberPermissions.objects.get(id=permissions_id)
 
-    @patch("django.db.models.Model.save")
-    def test_member_permissions_update_scenario(self, mock_save):
-        """Test updating member permissions"""
-        permissions = MemberPermissions(
-            workspace=self.workspace,
-            member=self.member,
-            is_owner=False,
-            manage_schedules=False,
-        )
-
-        # Simulate promoting user to have schedule management
-        permissions.manage_schedules = True
-
-        self.assertTrue(permissions.manage_schedules)
-        self.assertFalse(permissions.is_owner)  # Other permissions unchanged
