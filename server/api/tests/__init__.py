@@ -17,6 +17,7 @@ from .integration.roles.test_role_crud import (
     CreateRoleTests,
     DeleteRoleTests,
     ModifyWorkspaceRoleTests,
+    GetRoleTests,
 )
 from .integration.roles.test_role_queries import GetRolesTests, GetMemberRoleTests
 from .integration.roles.test_member_roles import (

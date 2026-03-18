@@ -58,6 +58,7 @@ class WorkspaceRoleModelTest(TestCase):
         with self.assertRaises(WorkspaceRole.DoesNotExist):
             WorkspaceRole.objects.get(id=role_id)
 
+
 class MemberRoleModelTest(TestCase):
     """Test cases for MemberRole model"""
 
@@ -239,4 +240,3 @@ class MemberPermissionsModelTest(TestCase):
 
         with self.assertRaises(MemberPermissions.DoesNotExist):
             MemberPermissions.objects.get(id=permissions_id)
-

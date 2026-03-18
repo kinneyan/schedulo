@@ -60,7 +60,7 @@ class MemberPermissionsView(APIView):
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Could not find member with provided ID."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
-        
+
         # Verify user has required permissions
         try:
             workspace_member = WorkspaceMember.objects.get(

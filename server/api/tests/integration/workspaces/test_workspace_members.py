@@ -40,7 +40,9 @@ class AddMemberTests(APITestCase):
             workspace=self.workspace,
             manage_workspace_members=True,
         )
-        self.url = reverse("workspace_members", kwargs={"workspace_id": self.workspace.id})
+        self.url = reverse(
+            "workspace_members", kwargs={"workspace_id": self.workspace.id}
+        )
 
     def test_add_workspace_member_permission(self):
         """Verify that a member with the manage_workspace_members permission can add a new member."""

@@ -218,12 +218,16 @@ class GetWorkspaceMembersTests(APITestCase):
     def test_as_non_member(self):
         self.client.force_authenticate(user=self.user3)
 
-        self.url = reverse("workspace_members", kwargs={"workspace_id": self.workspace.id})
+        self.url = reverse(
+            "workspace_members", kwargs={"workspace_id": self.workspace.id}
+        )
         response = self.client.get(self.url, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_valid(self):
-        self.url = reverse("workspace_members", kwargs={"workspace_id": self.workspace.id})
+        self.url = reverse(
+            "workspace_members", kwargs={"workspace_id": self.workspace.id}
+        )
         response = self.client.get(self.url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 

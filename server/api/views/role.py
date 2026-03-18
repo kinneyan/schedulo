@@ -22,8 +22,36 @@ class RoleView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, role_id):
-        # TODO
-        return None
+        """Get a given WorkspaceRole, must be a member of the workspace the role belongs to.
+
+        :param request: Authenticated HTTP request with workspace_role_id in url params
+        """
+
+        response = {"error": {}}
+
+        # Verify role exists
+        try:
+            role = WorkspaceRole.objects.get(pk=role_id)
+        except WorkspaceRole.DoesNotExist:
+            response["error"]["message"] = "Workspace role does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # verify user is member of workspace with role
+        try:
+            _ = WorkspaceMember.objects.get(user=request.user, workspace=role.workspace)
+        except WorkspaceMember.DoesNotExist:
+            response["error"][
+                "message"
+            ] = "Must be a member of the workspace to get a role."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+
+        response["id"] = role.id
+        response["pay_rate"] = role.pay_rate
+        response["name"] = role.name
+        response["date_created"] = role.date_created
+        response["date_modified"] = role.date_modified
+
+        return Response(response, status=status.HTTP_200_OK)
 
     def put(self, request, role_id):
         """Update name and/or pay_rate for an existing WorkspaceRole.
@@ -47,9 +75,7 @@ class RoleView(APIView):
 
         # Verify role exists
         try:
-            workspace_role = WorkspaceRole.objects.get(
-                pk=role_id
-            )
+            workspace_role = WorkspaceRole.objects.get(pk=role_id)
         except WorkspaceRole.DoesNotExist:
             response["error"]["message"] = "Workspace role does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)

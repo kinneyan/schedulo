@@ -77,7 +77,9 @@ class CreateShiftTests(APITestCase):
         self.time2 = self.time1 + timedelta(hours=2)
 
         self.client.force_authenticate(user=self.member.user)
-        self.url = reverse("workspace_shifts", kwargs={"workspace_id": self.workspace.id})
+        self.url = reverse(
+            "workspace_shifts", kwargs={"workspace_id": self.workspace.id}
+        )
 
     def test_invalid_workspace(self):
         """Verify that a non-existent workspace_id returns a 404 error."""
@@ -110,14 +112,22 @@ class CreateShiftTests(APITestCase):
 
     def test_end_time_before_start(self):
         """Verify that an end_time earlier than start_time returns a 400 error."""
-        data = {"role_id": self.role.id, "start_time": self.time2, "end_time": self.time1}
+        data = {
+            "role_id": self.role.id,
+            "start_time": self.time2,
+            "end_time": self.time1,
+        }
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_without_permissions(self):
         """Verify that a member without manage_schedules permission cannot create a shift."""
         self.client.force_authenticate(user=self.member2.user)
-        data = {"role_id": self.role.id, "start_time": self.time1, "end_time": self.time2}
+        data = {
+            "role_id": self.role.id,
+            "start_time": self.time1,
+            "end_time": self.time2,
+        }
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(
@@ -126,7 +136,11 @@ class CreateShiftTests(APITestCase):
 
     def test_valid(self):
         """Verify that a valid payload creates a shift and returns 201."""
-        data = {"role_id": self.role.id, "start_time": self.time1, "end_time": self.time2}
+        data = {
+            "role_id": self.role.id,
+            "start_time": self.time1,
+            "end_time": self.time2,
+        }
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(
@@ -230,8 +244,12 @@ class ModifyShiftTests(APITestCase):
             manage_time_off=False,
         )
 
-        self.role = WorkspaceRole.objects.create(workspace=self.workspace, name="test name")
-        self.role2 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name2")
+        self.role = WorkspaceRole.objects.create(
+            workspace=self.workspace, name="test name"
+        )
+        self.role2 = WorkspaceRole.objects.create(
+            workspace=self.workspace, name="test name2"
+        )
 
         self.time1 = datetime.now(timezone.utc)
         self.time2 = self.time1 + timedelta(hours=2)
@@ -270,7 +288,9 @@ class ModifyShiftTests(APITestCase):
 
     def test_modify_cross_workspace_isolation(self):
         """Verify that a privileged member of another workspace cannot modify a shift in this workspace."""
-        other_workspace = Workspace.objects.create(owner=self.user3, created_by=self.user3)
+        other_workspace = Workspace.objects.create(
+            owner=self.user3, created_by=self.user3
+        )
         other_member = WorkspaceMember.objects.create(
             user=self.user3, workspace=other_workspace, added_by=self.user3
         )
@@ -382,7 +402,9 @@ class ModifyShiftTests(APITestCase):
         response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(
-            Shift.objects.filter(pk=self.shift.id, member=self.member, open=False).exists()
+            Shift.objects.filter(
+                pk=self.shift.id, member=self.member, open=False
+            ).exists()
         )
 
     def test_invalid_role(self):
@@ -397,7 +419,9 @@ class ModifyShiftTests(APITestCase):
         data = {"role_id": self.role2.id}
         response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(Shift.objects.filter(pk=self.shift.id, role=self.role2).exists())
+        self.assertTrue(
+            Shift.objects.filter(pk=self.shift.id, role=self.role2).exists()
+        )
 
     def test_modify_multiple(self):
         """Verify that updating role, member, and times together all persist correctly."""
@@ -475,7 +499,9 @@ class DeleteShiftTests(APITestCase):
             manage_time_off=False,
         )
 
-        self.role = WorkspaceRole.objects.create(workspace=self.workspace, name="test name")
+        self.role = WorkspaceRole.objects.create(
+            workspace=self.workspace, name="test name"
+        )
 
         self.time1 = datetime.now(timezone.utc)
         self.time2 = self.time1 + timedelta(hours=2)
@@ -525,7 +551,9 @@ class DeleteShiftTests(APITestCase):
 
     def test_delete_cross_workspace_isolation(self):
         """Verify that a privileged member of another workspace cannot delete a shift in this workspace."""
-        other_workspace = Workspace.objects.create(owner=self.user3, created_by=self.user3)
+        other_workspace = Workspace.objects.create(
+            owner=self.user3, created_by=self.user3
+        )
         other_member = WorkspaceMember.objects.create(
             user=self.user3, workspace=other_workspace, added_by=self.user3
         )

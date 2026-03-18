@@ -51,7 +51,9 @@ class RoleSerializerTest(TestCase):
                 self.assertEqual(serializer.validated_data["pay_rate"], expected)
 
     def test_zero_pay_rate(self):
-        serializer = self.serializer_class(data={"name": "Volunteer", "pay_rate": "0.00"})
+        serializer = self.serializer_class(
+            data={"name": "Volunteer", "pay_rate": "0.00"}
+        )
         self.assertTrue(serializer.is_valid())
         self.assertEqual(serializer.validated_data["pay_rate"], Decimal("0.00"))
 

@@ -67,7 +67,9 @@ class GetRolesTests(APITestCase):
             manage_time_off=False,
         )
         self.client.force_authenticate(user=self.member.user)
-        self.url = reverse("workspace_roles", kwargs={"workspace_id": self.workspace.id})
+        self.url = reverse(
+            "workspace_roles", kwargs={"workspace_id": self.workspace.id}
+        )
 
     def test_invalid_workspace(self):
         """Verify that a nonexistent workspace_id returns 404."""

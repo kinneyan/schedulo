@@ -65,63 +65,75 @@ class RegisterUserSerializerTest(TestCase):
         self.assertEqual(serializer.validated_data["first_name"], "John")
 
     def test_missing_email(self):
-        serializer = self.serializer_class(data={
-            "password": "securepassword123",
-            "first_name": "John",
-            "last_name": "Doe",
-            "phone": "1234567890",
-        })
+        serializer = self.serializer_class(
+            data={
+                "password": "securepassword123",
+                "first_name": "John",
+                "last_name": "Doe",
+                "phone": "1234567890",
+            }
+        )
         self.assertFalse(serializer.is_valid())
         self.assertIn("email", serializer.errors)
 
     def test_missing_password(self):
-        serializer = self.serializer_class(data={
-            "email": "newuser@example.com",
-            "first_name": "John",
-            "last_name": "Doe",
-            "phone": "1234567890",
-        })
+        serializer = self.serializer_class(
+            data={
+                "email": "newuser@example.com",
+                "first_name": "John",
+                "last_name": "Doe",
+                "phone": "1234567890",
+            }
+        )
         self.assertFalse(serializer.is_valid())
         self.assertIn("password", serializer.errors)
 
     def test_missing_first_name(self):
-        serializer = self.serializer_class(data={
-            "email": "newuser@example.com",
-            "password": "securepassword123",
-            "last_name": "Doe",
-            "phone": "1234567890",
-        })
+        serializer = self.serializer_class(
+            data={
+                "email": "newuser@example.com",
+                "password": "securepassword123",
+                "last_name": "Doe",
+                "phone": "1234567890",
+            }
+        )
         self.assertFalse(serializer.is_valid())
         self.assertIn("first_name", serializer.errors)
 
     def test_missing_last_name(self):
-        serializer = self.serializer_class(data={
-            "email": "newuser@example.com",
-            "password": "securepassword123",
-            "first_name": "John",
-            "phone": "1234567890",
-        })
+        serializer = self.serializer_class(
+            data={
+                "email": "newuser@example.com",
+                "password": "securepassword123",
+                "first_name": "John",
+                "phone": "1234567890",
+            }
+        )
         self.assertFalse(serializer.is_valid())
         self.assertIn("last_name", serializer.errors)
 
     def test_missing_phone(self):
-        serializer = self.serializer_class(data={
-            "email": "newuser@example.com",
-            "password": "securepassword123",
-            "first_name": "John",
-            "last_name": "Doe",
-        })
+        serializer = self.serializer_class(
+            data={
+                "email": "newuser@example.com",
+                "password": "securepassword123",
+                "first_name": "John",
+                "last_name": "Doe",
+            }
+        )
         self.assertFalse(serializer.is_valid())
         self.assertIn("phone", serializer.errors)
 
     def test_invalid_email_format(self):
-        serializer = self.serializer_class(data={
-            "email": "invalid-email-format",
-            "password": "securepassword123",
-            "first_name": "John",
-            "last_name": "Doe",
-            "phone": "1234567890",
-        })
+        serializer = self.serializer_class(
+            data={
+                "email": "invalid-email-format",
+                "password": "securepassword123",
+                "first_name": "John",
+                "last_name": "Doe",
+                "phone": "1234567890",
+            }
+        )
         self.assertFalse(serializer.is_valid())
         self.assertIn("email", serializer.errors)
 
@@ -134,13 +146,15 @@ class RegisterUserSerializerTest(TestCase):
             last_name="User",
             phone="1111111111",
         )
-        serializer = self.serializer_class(data={
-            "email": "existing@example.com",
-            "password": "newpassword123",
-            "first_name": "New",
-            "last_name": "User",
-            "phone": "2222222222",
-        })
+        serializer = self.serializer_class(
+            data={
+                "email": "existing@example.com",
+                "password": "newpassword123",
+                "first_name": "New",
+                "last_name": "User",
+                "phone": "2222222222",
+            }
+        )
         self.assertFalse(serializer.is_valid())
         self.assertIn("email", serializer.errors)
 

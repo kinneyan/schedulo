@@ -36,13 +36,16 @@ class RegisterViewTest(TestCase):
         mock_register_serializer.return_value = mock_register_instance
         mock_create_user.side_effect = Exception("Database error")
 
-        request = self._create_drf_request("/register/", {
-            "email": "test@example.com",
-            "password": "password",
-            "first_name": "Test",
-            "last_name": "User",
-            "phone": "1234567890",
-        })
+        request = self._create_drf_request(
+            "/register/",
+            {
+                "email": "test@example.com",
+                "password": "password",
+                "first_name": "Test",
+                "last_name": "User",
+                "phone": "1234567890",
+            },
+        )
         response = self.view.post(request)
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)

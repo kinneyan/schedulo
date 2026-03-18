@@ -553,9 +553,7 @@ class WorkspaceRolesView(APIView):
 
         # Verify user has permissions to manage workspace roles
         try:
-            member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(
                 workspace=workspace,
                 member=member,

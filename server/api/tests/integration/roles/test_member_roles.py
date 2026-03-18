@@ -105,7 +105,9 @@ class AddMemberRoleTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.assertTrue(
-            MemberRole.objects.filter(workspace_role=self.role, member=self.member2).exists()
+            MemberRole.objects.filter(
+                workspace_role=self.role, member=self.member2
+            ).exists()
         )
 
     def test_add_multiple(self):
@@ -134,12 +136,16 @@ class AddMemberRoleTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         self.assertFalse(
-            MemberRole.objects.filter(workspace_role=self.role, member=self.member2).exists()
+            MemberRole.objects.filter(
+                workspace_role=self.role, member=self.member2
+            ).exists()
         )
 
     def test_add_cross_workspace_isolation(self):
         """Verify that a privileged member of another workspace cannot assign a role in this workspace."""
-        other_workspace = Workspace.objects.create(owner=self.user3, created_by=self.user3)
+        other_workspace = Workspace.objects.create(
+            owner=self.user3, created_by=self.user3
+        )
         other_member = WorkspaceMember.objects.create(
             user=self.user3, workspace=other_workspace, added_by=self.user3
         )
@@ -151,10 +157,14 @@ class AddMemberRoleTests(APITestCase):
         )
         self.client.force_authenticate(user=self.user3)
 
-        response = self.client.post(self.url, {"workspace_role_id": self.role.id}, format="json")
+        response = self.client.post(
+            self.url, {"workspace_role_id": self.role.id}, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(
-            MemberRole.objects.filter(workspace_role=self.role, member=self.member2).exists()
+            MemberRole.objects.filter(
+                workspace_role=self.role, member=self.member2
+            ).exists()
         )
 
 
@@ -257,10 +267,14 @@ class RemoveMemberRoleTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertFalse(
-            MemberRole.objects.filter(member=self.member2, workspace_role=self.role).exists()
+            MemberRole.objects.filter(
+                member=self.member2, workspace_role=self.role
+            ).exists()
         )
         self.assertTrue(
-            MemberRole.objects.filter(member=self.member2, workspace_role=self.role2).exists()
+            MemberRole.objects.filter(
+                member=self.member2, workspace_role=self.role2
+            ).exists()
         )
 
     def test_remove_role_member_doesnt_have(self):
@@ -277,12 +291,16 @@ class RemoveMemberRoleTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         self.assertTrue(
-            MemberRole.objects.filter(member=self.member2, workspace_role=self.role).exists()
+            MemberRole.objects.filter(
+                member=self.member2, workspace_role=self.role
+            ).exists()
         )
 
     def test_remove_cross_workspace_isolation(self):
         """Verify that a privileged member of another workspace cannot remove a role in this workspace."""
-        other_workspace = Workspace.objects.create(owner=self.user3, created_by=self.user3)
+        other_workspace = Workspace.objects.create(
+            owner=self.user3, created_by=self.user3
+        )
         other_member = WorkspaceMember.objects.create(
             user=self.user3, workspace=other_workspace, added_by=self.user3
         )
@@ -294,8 +312,12 @@ class RemoveMemberRoleTests(APITestCase):
         )
         self.client.force_authenticate(user=self.user3)
 
-        response = self.client.delete(self.url, {"workspace_role_id": self.role.id}, format="json")
+        response = self.client.delete(
+            self.url, {"workspace_role_id": self.role.id}, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertTrue(
-            MemberRole.objects.filter(member=self.member2, workspace_role=self.role).exists()
+            MemberRole.objects.filter(
+                member=self.member2, workspace_role=self.role
+            ).exists()
         )
