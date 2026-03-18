@@ -182,7 +182,7 @@ class GetRoleTests(APITestCase):
         )
 
         self.client.force_authenticate(user=self.member.user)
-        self.url = reverse("workspace_role", kwargs={"role_id": self.role.id})
+        self.url = reverse("role", kwargs={"role_id": self.role.id})
 
     def test_get_role_valid(self):
         """Verify that a workspace member can retrieve a role and response contains correct attributes."""
@@ -204,7 +204,7 @@ class GetRoleTests(APITestCase):
 
     def test_get_role_invalid_role_id(self):
         """Verify that a nonexistent role_id returns 404."""
-        url = reverse("workspace_role", kwargs={"role_id": 999})
+        url = reverse("role", kwargs={"role_id": 999})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 

@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.core import serializers
 
 from ..serializers import RoleSerializer
 from ..models import (
@@ -24,7 +25,7 @@ class RoleView(APIView):
     def get(self, request, role_id):
         """Get a given WorkspaceRole, must be a member of the workspace the role belongs to.
 
-        :param request: Authenticated HTTP request with workspace_role_id in url params
+        :param request: Authenticated HTTP request with role_id in url params
         """
 
         response = {"error": {}}
@@ -44,6 +45,10 @@ class RoleView(APIView):
                 "message"
             ] = "Must be a member of the workspace to get a role."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
+
+        results = WorkspaceRole.objects.filter(pk=role_id)
+        data = serializers.serialize("json", results)
+        print(data)
 
         response["id"] = role.id
         response["pay_rate"] = role.pay_rate
