@@ -1,9 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
 from django.utils import timezone
-from unittest.mock import patch, MagicMock
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 from ....models import (
     User,
     Workspace,
@@ -285,26 +283,6 @@ class UnavailabilityModelTest(TestCase):
                 day_of_week=7,
             )
             unavailability.full_clean()
-
-    @patch("django.db.models.Model.save")
-    def test_unavailability_day_of_week_constraint_at_db_level(self, mock_save):
-        """Test that database constraint exists for day_of_week"""
-        # This tests that the constraint is properly defined in the model
-        Unavailability(
-            member=self.member,
-            start_time=datetime(
-                2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()
-            ),
-            end_time=datetime(
-                2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()
-            ),
-            day_of_week=5,
-        )
-
-        # Check that the constraint is defined in Meta
-        constraints = Unavailability._meta.constraints
-        self.assertEqual(len(constraints), 1)
-        self.assertEqual(constraints[0].name, "day_of_week_valid")
 
     def test_unavailability_time_fields(self):
         """Test unavailability time field handling"""

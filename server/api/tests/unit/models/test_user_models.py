@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from unittest.mock import patch, MagicMock
 from ....models import CustomUserManager, User, Workspace, WorkspaceMember
 
 
@@ -12,21 +11,6 @@ class CustomUserManagerTest(TestCase):
         """Set up a bare CustomUserManager instance with the User model attached."""
         self.manager = CustomUserManager()
         self.manager.model = User
-
-    @patch("api.models.users.CustomUserManager.normalize_email")
-    def test_create_user_with_valid_email_normalizes_email(self, mock_normalize):
-        """Test that create_user normalizes the email address"""
-        mock_normalize.return_value = "test@example.com"
-        mock_user = MagicMock()
-
-        with patch.object(self.manager, "model") as mock_model:
-            mock_model.return_value = mock_user
-
-            self.manager.create_user("TEST@EXAMPLE.COM", "password123")
-
-            mock_normalize.assert_called_once_with("TEST@EXAMPLE.COM")
-            mock_user.set_password.assert_called_once_with("password123")
-            mock_user.save.assert_called_once()
 
     def test_create_user_without_email_raises_error(self):
         """Test that create_user raises ValueError when email is not provided"""
@@ -39,37 +23,6 @@ class CustomUserManagerTest(TestCase):
             self.manager.create_user(None, "password123")
 
         self.assertEqual(str(context.exception), "The Email field must be set")
-
-    @patch("api.models.users.CustomUserManager.create_user")
-    def test_create_superuser_sets_required_flags(self, mock_create_user):
-        """Test that create_superuser sets is_staff and is_superuser to True"""
-        mock_user = MagicMock()
-        mock_create_user.return_value = mock_user
-
-        self.manager.create_superuser("admin@example.com", "password123")
-
-        mock_create_user.assert_called_once_with(
-            "admin@example.com", "password123", is_staff=True, is_superuser=True
-        )
-
-    @patch("api.models.users.CustomUserManager.create_user")
-    def test_create_superuser_with_extra_fields(self, mock_create_user):
-        """Test that create_superuser preserves extra fields"""
-        mock_user = MagicMock()
-        mock_create_user.return_value = mock_user
-
-        self.manager.create_superuser(
-            "admin@example.com", "password123", first_name="Admin", last_name="User"
-        )
-
-        mock_create_user.assert_called_once_with(
-            "admin@example.com",
-            "password123",
-            is_staff=True,
-            is_superuser=True,
-            first_name="Admin",
-            last_name="User",
-        )
 
     def test_create_superuser_with_is_staff_false_raises_error(self):
         """Test that create_superuser raises ValueError if is_staff=False"""

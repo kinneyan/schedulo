@@ -9,7 +9,10 @@ from .integration.workspaces.test_workspace_crud import (
     ModifyWorkspaceTests,
     DeleteWorkspaceTests,
 )
-from .integration.workspaces.test_workspace_queries import GetWorkspaceTests
+from .integration.workspaces.test_workspace_queries import (
+    GetWorkspaceTests,
+    GetWorkspaceMembersTests,
+)
 from .integration.roles.test_role_crud import (
     CreateRoleTests,
     DeleteRoleTests,
@@ -50,12 +53,4 @@ from .unit.serializers.test_user_serializers import (
     RegisterUserSerializerTest,
 )
 from .unit.serializers.test_role_serializers import RoleSerializerTest
-from .unit.views.test_auth_views import (
-    LoginViewTest,
-    RegisterViewTest,
-)
-from .unit.views.test_role_views import (
-    CreateRoleViewTest,
-    DeleteWorkspaceRoleViewTest,
-    ModifyWorkspaceRoleViewTest,
-)
+from .unit.views.test_auth_views import RegisterViewTest

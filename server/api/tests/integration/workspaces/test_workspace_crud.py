@@ -282,11 +282,7 @@ class DeleteWorkspaceTests(APITestCase):
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        # ensure workspace was not deleted
-        try:
-            Workspace.objects.get(pk=self.workspace1.id)
-        except Workspace.DoesNotExist:
-            self.assertTrue(False)
+        self.assertTrue(Workspace.objects.filter(pk=self.workspace1.id).exists())
 
     def test_not_member(self):
         """Verify that a user who is not a workspace member cannot delete the workspace."""
@@ -295,11 +291,7 @@ class DeleteWorkspaceTests(APITestCase):
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        # ensure workspace was not deleted
-        try:
-            Workspace.objects.get(pk=self.workspace1.id)
-        except Workspace.DoesNotExist:
-            self.assertTrue(False)
+        self.assertTrue(Workspace.objects.filter(pk=self.workspace1.id).exists())
 
     def test_valid(self):
         """Verify that a workspace owner can successfully delete the workspace."""
@@ -307,9 +299,4 @@ class DeleteWorkspaceTests(APITestCase):
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # ensure workspace was deleted
-        try:
-            Workspace.objects.get(pk=self.workspace1.id)
-            self.assertTrue(False)
-        except Workspace.DoesNotExist:
-            self.assertTrue(True)
+        self.assertFalse(Workspace.objects.filter(pk=self.workspace1.id).exists())
