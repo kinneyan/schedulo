@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from ..models import Shift
+from .member import MemberReadSerializer
+from .role import RoleReadSerializer
+
 
 
 class ShiftSerializer(serializers.ModelSerializer):
@@ -30,3 +33,11 @@ class ModifyShiftSerializer(serializers.ModelSerializer):
             "start_time": {"required": False},
             "end_time": {"required": False},
         }
+
+class ShiftReadSerializer(serializers.ModelSerializer):
+    member = MemberReadSerializer(read_only=True, fields=["id", "user"])
+    role = RoleReadSerializer(read_only=True)
+
+    class Meta:
+        model = Shift
+        fields = ["id", "member", "role", "start_time", "end_time", "open"]

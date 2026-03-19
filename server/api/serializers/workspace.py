@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from ..models import Workspace
-from ..serializers import UserReadSerializer
+from .users import UserReadSerializer
 
 
 class WorkspaceSerializer(serializers.ModelSerializer):

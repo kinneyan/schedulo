@@ -21,13 +21,13 @@ class RoleSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {"name": {"required": False}, "pay_rate": {"required": False}}
 
-class RoleReadSerialzier(serializers.ModelSerializer):
+class RoleReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkspaceRole
         fields = ["id", "name"]
 
 class MemberRoleReadSerializer(serializers.ModelSerializer):
-    workspace_role = RoleReadSerialzier(read_only=True)
+    workspace_role = RoleReadSerializer(read_only=True)
 
     class Meta:
         model = MemberRole
