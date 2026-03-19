@@ -36,7 +36,7 @@ class ModifyShiftSerializer(serializers.ModelSerializer):
 
 class ShiftReadSerializer(serializers.ModelSerializer):
     member = MemberReadSerializer(read_only=True, fields=["id", "user"])
-    role = RoleReadSerializer(read_only=True)
+    role = RoleReadSerializer(read_only=True, fields=["id", "name"])
 
     class Meta:
         model = Shift

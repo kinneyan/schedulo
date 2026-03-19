@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from ..models import WorkspaceRole, MemberRole
+from .base import DynamicFieldsSerializer
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -21,13 +22,13 @@ class RoleSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {"name": {"required": False}, "pay_rate": {"required": False}}
 
-class RoleReadSerializer(serializers.ModelSerializer):
+class RoleReadSerializer(DynamicFieldsSerializer):
     class Meta:
         model = WorkspaceRole
-        fields = ["id", "name"]
+        fields = ["id", "name", "pay_rate"]
 
 class MemberRoleReadSerializer(serializers.ModelSerializer):
-    workspace_role = RoleReadSerializer(read_only=True)
+    workspace_role = RoleReadSerializer(read_only=True, fields=["id", "name"])
 
     class Meta:
         model = MemberRole

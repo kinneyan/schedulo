@@ -86,7 +86,7 @@ class GetRolesTests(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        output = response.data["roles"]
+        output = response.data["result"]
         role = WorkspaceRole.objects.get(id=output[0]["id"])
 
         self.assertEqual(role.name, data["name"])
@@ -105,7 +105,7 @@ class GetRolesTests(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        output = response.data["roles"]
+        output = response.data["result"]
 
         self.assertEqual(len(output), len(data))
 
@@ -154,7 +154,7 @@ class GetRolesTests(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        output = response.data["roles"]
+        output = response.data["result"]
 
         self.assertEqual(len(output), len(data))
 

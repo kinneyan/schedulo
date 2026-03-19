@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from ..serializers import WorkspaceSerializer, ShiftSerializer, RoleSerializer, WorkspaceReadSerializer, MemberReadSerializer, ShiftReadSerializer
+from ..serializers import WorkspaceSerializer, ShiftSerializer, RoleSerializer, WorkspaceReadSerializer, MemberReadSerializer, ShiftReadSerializer, RoleReadSerializer
 from ..models import (
     Workspace,
     WorkspaceMember,
@@ -580,16 +580,8 @@ class WorkspaceRolesView(APIView):
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         results = WorkspaceRole.objects.filter(workspace=workspace)
+        data = RoleReadSerializer(results, many=True).data
 
-        role_list = [
-            {
-                "id": role.id,
-                "name": role.name,
-                "pay_rate": role.pay_rate,
-            }
-            for role in results
-        ]
-
-        response["roles"] = role_list
+        response["result"] = data
 
         return Response(response, status=status.HTTP_200_OK)

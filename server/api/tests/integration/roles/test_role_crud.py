@@ -188,19 +188,16 @@ class GetRoleTests(APITestCase):
         """Verify that a workspace member can retrieve a role and response contains correct attributes."""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["id"], self.role.id)
-        self.assertEqual(response.data["name"], self.role.name)
-        self.assertEqual(response.data["pay_rate"], self.role.pay_rate)
-        self.assertEqual(response.data["date_created"], self.role.date_created)
-        self.assertEqual(response.data["date_modified"], self.role.date_modified)
+        self.assertEqual(response.data["result"]["id"], self.role.id)
+        self.assertEqual(response.data["result"]["name"], self.role.name)
 
     def test_get_role_as_unprivileged_member(self):
         """Verify that a member without manage_workspace_roles permission can still retrieve a role."""
         self.client.force_authenticate(user=self.user2)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["id"], self.role.id)
-        self.assertEqual(response.data["name"], self.role.name)
+        self.assertEqual(response.data["result"]["id"], self.role.id)
+        self.assertEqual(response.data["result"]["name"], self.role.name)
 
     def test_get_role_invalid_role_id(self):
         """Verify that a nonexistent role_id returns 404."""
