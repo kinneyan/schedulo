@@ -151,8 +151,8 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # check that response has correct shifts
-        self.assertEqual(len(response.data["shifts"]), 2)
-        shifts = response.data["shifts"]
+        self.assertEqual(len(response.data["result"]), 2)
+        shifts = response.data["result"]
         self.assertEqual(shifts[0]["id"], self.shift3.id)
         self.assertEqual(shifts[1]["id"], self.shift4.id)
 
@@ -163,8 +163,8 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # check that response has correct shifts
-        self.assertEqual(len(response.data["shifts"]), 1)
-        shifts = response.data["shifts"]
+        self.assertEqual(len(response.data["result"]), 1)
+        shifts = response.data["result"]
         self.assertEqual(shifts[0]["id"], self.shift4.id)
 
     def test_date_range_invalid(self):
@@ -191,8 +191,8 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # check that response has correct shifts
-        self.assertEqual(len(response.data["shifts"]), 1)
-        shifts = response.data["shifts"]
+        self.assertEqual(len(response.data["result"]), 1)
+        shifts = response.data["result"]
         self.assertEqual(shifts[0]["id"], self.shift5.id)
 
     def test_date_range_only_start(self):
@@ -213,8 +213,8 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # check that response has correct shifts
-        self.assertEqual(len(response.data["shifts"]), 1)
-        shifts = response.data["shifts"]
+        self.assertEqual(len(response.data["result"]), 1)
+        shifts = response.data["result"]
         self.assertEqual(shifts[0]["id"], self.shift5.id)
 
     def test_date_range_only_end(self):
@@ -235,8 +235,8 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # check that response has correct shifts
-        self.assertEqual(len(response.data["shifts"]), 5)
-        shifts = response.data["shifts"]
+        self.assertEqual(len(response.data["result"]), 5)
+        shifts = response.data["result"]
         ids = [row["id"] for row in shifts]
         self.assertTrue(self.shift1.id in ids)
         self.assertTrue(self.shift2.id in ids)
@@ -281,4 +281,4 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # check that response has correct shifts
-        self.assertEqual(len(response.data["shifts"]), 0)
+        self.assertEqual(len(response.data["result"]), 0)

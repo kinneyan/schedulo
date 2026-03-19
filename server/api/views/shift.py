@@ -6,7 +6,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from datetime import datetime
 from datetime import date
 
-from ..serializers import ShiftSerializer, ModifyShiftSerializer
+from ..serializers import ShiftSerializer, ModifyShiftSerializer, ShiftReadSerializer
 from ..models import (
     Workspace,
     WorkspaceMember,
@@ -251,20 +251,7 @@ class ShiftFilterView(APIView):
         # search by filters
         results = Shift.objects.filter(**filters)
 
-        shift_list = [
-            {
-                "id": shift.id,
-                "member_id": getattr(shift.member_id, "id", None),
-                "role_id": shift.role.id,
-                "workspace_id": shift.workspace.id,
-                "open": shift.open,
-                "created_by_id": shift.created_by.id,
-                "start_time": shift.start_time,
-                "end_time": shift.end_time,
-            }
-            for shift in results
-        ]
-
-        response["shifts"] = shift_list
+        data = ShiftReadSerializer(results, many=True).data
+        response["result"] = data
 
         return Response(response, status=status.HTTP_200_OK)
