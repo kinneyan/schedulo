@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from django.core import serializers
 
 from ..serializers import RoleSerializer
 from ..models import (
@@ -47,7 +46,7 @@ class RoleView(APIView):
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         results = WorkspaceRole.objects.filter(pk=role_id)
-        data = serializers.serialize("json", results)
+        data = RoleSerializer(results, many=True).data
         print(data)
 
         response["id"] = role.id

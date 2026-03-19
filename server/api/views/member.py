@@ -4,6 +4,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from ..serializers import MemberReadSerializer
+
 from ..models import (
     Workspace,
     WorkspaceMember,
@@ -20,8 +22,42 @@ class MemberView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, member_id):
-        # TODO
-        return None
+        """
+        Returns json in body with structure:
+        {
+            id: member id
+            first_name: user first name
+            last_name: user last name
+            member_roles: [
+                {
+                    id: role id
+                    name: role name
+                },
+                ...
+            ]
+        }
+        """
+    
+        response = {"error": {}}
+
+        # get member
+        try:
+            member = WorkspaceMember.objects.get(pk=member_id)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "Could not find member with provided ID."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        
+        # ensure request is from user in same workspace
+        try:
+            _ = WorkspaceMember.objects.get(workspace=member.workspace, user=request.user)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "Must share a workspace to get member."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        
+        data = MemberReadSerializer(member).data
+        response["member"] = data
+
+        return Response(response, status=status.HTTP_200_OK)
 
     def put(self, request, member_id):
         # TODO

@@ -10,3 +10,4 @@ class WorkspaceSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "name": {"required": False},
         }
+

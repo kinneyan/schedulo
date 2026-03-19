@@ -22,3 +22,13 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             "last_name": {"required": True, "allow_blank": False},
             "phone": {"required": True, "allow_blank": False},
         }
+
+class UserReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name"]
+
+class UserDetailedReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "first_name", "last_name", "phone", "email"]
