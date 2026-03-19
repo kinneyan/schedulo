@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from ..models import Workspace
+from ..serializers import UserReadSerializer
 
 
 class WorkspaceSerializer(serializers.ModelSerializer):
@@ -11,3 +12,9 @@ class WorkspaceSerializer(serializers.ModelSerializer):
             "name": {"required": False},
         }
 
+class WorkspaceReadSerializer(serializers.ModelSerializer):
+    owner = UserReadSerializer(read_only=True)
+
+    class Meta:
+        model = Workspace
+        fields = ["id", "name", "owner"]
