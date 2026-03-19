@@ -55,7 +55,7 @@ class MemberView(APIView):
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         
         data = MemberReadSerializer(member).data
-        response["member"] = data
+        response["result"] = data
 
         return Response(response, status=status.HTTP_200_OK)
 

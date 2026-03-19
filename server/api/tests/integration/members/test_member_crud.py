@@ -102,11 +102,11 @@ class GetMemberTests(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        print(response.data["member"])
+        print(response.data["result"])
 
     def test_multiple_roles(self):
         self.url = reverse("member", args=[self.workspace1_member2.id])
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        print(response.data["member"])
+        print(response.data["result"])
