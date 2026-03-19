@@ -1,6 +1,6 @@
 from .users import LoginUserSerializer, RegisterUserSerializer, UserReadSerializer, UserDetailedReadSerializer
 from .token import CustomTokenObtainPairSerializer
 from .workspace import WorkspaceSerializer, WorkspaceReadSerializer
-from .role import RoleSerializer, MemberRoleReadSerializer, RoleReadSerialzier
-from .shift import ShiftSerializer, ModifyShiftSerializer
+from .role import RoleSerializer, MemberRoleReadSerializer, RoleReadSerializer
+from .shift import ShiftSerializer, ModifyShiftSerializer, ShiftReadSerializer
 from .member import MemberReadSerializer
