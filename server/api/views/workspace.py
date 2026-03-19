@@ -67,7 +67,7 @@ class WorkspaceView(APIView):
             manage_schedules=True,
             manage_time_off=True,
         )
-
+        response["result"] = workspace.id
         return Response(response, status=status.HTTP_201_CREATED)
 
     """API view for renaming a workspace or transferring ownership. Owner only."""
@@ -328,6 +328,7 @@ class WorkspaceMembersView(APIView):
                 member=workspace_member,
             )
 
+            response["result"] = workspace_member.id
             return Response(response, status=status.HTTP_201_CREATED)
         else:
             response["error"] = "User is already member of this workspace"
