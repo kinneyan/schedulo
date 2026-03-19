@@ -138,14 +138,7 @@ class GetWorkspaceTests(APITestCase):
 
 
 class GetWorkspaceMembersTests(APITestCase):
-    def setUp(self):
-        self.user3 = User.objects.create_user(
-            email="testuser3@example.com",
-            password="testpassword",
-            first_name="Test3",
-            last_name="User3",
-            phone="1234567890",
-        )
+    def setUp(self):        
         self.user = User.objects.create_user(
             email="testuser@example.com",
             password="testpassword",
@@ -158,6 +151,13 @@ class GetWorkspaceMembersTests(APITestCase):
             password="testpassword",
             first_name="Test2",
             last_name="User2",
+            phone="1234567890",
+        )
+        self.user3 = User.objects.create_user(
+            email="testuser3@example.com",
+            password="testpassword",
+            first_name="Test3",
+            last_name="User3",
             phone="1234567890",
         )
 
@@ -231,39 +231,22 @@ class GetWorkspaceMembersTests(APITestCase):
         response = self.client.get(self.url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        result = response.data["members"]
+        result = response.data["result"]
         self.assertEqual(len(result), 2)
 
-        def build_expected_member(member, user, permissions, roles):
+        def build_expected_member(user, roles):
             return {
-                "member_id": member.id,
-                "user_id": user.id,
+                "id": user.id,
                 "first_name": user.first_name,
                 "last_name": user.last_name,
-                "email": user.email,
-                "roles": [
-                    {
-                        "role_id": role.id,
-                        "name": role.name,
-                        "pay_rate": role.pay_rate,
-                    }
+                "member_roles": [
+                    {"id": role.id, "name": role.name}
                     for role in roles
                 ],
-                "permissions": {
-                    "is_owner": permissions.is_owner,
-                    "manage_workspace_members": permissions.manage_workspace_members,
-                    "manage_workspace_roles": permissions.manage_workspace_roles,
-                    "manage_schedules": permissions.manage_schedules,
-                    "manage_time_off": permissions.manage_time_off,
-                },
             }
 
-        expected_member1 = build_expected_member(
-            self.member, self.user, self.permissions, [self.role]
-        )
-        expected_member2 = build_expected_member(
-            self.member2, self.user2, self.permissions2, [self.role, self.role2]
-        )
+        expected_member1 = build_expected_member(self.user, [self.role])
+        expected_member2 = build_expected_member(self.user2, [self.role, self.role2])
 
         self.assertEqual(result[0], expected_member1)
         self.assertEqual(result[1], expected_member2)
