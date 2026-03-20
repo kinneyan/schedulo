@@ -67,8 +67,40 @@ class MemberView(APIView):
         return None
 
     def delete(self, request, member_id):
-        # TODO
-        return None
+        response = {"error": {}}
+
+        # get member
+        try:
+            member = WorkspaceMember.objects.get(pk=member_id)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "Could not find member with provided ID."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # verify user is part of workspace
+        try:
+            request_member = WorkspaceMember.objects.get(
+                user=request.user, workspace=member.workspace
+            )
+        except WorkspaceMember.DoesNotExist:
+            response["error"][
+                "message"
+            ] = "You must be a member of the same workspace to retreive member roles."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+
+        # verify request user has perms to view member shifts or is viewing own shifts
+        perms = MemberPermissions.objects.get(member=request_member)
+        if (
+            perms.is_owner
+            or perms.manage_workspace_members
+            or member.id == request_member.id
+        ):
+            member.delete()
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            response["error"][
+                "message"
+            ] = "You do not have permission to view this members roles."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
 
 
 class MemberPermissionsView(APIView):
@@ -285,23 +317,34 @@ class MemberRolesView(APIView):
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Member does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
-        
+
         # verify user is part of workspace
         try:
-            request_member = WorkspaceMember.objects.get(user=request.user, workspace=member.workspace)           
+            request_member = WorkspaceMember.objects.get(
+                user=request.user, workspace=member.workspace
+            )
         except WorkspaceMember.DoesNotExist:
-            response["error"]["message"] = "You must be a member of the same workspace to retreive member roles."
+            response["error"][
+                "message"
+            ] = "You must be a member of the same workspace to retreive member roles."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
-        
-        # verify request user has perms to view member roles or is viewing own roles 
+
+        # verify request user has perms to view member roles or is viewing own roles
         # TODO: test for this once this is confirmed to be desired behavior
         perms = MemberPermissions.objects.get(member=request_member)
-        if perms.is_owner or perms.manage_workspace_members or perms.manage_workspace_roles or member.id == request_member.id:
+        if (
+            perms.is_owner
+            or perms.manage_workspace_members
+            or perms.manage_workspace_roles
+            or member.id == request_member.id
+        ):
             data = MemberDetailedReadSerializer(member).data
             response["result"] = data["member_roles"]
             return Response(response, status=status.HTTP_200_OK)
         else:
-            response["error"]["message"] = "You do not have permission to view this members roles."
+            response["error"][
+                "message"
+            ] = "You do not have permission to view this members roles."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, member_id):
@@ -392,21 +435,34 @@ class MemberShiftsView(APIView):
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Member does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
-        
+
         # verify user is part of workspace
         try:
-            request_member = WorkspaceMember.objects.get(user=request.user, workspace=member.workspace)           
+            request_member = WorkspaceMember.objects.get(
+                user=request.user, workspace=member.workspace
+            )
         except WorkspaceMember.DoesNotExist:
-            response["error"]["message"] = "You must be a member of the same workspace to retreive member roles."
+            response["error"][
+                "message"
+            ] = "You must be a member of the same workspace to retreive member roles."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
-        
+
         # verify request user has perms to view member shifts or is viewing own shifts
         perms = MemberPermissions.objects.get(member=request_member)
-        if perms.is_owner or perms.manage_workspace_members or perms.manage_schedules or member.id == request_member.id:
+        if (
+            perms.is_owner
+            or perms.manage_workspace_members
+            or perms.manage_schedules
+            or member.id == request_member.id
+        ):
             shifts = Shift.objects.filter(member=member)
-            data = ShiftReadSerializer(shifts, many=True, fields=["id", "role", "start_time", "end_time"]).data
+            data = ShiftReadSerializer(
+                shifts, many=True, fields=["id", "role", "start_time", "end_time"]
+            ).data
             response["result"] = data
             return Response(response, status=status.HTTP_200_OK)
         else:
-            response["error"]["message"] = "You do not have permission to view this members roles."
+            response["error"][
+                "message"
+            ] = "You do not have permission to view this members roles."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
