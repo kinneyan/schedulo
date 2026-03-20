@@ -118,6 +118,7 @@ class GetMemberPermissionsTests(APITestCase):
         self.assertEqual(result["manage_schedules"], self.permissions2.manage_schedules)
         self.assertEqual(result["manage_time_off"], self.permissions2.manage_time_off)
 
+
 class GetMemberShiftsTests(APITestCase):
     """Integration tests for the get member shifts endpoint."""
 
