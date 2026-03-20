@@ -29,7 +29,7 @@ class RoleReadSerializer(DynamicFieldsSerializer):
         fields = ["id", "name", "pay_rate"]
 
 
-class MemberRoleReadSerializer(serializers.ModelSerializer):
+class MemberRoleReadSerializer(DynamicFieldsSerializer):
     workspace_role = RoleReadSerializer(read_only=True, fields=["id", "name"])
 
     class Meta:

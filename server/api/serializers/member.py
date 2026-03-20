@@ -6,7 +6,7 @@ from .role import MemberRoleReadSerializer
 
 class MemberReadSerializer(DynamicFieldsSerializer):
     user = UserReadSerializer(read_only=True)
-    member_roles = MemberRoleReadSerializer(many=True, read_only=True)
+    member_roles = MemberRoleReadSerializer(many=True, read_only=True, fields=["id", "name"])
 
     class Meta:
         model = WorkspaceMember

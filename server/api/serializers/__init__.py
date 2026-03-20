@@ -8,5 +8,5 @@ from .token import CustomTokenObtainPairSerializer
 from .workspace import WorkspaceSerializer, WorkspaceReadSerializer
 from .role import RoleSerializer, MemberRoleReadSerializer, RoleReadSerializer
 from .shift import ShiftSerializer, ModifyShiftSerializer, ShiftReadSerializer
-from .member import MemberReadSerializer
+from .member import MemberReadSerializer, MemberDetailedReadSerializer
 from .permissions import PermissionsReadSerializer

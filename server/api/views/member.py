@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from ..serializers import MemberReadSerializer, PermissionsReadSerializer
+from ..serializers import MemberReadSerializer, PermissionsReadSerializer, MemberDetailedReadSerializer
 
 from ..models import (
     Workspace,
@@ -284,23 +284,24 @@ class MemberRolesView(APIView):
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Member does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-        # get list of roles
-        member_roles = MemberRole.objects.filter(member=member)
-        results = WorkspaceRole.objects.filter(pk__in=member_roles)
-
-        role_list = [
-            {
-                "id": role.id,
-                "name": role.name,
-                "pay_rate": role.pay_rate,
-            }
-            for role in results
-        ]
-
-        response["roles"] = role_list
-
-        return Response(response, status=status.HTTP_200_OK)
+        
+        # verify user is part of workspace
+        try:
+            request_member = WorkspaceMember.objects.get(user=request.user, workspace=member.workspace)           
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "You must be a member of the same workspace to retreive member roles."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        
+        # verify request user has perms to view member roles or is viewing own roles 
+        # TODO: test for this once this is confirmed to be desired behavior
+        perms = MemberPermissions.objects.get(member=request_member)
+        if perms.is_owner or perms.manage_workspace_members or perms.manage_workspace_roles or member.id == request_member.id:
+            data = MemberDetailedReadSerializer(member).data
+            response["result"] = data["member_roles"]
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            response["error"]["message"] = "You do not have permission to view this members roles."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, member_id):
         """Remove a WorkspaceRole from a workspace member.
@@ -382,5 +383,7 @@ class MemberShiftsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, member_id):
+        response = {"error": {}}
         # TODO
+
         return None

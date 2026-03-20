@@ -241,7 +241,7 @@ class GetMemberRoleTests(APITestCase):
         url = reverse("member_roles", kwargs={"member_id": self.member2.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["roles"]), 0)
+        self.assertEqual(len(response.data["result"]), 0)
 
     def test_single(self):
         """Verify that fetching roles for a member with one assignment returns that role."""
@@ -250,9 +250,9 @@ class GetMemberRoleTests(APITestCase):
         url = reverse("member_roles", kwargs={"member_id": self.member2.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["roles"]), 1)
+        self.assertEqual(len(response.data["result"]), 1)
 
-        role = WorkspaceRole.objects.get(id=response.data["roles"][0]["id"])
+        role = WorkspaceRole.objects.get(id=response.data["result"][0]["id"])
         self.assertEqual(self.role.id, role.id)
 
     def test_multiple(self):
@@ -264,11 +264,11 @@ class GetMemberRoleTests(APITestCase):
         url = reverse("member_roles", kwargs={"member_id": self.member2.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["roles"]), 3)
+        self.assertEqual(len(response.data["result"]), 3)
 
-        role = WorkspaceRole.objects.get(id=response.data["roles"][0]["id"])
-        role2 = WorkspaceRole.objects.get(id=response.data["roles"][1]["id"])
-        role3 = WorkspaceRole.objects.get(id=response.data["roles"][2]["id"])
+        role = WorkspaceRole.objects.get(id=response.data["result"][0]["id"])
+        role2 = WorkspaceRole.objects.get(id=response.data["result"][1]["id"])
+        role3 = WorkspaceRole.objects.get(id=response.data["result"][2]["id"])
         self.assertEqual(self.role.id, role.id)
         self.assertEqual(self.role2.id, role2.id)
         self.assertEqual(self.role3.id, role3.id)
