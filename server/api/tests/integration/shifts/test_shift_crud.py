@@ -188,9 +188,8 @@ class CreateShiftTests(APITestCase):
             Shift.objects.filter(workspace=self.workspace, role=self.role).exists()
         )
 
-
-class GetShiftsTests(APITestCase):
-    """Integration tests for the get shifts endpoint."""
+class GetShiftTests(APITestCase):
+    """Integration tests for the get shift endpoint."""
 
     def setUp(self):
         """Create a workspace with members, roles, and shifts."""
@@ -248,7 +247,7 @@ class GetShiftsTests(APITestCase):
             workspace=self.workspace, name="Test Role", pay_rate=15.00
         )
 
-        self.shift1 = Shift.objects.create(
+        self.shift = Shift.objects.create(
             workspace=self.workspace,
             member=self.member,
             role=self.role,
@@ -256,7 +255,7 @@ class GetShiftsTests(APITestCase):
             start_time="2026-01-01T09:00:00Z",
             end_time="2026-01-01T17:00:00Z",
         )
-        self.shift2 = Shift.objects.create(
+        self.open_shift = Shift.objects.create(
             workspace=self.workspace,
             member=None,
             role=self.role,
@@ -267,64 +266,51 @@ class GetShiftsTests(APITestCase):
         )
 
         self.client.force_authenticate(user=self.user)
-        self.url = reverse("workspace_shifts", kwargs={"workspace_id": self.workspace.id})
+        self.url = reverse("shift", kwargs={"shift_id": self.shift.id})
 
-    def test_invalid_workspace(self):
-        """Verify that a nonexistent workspace_id returns 404."""
-        url = reverse("workspace_shifts", kwargs={"workspace_id": 999})
+    def test_invalid_shift(self):
+        """Verify that a nonexistent shift_id returns 404."""
+        url = reverse("shift", kwargs={"shift_id": 999})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_get_shifts_without_permissions(self):
-        """Verify that a member without manage_schedules permission receives 403."""
-        self.client.force_authenticate(user=self.user2)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_get_shifts_as_non_member(self):
+    def test_get_shift_as_non_member(self):
         """Verify that a user who is not a workspace member receives 403."""
         self.client.force_authenticate(user=self.user3)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_get_shifts_valid(self):
-        """Verify that a member with manage_schedules permission can retrieve all shifts with correct structure."""
+    def test_get_shift_valid(self):
+        """Verify that a workspace member can retrieve shift details with correct structure."""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         result = response.data["result"]
-        self.assertEqual(len(result), 2)
+        self.assertEqual(result["id"], self.shift.id)
+        self.assertEqual(result["member"]["id"], self.member.id)
+        self.assertEqual(result["member"]["first_name"], self.user.first_name)
+        self.assertEqual(result["member"]["last_name"], self.user.last_name)
+        self.assertEqual(result["role"]["id"], self.role.id)
+        self.assertEqual(result["role"]["name"], self.role.name)
+        self.assertEqual(result["start_time"], self.shift.start_time)
+        self.assertEqual(result["end_time"], self.shift.end_time)
+        self.assertEqual(result["open"], self.shift.open)
 
-        expected_shift1 = {
-            "id": self.shift1.id,
-            "member": {
-                "id": self.member.id,
-                "first_name": self.user.first_name,
-                "last_name": self.user.last_name,
-            },
-            "role": {"id": self.role.id, "name": self.role.name},
-            "start_time": self.shift1.start_time,
-            "end_time": self.shift1.end_time,
-            "open": self.shift1.open,
-        }
-        expected_shift2 = {
-            "id": self.shift2.id,
-            "member": None,
-            "role": {"id": self.role.id, "name": self.role.name},
-            "start_time": self.shift2.start_time,
-            "end_time": self.shift2.end_time,
-            "open": self.shift2.open,
-        }
-
-        self.assertEqual(result[0], expected_shift1)
-        self.assertEqual(result[1], expected_shift2)
-
-    def test_get_shifts_empty(self):
-        """Verify that an empty list is returned when no shifts exist in the workspace."""
-        Shift.objects.all().delete()
+    def test_get_shift_valid_as_unprivileged_member(self):
+        """Verify that a member without manage_schedules permission can still retrieve shift details."""
+        self.client.force_authenticate(user=self.user2)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["result"]), 0)
+
+    def test_get_open_shift_valid(self):
+        """Verify that an open shift with no assigned member returns None for member field."""
+        url = reverse("shift", kwargs={"shift_id": self.open_shift.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        result = response.data["result"]
+        self.assertIsNone(result["member"])
+        self.assertTrue(result["open"])
 
 class ModifyShiftTests(APITestCase):
     """Integration tests for the shift modification endpoint."""
