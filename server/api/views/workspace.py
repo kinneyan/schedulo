@@ -481,17 +481,11 @@ class WorkspaceShiftsView(APIView):
 
         # Verify user is part of workspace and has perms to manage schedules
         try:
-            creator_member = WorkspaceMember.objects.get(
+            _ = WorkspaceMember.objects.get(
                 user=request.user, workspace=workspace
             )
-            MemberPermissions.objects.get(member=creator_member, manage_schedules=True)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
-            return Response(response, status=status.HTTP_403_FORBIDDEN)
-        except MemberPermissions.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "You do not have permissions to manage schedules in this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         
         result = Shift.objects.filter(workspace=workspace)
