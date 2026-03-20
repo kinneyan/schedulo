@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .base import DynamicFieldsSerializer
 from ..models import Shift
 from .member import MemberReadSerializer
 from .role import RoleReadSerializer
@@ -34,7 +35,7 @@ class ModifyShiftSerializer(serializers.ModelSerializer):
         }
 
 
-class ShiftReadSerializer(serializers.ModelSerializer):
+class ShiftReadSerializer(DynamicFieldsSerializer):
     member = MemberReadSerializer(read_only=True, fields=["id", "user"])
     role = RoleReadSerializer(read_only=True, fields=["id", "name"])
 

@@ -33,7 +33,7 @@ from .integration.shifts.test_shift_crud import (
 )
 from .integration.shifts.test_shift_queries import GetShiftsTest
 from .integration.members.test_member_crud import GetMemberTests
-from .integration.members.test_member_queries import GetMemberPermissionsTests
+from .integration.members.test_member_queries import GetMemberPermissionsTests, GetMemberShiftsTests
 
 # Import from unit tests
 from .unit.models.test_user_models import (

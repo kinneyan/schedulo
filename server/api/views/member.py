@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from ..serializers import MemberReadSerializer, PermissionsReadSerializer, MemberDetailedReadSerializer
+from ..serializers import MemberReadSerializer, PermissionsReadSerializer, MemberDetailedReadSerializer, ShiftReadSerializer
 
 from ..models import (
     Workspace,
@@ -13,6 +13,7 @@ from ..models import (
     MemberPermissions,
     WorkspaceRole,
     MemberRole,
+    Shift,
 )
 
 
@@ -384,6 +385,28 @@ class MemberShiftsView(APIView):
 
     def get(self, request, member_id):
         response = {"error": {}}
-        # TODO
 
-        return None
+        # Verify that member exists
+        try:
+            member = WorkspaceMember.objects.get(pk=member_id)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "Member does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        
+        # verify user is part of workspace
+        try:
+            request_member = WorkspaceMember.objects.get(user=request.user, workspace=member.workspace)           
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "You must be a member of the same workspace to retreive member roles."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+        
+        # verify request user has perms to view member shifts or is viewing own shifts
+        perms = MemberPermissions.objects.get(member=request_member)
+        if perms.is_owner or perms.manage_workspace_members or perms.manage_schedules or member.id == request_member.id:
+            shifts = Shift.objects.filter(member=member)
+            data = ShiftReadSerializer(shifts, many=True, fields=["id", "role", "start_time", "end_time"]).data
+            response["result"] = data
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            response["error"]["message"] = "You do not have permission to view this members roles."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
