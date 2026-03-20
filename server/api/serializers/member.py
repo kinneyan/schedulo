@@ -22,7 +22,7 @@ class MemberReadSerializer(DynamicFieldsSerializer):
         return data
 
 class MemberDetailedReadSerializer(DynamicFieldsSerializer):
-    user = UserDetailedReadSerializer(read_only=True)
+    user = UserDetailedReadSerializer(read_only=True, fields=["first_name", "last_name", "phone", "email"])
     member_roles = MemberRoleReadSerializer(many=True, read_only=True)
 
     class Meta:
