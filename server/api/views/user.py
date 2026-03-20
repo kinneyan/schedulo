@@ -7,6 +7,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
 from ..models import Workspace, WorkspaceMember
+from ..serializers import UserDetailedReadSerializer, WorkspaceReadSerializer
 
 
 class GetUser(APIView):
@@ -22,13 +23,33 @@ class GetUser(APIView):
         :type request: rest_framework.request.Request
         :return: User profile fields and a list of workspaces the user belongs to.
         :rtype: rest_framework.response.Response
+
+
+        result: {
+            user: {
+                id: user id
+                first_name: first name
+                last_name: last name
+                phone: phone #
+                email: email
+            }
+            workspaces: [
+                {
+                    id: workspace id
+                    name: workspace name
+                    owner: {
+                        first_name: owner first name
+                        last_name: owner last name
+                    },
+                    ...
+                }
+            ]
+        }
         """
         response = {"error": {}}
+        response = {"result": {}}
 
-        response["email"] = request.user.email
-        response["phone"] = request.user.phone
-        response["first_name"] = request.user.first_name
-        response["last_name"] = request.user.last_name
+        response["result"]["user"] = UserDetailedReadSerializer(request.user).data
 
         # get list of workspaces user is in
         members = WorkspaceMember.objects.filter(user=request.user).values_list(
@@ -47,6 +68,7 @@ class GetUser(APIView):
         ]
 
         response["workspaces"] = workspace_list
+        response["result"]["workspaces"] = WorkspaceReadSerializer(results, many=True).data
 
         return Response(response, status=status.HTTP_200_OK)
 
