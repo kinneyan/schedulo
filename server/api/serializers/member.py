@@ -3,6 +3,7 @@ from ..models import WorkspaceMember, User
 from .users import UserReadSerializer, UserDetailedReadSerializer
 from .role import MemberRoleReadSerializer
 
+
 class MemberReadSerializer(DynamicFieldsSerializer):
     user = UserReadSerializer(read_only=True)
     member_roles = MemberRoleReadSerializer(many=True, read_only=True)
@@ -18,11 +19,14 @@ class MemberReadSerializer(DynamicFieldsSerializer):
             user = data.pop("user")
             data.update(user)
         if "member_roles" in data:
-            data["member_roles"] = [mr["workspace_role"] for mr in data["member_roles"]]      
+            data["member_roles"] = [mr["workspace_role"] for mr in data["member_roles"]]
         return data
 
+
 class MemberDetailedReadSerializer(DynamicFieldsSerializer):
-    user = UserDetailedReadSerializer(read_only=True, fields=["first_name", "last_name", "phone", "email"])
+    user = UserDetailedReadSerializer(
+        read_only=True, fields=["first_name", "last_name", "phone", "email"]
+    )
     member_roles = MemberRoleReadSerializer(many=True, read_only=True)
 
     class Meta:
@@ -36,5 +40,5 @@ class MemberDetailedReadSerializer(DynamicFieldsSerializer):
             user = data.pop("user")
             data.update(user)
         if "member_roles" in data:
-            data["member_roles"] = [mr["workspace_role"] for mr in data["member_roles"]]      
+            data["member_roles"] = [mr["workspace_role"] for mr in data["member_roles"]]
         return data

@@ -63,8 +63,12 @@ class GetUserTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["result"]["user"]["email"], self.user.email)
         self.assertEqual(response.data["result"]["user"]["phone"], self.user.phone)
-        self.assertEqual(response.data["result"]["user"]["first_name"], self.user.first_name)
-        self.assertEqual(response.data["result"]["user"]["last_name"], self.user.last_name)
+        self.assertEqual(
+            response.data["result"]["user"]["first_name"], self.user.first_name
+        )
+        self.assertEqual(
+            response.data["result"]["user"]["last_name"], self.user.last_name
+        )
 
         workspaces = response.data["result"]["workspaces"]
         self.assertEqual(len(workspaces), 1)
@@ -77,8 +81,12 @@ class GetUserTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["result"]["user"]["email"], self.user2.email)
         self.assertEqual(response.data["result"]["user"]["phone"], self.user2.phone)
-        self.assertEqual(response.data["result"]["user"]["first_name"], self.user2.first_name)
-        self.assertEqual(response.data["result"]["user"]["last_name"], self.user2.last_name)
+        self.assertEqual(
+            response.data["result"]["user"]["first_name"], self.user2.first_name
+        )
+        self.assertEqual(
+            response.data["result"]["user"]["last_name"], self.user2.last_name
+        )
 
         workspaces = response.data["result"]["workspaces"]
         self.assertEqual(len(workspaces), 0)

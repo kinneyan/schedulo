@@ -132,7 +132,7 @@ class GetWorkspaceTests(APITestCase):
 
 
 class GetWorkspaceMembersTests(APITestCase):
-    def setUp(self):        
+    def setUp(self):
         self.user = User.objects.create_user(
             email="testuser@example.com",
             password="testpassword",
@@ -233,10 +233,7 @@ class GetWorkspaceMembersTests(APITestCase):
                 "id": user.id,
                 "first_name": user.first_name,
                 "last_name": user.last_name,
-                "member_roles": [
-                    {"id": role.id, "name": role.name}
-                    for role in roles
-                ],
+                "member_roles": [{"id": role.id, "name": role.name} for role in roles],
             }
 
         expected_member1 = build_expected_member(self.user, [self.role])
@@ -324,7 +321,9 @@ class GetWorkspaceShiftsTests(APITestCase):
         )
 
         self.client.force_authenticate(user=self.user)
-        self.url = reverse("workspace_shifts", kwargs={"workspace_id": self.workspace.id})
+        self.url = reverse(
+            "workspace_shifts", kwargs={"workspace_id": self.workspace.id}
+        )
 
     def test_invalid_workspace(self):
         """Verify that a nonexistent workspace_id returns 404."""

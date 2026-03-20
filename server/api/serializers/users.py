@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .base import DynamicFieldsSerializer
 from ..models import User
 
 
@@ -23,12 +24,14 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             "phone": {"required": True, "allow_blank": False},
         }
 
+
 class UserReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["first_name", "last_name"]
 
-class UserDetailedReadSerializer(serializers.ModelSerializer):
+
+class UserDetailedReadSerializer(DynamicFieldsSerializer):
     class Meta:
         model = User
         fields = ["id", "first_name", "last_name", "phone", "email"]

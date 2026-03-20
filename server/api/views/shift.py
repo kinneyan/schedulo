@@ -25,7 +25,7 @@ class ShiftView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, shift_id):
-        """ Get details for shift in url params
+        """Get details for shift in url params
         returns:
         result {
             id: shift id
@@ -42,7 +42,7 @@ class ShiftView(APIView):
             end_time: shift end time
             open: Boolean (if shift has member assigned)
         }
-        
+
         """
 
         response = {"error": {}}
@@ -61,7 +61,9 @@ class ShiftView(APIView):
         try:
             _ = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
         except WorkspaceMember.DoesNotExist:
-            response["error"]["message"] = "You must be a member of the workspace to retrive shift details."
+            response["error"][
+                "message"
+            ] = "You must be a member of the workspace to retrive shift details."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         data = ShiftReadSerializer(shift).data

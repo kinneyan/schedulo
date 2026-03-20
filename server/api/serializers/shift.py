@@ -4,7 +4,6 @@ from .member import MemberReadSerializer
 from .role import RoleReadSerializer
 
 
-
 class ShiftSerializer(serializers.ModelSerializer):
     """Serializer for Shift creation that requires both start_time and end_time."""
 
@@ -33,6 +32,7 @@ class ModifyShiftSerializer(serializers.ModelSerializer):
             "start_time": {"required": False},
             "end_time": {"required": False},
         }
+
 
 class ShiftReadSerializer(serializers.ModelSerializer):
     member = MemberReadSerializer(read_only=True, fields=["id", "user"])

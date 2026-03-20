@@ -4,7 +4,15 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from ..serializers import WorkspaceSerializer, ShiftSerializer, RoleSerializer, WorkspaceReadSerializer, MemberReadSerializer, ShiftReadSerializer, RoleReadSerializer
+from ..serializers import (
+    WorkspaceSerializer,
+    ShiftSerializer,
+    RoleSerializer,
+    WorkspaceReadSerializer,
+    MemberReadSerializer,
+    ShiftReadSerializer,
+    RoleReadSerializer,
+)
 from ..models import (
     Workspace,
     WorkspaceMember,
@@ -177,7 +185,7 @@ class WorkspaceView(APIView):
     """API view for retrieving details about a workspace the user belongs to."""
 
     def get(self, request, workspace_id=None):
-        """Return workspace details 
+        """Return workspace details
 
         :param request: Authenticated HTTP request with workspace_id as a query
             parameter.
@@ -353,10 +361,8 @@ class WorkspaceMembersView(APIView):
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "User is not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
-        
-        member_results = (
-            WorkspaceMember.objects.filter(workspace=workspace)
-        )
+
+        member_results = WorkspaceMember.objects.filter(workspace=workspace)
         data = MemberReadSerializer(member_results, many=True).data
 
         response["result"] = data
@@ -481,13 +487,11 @@ class WorkspaceShiftsView(APIView):
 
         # Verify user is part of workspace and has perms to manage schedules
         try:
-            _ = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            _ = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
-        
+
         result = Shift.objects.filter(workspace=workspace)
         data = ShiftReadSerializer(result, many=True).data
         response["result"] = data

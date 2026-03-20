@@ -12,6 +12,7 @@ class WorkspaceSerializer(serializers.ModelSerializer):
             "name": {"required": False},
         }
 
+
 class WorkspaceReadSerializer(serializers.ModelSerializer):
     owner = UserReadSerializer(read_only=True)
 

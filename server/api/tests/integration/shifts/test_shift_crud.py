@@ -188,6 +188,7 @@ class CreateShiftTests(APITestCase):
             Shift.objects.filter(workspace=self.workspace, role=self.role).exists()
         )
 
+
 class GetShiftTests(APITestCase):
     """Integration tests for the get shift endpoint."""
 
@@ -311,6 +312,7 @@ class GetShiftTests(APITestCase):
         result = response.data["result"]
         self.assertIsNone(result["member"])
         self.assertTrue(result["open"])
+
 
 class ModifyShiftTests(APITestCase):
     """Integration tests for the shift modification endpoint."""

@@ -2,7 +2,15 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from ....models import Workspace, WorkspaceMember, User, MemberPermissions, WorkspaceRole, MemberRole
+from ....models import (
+    Workspace,
+    WorkspaceMember,
+    User,
+    MemberPermissions,
+    WorkspaceRole,
+    MemberRole,
+)
+
 
 class GetMemberTests(APITestCase):
     """Integration tests for the get member endpoint."""

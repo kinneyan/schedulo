@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from ..serializers import MemberReadSerializer
+from ..serializers import MemberReadSerializer, PermissionsReadSerializer
 
 from ..models import (
     Workspace,
@@ -37,7 +37,7 @@ class MemberView(APIView):
             ]
         }
         """
-    
+
         response = {"error": {}}
 
         # get member
@@ -46,14 +46,16 @@ class MemberView(APIView):
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Could not find member with provided ID."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
-        
+
         # ensure request is from user in same workspace
         try:
-            _ = WorkspaceMember.objects.get(workspace=member.workspace, user=request.user)
+            _ = WorkspaceMember.objects.get(
+                workspace=member.workspace, user=request.user
+            )
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Must share a workspace to get member."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
-        
+
         data = MemberReadSerializer(member).data
         response["result"] = data
 
@@ -73,8 +75,39 @@ class MemberPermissionsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, member_id):
-        # TODO
-        return None
+        """Returns the perms of member in url param. User must be in same workspace
+
+        result: {
+            is_owner: Boolean
+            manage_workspace_members: Boolean
+            manage_workspace_roles: Boolean
+            manage_schedules: Boolean
+            manage_time_off: Boolean
+        }
+        """
+
+        response = {"error": {}}
+
+        # get member
+        try:
+            member = WorkspaceMember.objects.get(pk=member_id)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "Could not find member with provided ID."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # ensure request is from user in same workspace
+        try:
+            _ = WorkspaceMember.objects.get(
+                workspace=member.workspace, user=request.user
+            )
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "Must share a workspace to get member."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+
+        permissions = MemberPermissions.objects.get(member=member)
+        response["result"] = PermissionsReadSerializer(permissions).data
+
+        return Response(response, status=status.HTTP_200_OK)
 
     def put(self, request, member_id):
         """Update permission flags for a specific workspace member.

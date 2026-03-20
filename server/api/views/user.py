@@ -68,7 +68,9 @@ class GetUser(APIView):
         ]
 
         response["workspaces"] = workspace_list
-        response["result"]["workspaces"] = WorkspaceReadSerializer(results, many=True).data
+        response["result"]["workspaces"] = WorkspaceReadSerializer(
+            results, many=True
+        ).data
 
         return Response(response, status=status.HTTP_200_OK)
 

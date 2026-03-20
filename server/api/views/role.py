@@ -44,7 +44,7 @@ class RoleView(APIView):
                 "message"
             ] = "Must be a member of the workspace to get a role."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
-        
+
         data = RoleReadSerializer(role).data
         response["result"] = data
 
