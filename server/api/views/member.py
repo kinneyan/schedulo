@@ -67,10 +67,6 @@ class MemberView(APIView):
 
         return Response(response, status=status.HTTP_200_OK)
 
-    def put(self, request, member_id):
-        # TODO
-        return None
-
     def delete(self, request, member_id):
         response = {"error": {}}
 
@@ -135,17 +131,27 @@ class MemberPermissionsView(APIView):
 
         # ensure request is from user in same workspace
         try:
-            _ = WorkspaceMember.objects.get(
+            request_member = WorkspaceMember.objects.get(
                 workspace=member.workspace, user=request.user
             )
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Must share a workspace to get member."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
-        permissions = MemberPermissions.objects.get(member=member)
-        response["result"] = PermissionsReadSerializer(permissions).data
-
-        return Response(response, status=status.HTTP_200_OK)
+        request_perms = MemberPermissions.objects.get(member=request_member)
+        if (
+            request_member.id == member.id
+            or request_perms.is_owner
+            or request_perms.manage_workspace_members
+        ):
+            permissions = MemberPermissions.objects.get(member=member)
+            response["result"] = PermissionsReadSerializer(permissions).data
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            response["error"][
+                "message"
+            ] = "You do not have permission to view this members permissions."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
 
     def put(self, request, member_id):
         """Update permission flags for a specific workspace member.
