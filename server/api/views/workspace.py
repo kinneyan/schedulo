@@ -4,7 +4,15 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from ..serializers import WorkspaceSerializer, ShiftSerializer, RoleSerializer
+from ..serializers import (
+    WorkspaceSerializer,
+    ShiftSerializer,
+    RoleSerializer,
+    WorkspaceReadSerializer,
+    MemberReadSerializer,
+    ShiftReadSerializer,
+    RoleReadSerializer,
+)
 from ..models import (
     Workspace,
     WorkspaceMember,
@@ -67,7 +75,7 @@ class WorkspaceView(APIView):
             manage_schedules=True,
             manage_time_off=True,
         )
-
+        response["result"] = workspace.id
         return Response(response, status=status.HTTP_201_CREATED)
 
     """API view for renaming a workspace or transferring ownership. Owner only."""
@@ -177,7 +185,7 @@ class WorkspaceView(APIView):
     """API view for retrieving details about a workspace the user belongs to."""
 
     def get(self, request, workspace_id=None):
-        """Return workspace details and the authenticated user's membership role.
+        """Return workspace details
 
         :param request: Authenticated HTTP request with workspace_id as a query
             parameter.
@@ -201,28 +209,13 @@ class WorkspaceView(APIView):
 
         # Verify user is member of workspace
         try:
-            member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
+            _ = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "User is not a member of this workspace."
             return Response(response, status=status.HTTP_401_UNAUTHORIZED)
 
-        # Get user's perms
-        permissions = MemberPermissions.objects.get(workspace=workspace, member=member)
-
-        if permissions.is_owner:
-            response["membership"] = "owner"
-        # UNCOMMENT WHEN MANAGER MEMBERSHIP ADDED!!
-        # elif (permissions.IS_MANAGER):
-        #   response["membership"] = "manager"
-        else:
-            response["membership"] = "employee"
-
-        response["owner_name"] = (
-            workspace.owner.first_name + " " + workspace.owner.last_name
-        )
-        response["owner_id"] = workspace.owner.id
-        response["name"] = workspace.name
-        response["workspace_id"] = workspace.id
+        data = WorkspaceReadSerializer(workspace).data
+        response["result"] = data
 
         return Response(response, status=status.HTTP_200_OK)
 
@@ -343,6 +336,7 @@ class WorkspaceMembersView(APIView):
                 member=workspace_member,
             )
 
+            response["result"] = workspace_member.id
             return Response(response, status=status.HTTP_201_CREATED)
         else:
             response["error"] = "User is already member of this workspace"
@@ -363,47 +357,15 @@ class WorkspaceMembersView(APIView):
 
         # Verify user is member of workspace
         try:
-            member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
+            _ = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "User is not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
-        # Get members of workspace
-        member_results = (
-            WorkspaceMember.objects.filter(workspace=workspace)
-            .select_related("memberpermissions")
-            .prefetch_related("memberrole_set__workspace_role")
-        )
+        member_results = WorkspaceMember.objects.filter(workspace=workspace)
+        data = MemberReadSerializer(member_results, many=True).data
 
-        members_list = []
-        for member in member_results:
-            roles_list = [
-                {
-                    "role_id": role.workspace_role.id,
-                    "name": role.workspace_role.name,
-                    "pay_rate": role.workspace_role.pay_rate,
-                }
-                for role in member.memberrole_set.all()
-            ]
-
-            entry = {
-                "member_id": member.id,
-                "user_id": member.user.id,
-                "first_name": member.user.first_name,
-                "last_name": member.user.last_name,
-                "email": member.user.email,
-                "roles": roles_list,
-                "permissions": {
-                    "is_owner": member.memberpermissions.is_owner,
-                    "manage_workspace_members": member.memberpermissions.manage_workspace_members,
-                    "manage_workspace_roles": member.memberpermissions.manage_workspace_roles,
-                    "manage_schedules": member.memberpermissions.manage_schedules,
-                    "manage_time_off": member.memberpermissions.manage_time_off,
-                },
-            }
-            members_list.append(entry)
-
-        response["members"] = members_list
+        response["result"] = data
         return Response(response, status=status.HTTP_200_OK)
 
 
@@ -514,8 +476,27 @@ class WorkspaceShiftsView(APIView):
         return Response(response, status=status.HTTP_201_CREATED)
 
     def get(self, request, workspace_id):
-        # TODO
-        return None
+        response = {"error": {}}
+
+        # Verify workspace exists
+        try:
+            workspace = Workspace.objects.get(pk=workspace_id)
+        except Workspace.DoesNotExist:
+            response["error"]["message"] = "Workspace does not exist."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # Verify user is part of workspace and has perms to manage schedules
+        try:
+            _ = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
+        except WorkspaceMember.DoesNotExist:
+            response["error"]["message"] = "You are not a member of this workspace."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+
+        result = Shift.objects.filter(workspace=workspace)
+        data = ShiftReadSerializer(result, many=True).data
+        response["result"] = data
+
+        return Response(response, status=status.HTTP_200_OK)
 
 
 class WorkspaceRolesView(APIView):
@@ -597,16 +578,8 @@ class WorkspaceRolesView(APIView):
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         results = WorkspaceRole.objects.filter(workspace=workspace)
+        data = RoleReadSerializer(results, many=True).data
 
-        role_list = [
-            {
-                "id": role.id,
-                "name": role.name,
-                "pay_rate": role.pay_rate,
-            }
-            for role in results
-        ]
-
-        response["roles"] = role_list
+        response["result"] = data
 
         return Response(response, status=status.HTTP_200_OK)

@@ -6,7 +6,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from datetime import datetime
 from datetime import date
 
-from ..serializers import ShiftSerializer, ModifyShiftSerializer
+from ..serializers import ShiftSerializer, ModifyShiftSerializer, ShiftReadSerializer
 from ..models import (
     Workspace,
     WorkspaceMember,
@@ -25,8 +25,51 @@ class ShiftView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, shift_id):
-        # TODO
-        return None
+        """Get details for shift in url params
+        returns:
+        result {
+            id: shift id
+            member(can be None): {
+                id: member id
+                first_name: first name
+                last_name: last name
+            }
+            role: {
+                id: role id
+                name: role name
+            }
+            start_time: shift start time
+            end_time: shift end time
+            open: Boolean (if shift has member assigned)
+        }
+
+        """
+
+        response = {"error": {}}
+
+        # ensure shift id is valid
+        try:
+            shift = Shift.objects.get(pk=shift_id)
+        except Shift.DoesNotExist:
+            response["error"]["message"] = "Shift could not be found."
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # get workspace from shift
+        workspace = Workspace.objects.get(pk=shift.workspace.id)
+
+        # Verify user is part of workspace and has perms to manage schedules
+        try:
+            _ = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
+        except WorkspaceMember.DoesNotExist:
+            response["error"][
+                "message"
+            ] = "You must be a member of the workspace to retrive shift details."
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
+
+        data = ShiftReadSerializer(shift).data
+        response["result"] = data
+
+        return Response(response, status=status.HTTP_200_OK)
 
     def put(self, request, shift_id):
         """Update one or more fields on an existing Shift.
@@ -251,20 +294,7 @@ class ShiftFilterView(APIView):
         # search by filters
         results = Shift.objects.filter(**filters)
 
-        shift_list = [
-            {
-                "id": shift.id,
-                "member_id": getattr(shift.member_id, "id", None),
-                "role_id": shift.role.id,
-                "workspace_id": shift.workspace.id,
-                "open": shift.open,
-                "created_by_id": shift.created_by.id,
-                "start_time": shift.start_time,
-                "end_time": shift.end_time,
-            }
-            for shift in results
-        ]
-
-        response["shifts"] = shift_list
+        data = ShiftReadSerializer(results, many=True).data
+        response["result"] = data
 
         return Response(response, status=status.HTTP_200_OK)

@@ -20,7 +20,9 @@ class MemberRole(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     workspace_role = models.ForeignKey(WorkspaceRole, on_delete=models.CASCADE)
-    member = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
+    member = models.ForeignKey(
+        WorkspaceMember, on_delete=models.CASCADE, related_name="member_roles"
+    )
 
 
 class MemberPermissions(models.Model):

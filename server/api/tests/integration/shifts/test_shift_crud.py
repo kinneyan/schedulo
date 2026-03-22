@@ -189,6 +189,131 @@ class CreateShiftTests(APITestCase):
         )
 
 
+class GetShiftTests(APITestCase):
+    """Integration tests for the get shift endpoint."""
+
+    def setUp(self):
+        """Create a workspace with members, roles, and shifts."""
+        self.user = User.objects.create_user(
+            email="testuser@example.com",
+            password="testpassword",
+            first_name="Test",
+            last_name="User",
+            phone="1234567890",
+        )
+        self.user2 = User.objects.create_user(
+            email="testuser2@example.com",
+            password="testpassword",
+            first_name="Test2",
+            last_name="User2",
+            phone="1234567890",
+        )
+        self.user3 = User.objects.create_user(
+            email="testuser3@example.com",
+            password="testpassword",
+            first_name="Test3",
+            last_name="User3",
+            phone="1234567890",
+        )
+
+        self.workspace = Workspace.objects.create(owner=self.user, created_by=self.user)
+
+        self.member = WorkspaceMember.objects.create(
+            user=self.user, workspace=self.workspace, added_by=self.user
+        )
+        self.permissions = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
+        )
+
+        self.member2 = WorkspaceMember.objects.create(
+            user=self.user2, workspace=self.workspace, added_by=self.user
+        )
+        self.permissions2 = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member2,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
+        )
+
+        self.role = WorkspaceRole.objects.create(
+            workspace=self.workspace, name="Test Role", pay_rate=15.00
+        )
+
+        self.shift = Shift.objects.create(
+            workspace=self.workspace,
+            member=self.member,
+            role=self.role,
+            created_by=self.member,
+            start_time="2026-01-01T09:00:00Z",
+            end_time="2026-01-01T17:00:00Z",
+        )
+        self.open_shift = Shift.objects.create(
+            workspace=self.workspace,
+            member=None,
+            role=self.role,
+            created_by=self.member,
+            start_time="2026-01-02T09:00:00Z",
+            end_time="2026-01-02T17:00:00Z",
+            open=True,
+        )
+
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse("shift", kwargs={"shift_id": self.shift.id})
+
+    def test_invalid_shift(self):
+        """Verify that a nonexistent shift_id returns 404."""
+        url = reverse("shift", kwargs={"shift_id": 999})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_shift_as_non_member(self):
+        """Verify that a user who is not a workspace member receives 403."""
+        self.client.force_authenticate(user=self.user3)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_shift_valid(self):
+        """Verify that a workspace member can retrieve shift details with correct structure."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        result = response.data["result"]
+        self.assertEqual(result["id"], self.shift.id)
+        self.assertEqual(result["member"]["id"], self.member.id)
+        self.assertEqual(result["member"]["first_name"], self.user.first_name)
+        self.assertEqual(result["member"]["last_name"], self.user.last_name)
+        self.assertEqual(result["role"]["id"], self.role.id)
+        self.assertEqual(result["role"]["name"], self.role.name)
+        self.assertEqual(result["start_time"], self.shift.start_time)
+        self.assertEqual(result["end_time"], self.shift.end_time)
+        self.assertEqual(result["open"], self.shift.open)
+
+    def test_get_shift_valid_as_unprivileged_member(self):
+        """Verify that a member without manage_schedules permission can still retrieve shift details."""
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_open_shift_valid(self):
+        """Verify that an open shift with no assigned member returns None for member field."""
+        url = reverse("shift", kwargs={"shift_id": self.open_shift.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        result = response.data["result"]
+        self.assertIsNone(result["member"])
+        self.assertTrue(result["open"])
+
+
 class ModifyShiftTests(APITestCase):
     """Integration tests for the shift modification endpoint."""
 
