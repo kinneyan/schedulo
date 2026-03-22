@@ -209,7 +209,7 @@ class WorkspaceView(APIView):
 
         # Verify user is member of workspace
         try:
-            member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
+            _ = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "User is not a member of this workspace."
             return Response(response, status=status.HTTP_401_UNAUTHORIZED)
@@ -357,7 +357,7 @@ class WorkspaceMembersView(APIView):
 
         # Verify user is member of workspace
         try:
-            member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
+            _ = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "User is not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
