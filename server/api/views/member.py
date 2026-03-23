@@ -384,7 +384,7 @@ class MemberRolesView(APIView):
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Get workspace
-        workspace = Workspace.objects.get(id=modify_member.workspace.id)
+        workspace = modify_member.workspace
 
         # Verify user has permissions to manage workspace roles
         try:
@@ -416,20 +416,16 @@ class MemberRolesView(APIView):
 
         # Verify that member already has this role
         try:
-            MemberRole.objects.get(
+            member_role = MemberRole.objects.get(
                 member=modify_member,
                 workspace_role=request.data["workspace_role_id"],
             )
         except MemberRole.DoesNotExist:
-            # add role to member if they did not have it
             response["error"]["message"] = "Member does not have this role."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # remove role
-        MemberRole.objects.get(
-            member=modify_member,
-            workspace_role=request.data["workspace_role_id"],
-        ).delete()
+        member_role.delete()
         return Response(response, status=status.HTTP_200_OK)
 
 
