@@ -24,7 +24,15 @@ import SubmitButton from "../../buttons/submitButton/SubmitButton";
  * @param {Function} props.handleSubmit - Form submit handler.
  * @returns {JSX.Element}
  */
-const RegisterForm = ({email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, firstName, setFirstName, lastName, setLastName, phone, setPhone, error, handleSubmit}) =>
+const RegisterForm = ({
+    email, setEmail,
+    password, setPassword,
+    confirmPassword, setConfirmPassword,
+    firstName, setFirstName,
+    lastName, setLastName,
+    phone, setPhone,
+    error, handleSubmit,
+}) =>
 {
     return (
         <Card className="w-full max-w-xl">
