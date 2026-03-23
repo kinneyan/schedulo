@@ -208,7 +208,7 @@ class ShiftView(APIView):
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # get workspace from shift
-        workspace = Workspace.objects.get(pk=shift.workspace.id)
+        workspace = shift.workspace
 
         # Verify user is part of workspace and has perms to manage schedules
         try:
