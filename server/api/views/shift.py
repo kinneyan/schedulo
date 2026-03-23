@@ -49,7 +49,7 @@ class ShiftView(APIView):
 
         # ensure shift id is valid
         try:
-            shift = Shift.objects.get(pk=shift_id)
+            shift = Shift.objects.select_related("member__user", "role").prefetch_related("member__member_roles__workspace_role").get(pk=shift_id)
         except Shift.DoesNotExist:
             response["error"]["message"] = "Shift could not be found."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -292,7 +292,7 @@ class ShiftFilterView(APIView):
         )
 
         # search by filters
-        results = Shift.objects.filter(**filters)
+        results = Shift.objects.filter(**filters).select_related("member__user", "role").prefetch_related("member__member_roles__workspace_role")
 
         data = ShiftReadSerializer(results, many=True).data
         response["result"] = data

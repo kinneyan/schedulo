@@ -48,7 +48,7 @@ class MemberView(APIView):
 
         # get member
         try:
-            member = WorkspaceMember.objects.get(pk=member_id)
+            member = WorkspaceMember.objects.select_related("user").prefetch_related("member_roles__workspace_role").get(pk=member_id)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Could not find member with provided ID."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -324,7 +324,7 @@ class MemberRolesView(APIView):
 
         # Verify that member exists
         try:
-            member = WorkspaceMember.objects.get(pk=member_id)
+            member = WorkspaceMember.objects.select_related("user").prefetch_related("member_roles__workspace_role").get(pk=member_id)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Member does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -462,7 +462,7 @@ class MemberShiftsView(APIView):
             or perms.manage_schedules
             or member.id == request_member.id
         ):
-            shifts = Shift.objects.filter(member=member)
+            shifts = Shift.objects.filter(member=member).select_related("member__user", "role").prefetch_related("member__member_roles__workspace_role")
             data = ShiftReadSerializer(
                 shifts, many=True, fields=["id", "role", "start_time", "end_time"]
             ).data

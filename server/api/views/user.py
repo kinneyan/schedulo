@@ -54,7 +54,7 @@ class GetUser(APIView):
         members = WorkspaceMember.objects.filter(user=request.user).values_list(
             "workspace"
         )
-        results = Workspace.objects.filter(pk__in=members)
+        results = Workspace.objects.filter(pk__in=members).select_related("owner")
 
         workspace_list = [
             {

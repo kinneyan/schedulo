@@ -344,7 +344,7 @@ class WorkspaceMembersView(APIView):
             response["result"] = workspace_member.id
             return Response(response, status=status.HTTP_201_CREATED)
         else:
-            response["error"]["message"] = "User is already member of this workspace"
+            response["error"]["message"] = "User is already a member of this workspace."
             return Response(response, status=status.HTTP_409_CONFLICT)
 
     def get(self, request, workspace_id):
@@ -367,7 +367,7 @@ class WorkspaceMembersView(APIView):
             response["error"]["message"] = "User is not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
-        member_results = WorkspaceMember.objects.filter(workspace=workspace)
+        member_results = WorkspaceMember.objects.filter(workspace=workspace).select_related("user").prefetch_related("member_roles__workspace_role")
         data = MemberReadSerializer(member_results, many=True).data
 
         response["result"] = data
@@ -497,7 +497,7 @@ class WorkspaceShiftsView(APIView):
             response["error"]["message"] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
-        result = Shift.objects.filter(workspace=workspace)
+        result = Shift.objects.filter(workspace=workspace).select_related("member__user", "role").prefetch_related("member__member_roles__workspace_role")
         data = ShiftReadSerializer(result, many=True).data
         response["result"] = data
 
