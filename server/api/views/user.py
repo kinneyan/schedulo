@@ -46,8 +46,7 @@ class GetUser(APIView):
             ]
         }
         """
-        response = {"error": {}}
-        response = {"result": {}}
+        response = {"error": {}, "result": {}}
 
         response["result"]["user"] = UserDetailedReadSerializer(request.user).data
 
