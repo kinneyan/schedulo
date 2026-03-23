@@ -303,14 +303,12 @@ class WorkspaceMembersView(APIView):
                 manage_workspace_members=True,
             )
         except WorkspaceMember.DoesNotExist:
-            response["error"]["message"] = (
-                "You are not a member of this workspace."
-            )
+            response["error"]["message"] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         except MemberPermissions.DoesNotExist:
-            response["error"]["message"] = (
-                "You do not have permission to add members to this workspace."
-            )
+            response["error"][
+                "message"
+            ] = "You do not have permission to add members to this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         # get added user
@@ -367,7 +365,11 @@ class WorkspaceMembersView(APIView):
             response["error"]["message"] = "User is not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
-        member_results = WorkspaceMember.objects.filter(workspace=workspace).select_related("user").prefetch_related("member_roles__workspace_role")
+        member_results = (
+            WorkspaceMember.objects.filter(workspace=workspace)
+            .select_related("user")
+            .prefetch_related("member_roles__workspace_role")
+        )
         data = MemberReadSerializer(member_results, many=True).data
 
         response["result"] = data
@@ -497,7 +499,11 @@ class WorkspaceShiftsView(APIView):
             response["error"]["message"] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
-        result = Shift.objects.filter(workspace=workspace).select_related("member__user", "role").prefetch_related("member__member_roles__workspace_role")
+        result = (
+            Shift.objects.filter(workspace=workspace)
+            .select_related("member__user", "role")
+            .prefetch_related("member__member_roles__workspace_role")
+        )
         data = ShiftReadSerializer(result, many=True).data
         response["result"] = data
 
@@ -581,8 +587,10 @@ class WorkspaceRolesView(APIView):
         except Workspace.DoesNotExist:
             response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
-        
-        if not WorkspaceMember.objects.filter(user=request.user, workspace=workspace).exists():
+
+        if not WorkspaceMember.objects.filter(
+            user=request.user, workspace=workspace
+        ).exists():
             response["error"]["message"] = "You are not a member of this workspace"
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
