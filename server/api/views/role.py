@@ -77,12 +77,7 @@ class RoleView(APIView):
             response["error"]["message"] = "Workspace role does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
-        # Verify workspace exists; this shouldnt ever fail but have to get the workspace
-        try:
-            workspace = Workspace.objects.get(pk=workspace_role.workspace.id)
-        except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exist."
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        workspace = workspace_role.workspace
 
         # Verify user has permissions to manage workspace roles
         try:
