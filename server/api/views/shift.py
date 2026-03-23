@@ -63,7 +63,7 @@ class ShiftView(APIView):
         except WorkspaceMember.DoesNotExist:
             response["error"][
                 "message"
-            ] = "You must be a member of the workspace to retrive shift details."
+            ] = "You must be a member of the workspace to retrieve shift details."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         data = ShiftReadSerializer(shift).data

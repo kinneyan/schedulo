@@ -84,7 +84,7 @@ class WorkspaceView(APIView):
         """Update the name or owner of a workspace.
 
         Requires the authenticated user to be the workspace owner.
-        Aceepected parameters fields: workspace_id (required)
+        Accepted parameter fields: workspace_id (required)
         Accepted body fields: new_owner_id (optional), name (optional).
 
         :param request: Authenticated HTTP request with workspace_id and optional
@@ -126,7 +126,7 @@ class WorkspaceView(APIView):
         except MemberPermissions.DoesNotExist:
             response["error"][
                 "message"
-            ] = "You do not have permission modify this workspace."
+            ] = "You do not have permission to modify this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
@@ -204,14 +204,14 @@ class WorkspaceView(APIView):
         try:
             workspace = Workspace.objects.get(pk=workspace_id)
         except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exists."
+            response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Verify user is member of workspace
         try:
             _ = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
         except WorkspaceMember.DoesNotExist:
-            response["error"]["message"] = "User is not a member of this workspace."
+            response["error"]["message"] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_401_UNAUTHORIZED)
 
         data = WorkspaceReadSerializer(workspace).data
@@ -256,7 +256,7 @@ class WorkspaceView(APIView):
         except MemberPermissions.DoesNotExist:
             response["error"][
                 "message"
-            ] = "You do not have permission modify this workspace."
+            ] = "You do not have permission to modify this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
@@ -357,7 +357,7 @@ class WorkspaceMembersView(APIView):
         try:
             workspace = Workspace.objects.get(pk=workspace_id)
         except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exists."
+            response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Verify user is member of workspace
@@ -548,7 +548,7 @@ class WorkspaceRolesView(APIView):
         except MemberPermissions.DoesNotExist:
             response["error"][
                 "message"
-            ] = "You do not have permission modify roles in this workspace."
+            ] = "You do not have permission to modify roles in this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."

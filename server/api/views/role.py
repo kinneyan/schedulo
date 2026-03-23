@@ -93,7 +93,7 @@ class RoleView(APIView):
         except MemberPermissions.DoesNotExist:
             response["error"][
                 "message"
-            ] = "You do not have permission modify roles in this workspace."
+            ] = "You do not have permission to modify roles in this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
@@ -145,7 +145,7 @@ class RoleView(APIView):
         except MemberPermissions.DoesNotExist:
             response["error"][
                 "message"
-            ] = "You do not have permission modify roles in this workspace."
+            ] = "You do not have permission to modify roles in this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."

@@ -85,7 +85,7 @@ class MemberView(APIView):
         except WorkspaceMember.DoesNotExist:
             response["error"][
                 "message"
-            ] = "You must be a member of the same workspace to retreive member roles."
+            ] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         # verify request user has perms to view member shifts or is viewing own shifts
@@ -100,7 +100,7 @@ class MemberView(APIView):
         else:
             response["error"][
                 "message"
-            ] = "You do not have permission to view this members roles."
+            ] = "You do not have permission delete this member."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
 
@@ -278,7 +278,7 @@ class MemberRolesView(APIView):
         except MemberPermissions.DoesNotExist:
             response["error"][
                 "message"
-            ] = "You do not have permission modify roles in this workspace."
+            ] = "You do not have permission to modify roles in this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
@@ -337,7 +337,7 @@ class MemberRolesView(APIView):
         except WorkspaceMember.DoesNotExist:
             response["error"][
                 "message"
-            ] = "You must be a member of the same workspace to retreive member roles."
+            ] = "You must be a member of the same workspace to retrieve member roles."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         # verify request user has perms to view member roles or is viewing own roles
@@ -397,7 +397,7 @@ class MemberRolesView(APIView):
         except MemberPermissions.DoesNotExist:
             response["error"][
                 "message"
-            ] = "You do not have permission modify roles in this workspace."
+            ] = "You do not have permission to modify roles in this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
@@ -451,7 +451,7 @@ class MemberShiftsView(APIView):
         except WorkspaceMember.DoesNotExist:
             response["error"][
                 "message"
-            ] = "You must be a member of the same workspace to retreive member roles."
+            ] = "You are not a member of this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         # verify request user has perms to view member shifts or is viewing own shifts
@@ -471,5 +471,5 @@ class MemberShiftsView(APIView):
         else:
             response["error"][
                 "message"
-            ] = "You do not have permission to view this members roles."
+            ] = "You do not have permission to view this members shifts."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
