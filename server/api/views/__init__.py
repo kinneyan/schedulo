@@ -8,6 +8,5 @@ from .workspace import (
 )
 
 from .member import MemberView, MemberPermissionsView, MemberRolesView, MemberShiftsView
-from .permissions import PermissionsView
 from .shift import ShiftView, ShiftFilterView
 from .role import RoleView
