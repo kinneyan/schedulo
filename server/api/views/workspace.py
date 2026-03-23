@@ -581,6 +581,10 @@ class WorkspaceRolesView(APIView):
         except Workspace.DoesNotExist:
             response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
+        
+        if not WorkspaceMember.objects.filter(user=request.user, workspace=workspace).exists():
+            response["error"]["message"] = "You are not a member of this workspace"
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         results = WorkspaceRole.objects.filter(workspace=workspace)
         data = RoleReadSerializer(results, many=True).data
