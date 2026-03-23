@@ -303,7 +303,7 @@ class WorkspaceMembersView(APIView):
                 manage_workspace_members=True,
             )
         except MemberPermissions.DoesNotExist:
-            response["error"] = (
+            response["error"]["message"] = (
                 "You do not have permission to add members to this workspace"
             )
             return Response(response, status=status.HTTP_403_FORBIDDEN)
@@ -339,7 +339,7 @@ class WorkspaceMembersView(APIView):
             response["result"] = workspace_member.id
             return Response(response, status=status.HTTP_201_CREATED)
         else:
-            response["error"] = "User is already member of this workspace"
+            response["error"]["message"] = "User is already member of this workspace"
             return Response(response, status=status.HTTP_409_CONFLICT)
 
     def get(self, request, workspace_id):
