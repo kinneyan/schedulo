@@ -30,7 +30,7 @@ dev = [
 where = ["server"]
 
 [tool.black]
-line-length = 88
+line-length = 100
 exclude = '''
 /(
       \.eggs
