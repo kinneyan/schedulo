@@ -175,9 +175,7 @@ class ModifyWorkspaceRole(APIView):
 
         # Verify role exists
         try:
-            workspace_role = WorkspaceRole.objects.get(
-                pk=request.data["workspace_role_id"]
-            )
+            workspace_role = WorkspaceRole.objects.get(pk=request.data["workspace_role_id"])
         except WorkspaceRole.DoesNotExist:
             response["error"]["message"] = "Workspace role does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -347,9 +345,7 @@ class AddMemberRole(APIView):
 
         # Verify user has permissions to manage workspace roles
         try:
-            request_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            request_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(
                 workspace=workspace, member=request_member, manage_workspace_roles=True
             )
@@ -368,9 +364,7 @@ class AddMemberRole(APIView):
                 id=request.data["workspace_role_id"], workspace=workspace
             )
         except WorkspaceRole.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "Role is not part of this workspace or does not exist."
+            response["error"]["message"] = "Role is not part of this workspace or does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Verify that member does not already have this role
@@ -381,9 +375,7 @@ class AddMemberRole(APIView):
             )
         except MemberRole.DoesNotExist:
             # add role to member if they did not have it
-            MemberRole.objects.create(
-                member=modify_member, workspace_role=workspace_role
-            )
+            MemberRole.objects.create(member=modify_member, workspace_role=workspace_role)
             return Response(response, status=status.HTTP_201_CREATED)
 
         # member already had role
@@ -431,9 +423,7 @@ class RemoveMemberRole(APIView):
 
         # Verify user has permissions to manage workspace roles
         try:
-            request_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            request_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(
                 workspace=workspace, member=request_member, manage_workspace_roles=True
             )
@@ -448,13 +438,9 @@ class RemoveMemberRole(APIView):
 
         # Verify that role exists and is part of workspace
         try:
-            WorkspaceRole.objects.get(
-                id=request.data["workspace_role_id"], workspace=workspace
-            )
+            WorkspaceRole.objects.get(id=request.data["workspace_role_id"], workspace=workspace)
         except WorkspaceRole.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "Role is not part of this workspace or does not exist."
+            response["error"]["message"] = "Role is not part of this workspace or does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Verify that member already has this role

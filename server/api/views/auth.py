@@ -69,10 +69,7 @@ class Register(APIView):
 
         serializer = RegisterUserSerializer(data=request.data)
         if not serializer.is_valid():
-            if (
-                "email" in serializer.errors
-                and serializer.errors["email"][0].code == "unique"
-            ):
+            if "email" in serializer.errors and serializer.errors["email"][0].code == "unique":
                 response["error"]["code"] = 409
                 response["error"]["message"] = "Account with this email already exists"
                 return Response(response, status=status.HTTP_409_CONFLICT)

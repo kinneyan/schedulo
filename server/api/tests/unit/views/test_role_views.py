@@ -205,9 +205,7 @@ class DeleteWorkspaceRoleViewTest(TestCase):
         mock_permissions_get.return_value = mock_permissions
 
         request_data = {"workspace_role_id": 1}
-        request = self._create_drf_request(
-            "/delete-role/", request_data, method="delete"
-        )
+        request = self._create_drf_request("/delete-role/", request_data, method="delete")
 
         response = self.view.delete(request)
 
@@ -218,16 +216,12 @@ class DeleteWorkspaceRoleViewTest(TestCase):
     def test_delete_role_missing_workspace_role_id(self):
         """Test role deletion without workspace_role_id"""
         request_data = {}  # Missing workspace_role_id
-        request = self._create_drf_request(
-            "/delete-role/", request_data, method="delete"
-        )
+        request = self._create_drf_request("/delete-role/", request_data, method="delete")
 
         response = self.view.delete(request)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(
-            response.data["error"]["message"], "Workspace role ID is required."
-        )
+        self.assertEqual(response.data["error"]["message"], "Workspace role ID is required.")
 
     @patch("api.views.role.WorkspaceRole.objects.get")
     def test_delete_role_role_not_found(self, mock_role_get):
@@ -235,9 +229,7 @@ class DeleteWorkspaceRoleViewTest(TestCase):
         mock_role_get.side_effect = WorkspaceRole.DoesNotExist
 
         request_data = {"workspace_role_id": 999}
-        request = self._create_drf_request(
-            "/delete-role/", request_data, method="delete"
-        )
+        request = self._create_drf_request("/delete-role/", request_data, method="delete")
 
         response = self.view.delete(request)
 
@@ -331,9 +323,7 @@ class ModifyWorkspaceRoleViewTest(TestCase):
         response = self.view.post(request)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(
-            response.data["error"]["message"], "Workspace role ID is required."
-        )
+        self.assertEqual(response.data["error"]["message"], "Workspace role ID is required.")
 
     @patch("api.views.role.RoleSerializer")
     def test_modify_role_invalid_serializer_data(self, mock_serializer):
@@ -367,9 +357,7 @@ class ModifyWorkspaceRoleViewTest(TestCase):
         response = self.view.post(request)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(
-            response.data["error"]["message"], "Workspace role does not exist."
-        )
+        self.assertEqual(response.data["error"]["message"], "Workspace role does not exist.")
 
     @patch("api.views.role.RoleSerializer")
     @patch("api.views.role.WorkspaceRole.objects.get")

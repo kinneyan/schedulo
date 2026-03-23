@@ -74,22 +74,16 @@ class CustomUserManagerTest(TestCase):
     def test_create_superuser_with_is_staff_false_raises_error(self):
         """Test that create_superuser raises ValueError if is_staff=False"""
         with self.assertRaises(ValueError) as context:
-            self.manager.create_superuser(
-                "admin@example.com", "password123", is_staff=False
-            )
+            self.manager.create_superuser("admin@example.com", "password123", is_staff=False)
 
         self.assertEqual(str(context.exception), "Superuser must have is_staff=True.")
 
     def test_create_superuser_with_is_superuser_false_raises_error(self):
         """Test that create_superuser raises ValueError if is_superuser=False"""
         with self.assertRaises(ValueError) as context:
-            self.manager.create_superuser(
-                "admin@example.com", "password123", is_superuser=False
-            )
+            self.manager.create_superuser("admin@example.com", "password123", is_superuser=False)
 
-        self.assertEqual(
-            str(context.exception), "Superuser must have is_superuser=True."
-        )
+        self.assertEqual(str(context.exception), "Superuser must have is_superuser=True.")
 
 
 class UserModelTest(TestCase):
@@ -127,9 +121,7 @@ class UserModelTest(TestCase):
 
     def test_user_string_representation(self):
         """Test user string representation"""
-        user = User.objects.create_user(
-            email="test@example.com", password="password123"
-        )
+        user = User.objects.create_user(email="test@example.com", password="password123")
         # Default Django behavior should use email since username is None
         self.assertIn("test@example.com", str(user))
 
@@ -139,9 +131,7 @@ class WorkspaceModelTest(TestCase):
 
     def setUp(self):
         """Create an owner user for use in each workspace test."""
-        self.user = User.objects.create_user(
-            email="owner@example.com", password="password123"
-        )
+        self.user = User.objects.create_user(email="owner@example.com", password="password123")
 
     def test_workspace_creation_with_defaults(self):
         """Test workspace creation with default values"""
@@ -177,15 +167,11 @@ class WorkspaceMemberModelTest(TestCase):
 
     def setUp(self):
         """Create owner, member user, and workspace for use in each test."""
-        self.owner = User.objects.create_user(
-            email="owner@example.com", password="password123"
-        )
+        self.owner = User.objects.create_user(email="owner@example.com", password="password123")
         self.member_user = User.objects.create_user(
             email="member@example.com", password="password123"
         )
-        self.workspace = Workspace.objects.create(
-            created_by=self.owner, owner=self.owner
-        )
+        self.workspace = Workspace.objects.create(created_by=self.owner, owner=self.owner)
 
     def test_workspace_member_creation(self):
         """Test workspace member creation"""

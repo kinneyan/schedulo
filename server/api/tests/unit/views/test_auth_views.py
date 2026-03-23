@@ -64,9 +64,7 @@ class LoginViewTest(TestCase):
 
         # Verify mocks were called correctly
         mock_login_serializer.assert_called_once_with(data=request_data)
-        mock_authenticate.assert_called_once_with(
-            email="test@example.com", password="password123"
-        )
+        mock_authenticate.assert_called_once_with(email="test@example.com", password="password123")
         mock_token_serializer.assert_called_once_with(data=request_data)
 
     @patch("api.views.auth.LoginUserSerializer")
@@ -114,9 +112,7 @@ class LoginViewTest(TestCase):
         # Assertions
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.data["error"]["code"], 401)
-        self.assertEqual(
-            response.data["error"]["message"], "Incorrect email or password"
-        )
+        self.assertEqual(response.data["error"]["message"], "Incorrect email or password")
 
     @patch("api.views.auth.LoginUserSerializer")
     @patch("api.views.auth.authenticate")
@@ -151,9 +147,7 @@ class LoginViewTest(TestCase):
         # Assertions
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.data["error"]["code"], 401)
-        self.assertEqual(
-            response.data["error"]["message"], "Incorrect email or password"
-        )
+        self.assertEqual(response.data["error"]["message"], "Incorrect email or password")
 
 
 class RegisterViewTest(TestCase):
@@ -283,9 +277,7 @@ class RegisterViewTest(TestCase):
 
     @patch("api.views.auth.RegisterUserSerializer")
     @patch("api.views.auth.User.objects.create_user")
-    def test_register_internal_server_error(
-        self, mock_create_user, mock_register_serializer
-    ):
+    def test_register_internal_server_error(self, mock_create_user, mock_register_serializer):
         """Test registration when unexpected exception occurs"""
         # Setup mocks
         mock_register_instance = MagicMock()

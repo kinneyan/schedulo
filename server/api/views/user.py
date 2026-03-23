@@ -31,9 +31,7 @@ class GetUser(APIView):
         response["last_name"] = request.user.last_name
 
         # get list of workspaces user is in
-        members = WorkspaceMember.objects.filter(user=request.user).values_list(
-            "workspace"
-        )
+        members = WorkspaceMember.objects.filter(user=request.user).values_list("workspace")
         results = Workspace.objects.filter(pk__in=members)
 
         workspace_list = [
@@ -74,14 +72,10 @@ class GetUser(APIView):
 
         if "password" in request.data:
             if "current_password" not in request.data:
-                response["error"][
-                    "message"
-                ] = "Current password required when changing password."
+                response["error"]["message"] = "Current password required when changing password."
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-            auth = authenticate(
-                email=request.user, password=request.data["current_password"]
-            )
+            auth = authenticate(email=request.user, password=request.data["current_password"])
             if auth == request.user:
                 request.user.set_password(request.data["password"])
                 request.user.save()

@@ -53,9 +53,7 @@ class UpdatePermissionsTests(APITestCase):
 
     def test_member_not_found(self):
         """Verify that a non-existent member_id returns a 404 error."""
-        response = self.client.put(
-            self.url, {"workspace_id": self.workspace.id, "member_id": 999}
-        )
+        response = self.client.put(self.url, {"workspace_id": self.workspace.id, "member_id": 999})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
             response.data["error"]["message"], "Could not find member with provided ID."

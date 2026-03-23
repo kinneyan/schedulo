@@ -18,9 +18,7 @@ class WorkspaceRoleModelTest(TestCase):
 
     def setUp(self):
         """Create a user and workspace for use in each workspace role test."""
-        self.user = User.objects.create_user(
-            email="test@example.com", password="password123"
-        )
+        self.user = User.objects.create_user(email="test@example.com", password="password123")
         self.workspace = Workspace.objects.create(created_by=self.user, owner=self.user)
 
     def test_workspace_role_creation_with_defaults(self):
@@ -44,9 +42,7 @@ class WorkspaceRoleModelTest(TestCase):
 
     def test_workspace_role_pay_rate_precision(self):
         """Test workspace role pay rate decimal precision (5 digits, 2 decimal places)"""
-        role = WorkspaceRole.objects.create(
-            workspace=self.workspace, pay_rate=Decimal("999.99")
-        )
+        role = WorkspaceRole.objects.create(workspace=self.workspace, pay_rate=Decimal("999.99"))
 
         self.assertEqual(role.pay_rate, Decimal("999.99"))
 
@@ -73,22 +69,16 @@ class MemberRoleModelTest(TestCase):
 
     def setUp(self):
         """Create a user, workspace, member, and role for use in each member role test."""
-        self.user = User.objects.create_user(
-            email="test@example.com", password="password123"
-        )
+        self.user = User.objects.create_user(email="test@example.com", password="password123")
         self.workspace = Workspace.objects.create(created_by=self.user, owner=self.user)
         self.member = WorkspaceMember.objects.create(
             workspace=self.workspace, user=self.user, added_by=self.user
         )
-        self.role = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="Test Role"
-        )
+        self.role = WorkspaceRole.objects.create(workspace=self.workspace, name="Test Role")
 
     def test_member_role_creation(self):
         """Test member role creation"""
-        member_role = MemberRole.objects.create(
-            workspace_role=self.role, member=self.member
-        )
+        member_role = MemberRole.objects.create(workspace_role=self.role, member=self.member)
 
         self.assertEqual(member_role.workspace_role, self.role)
         self.assertEqual(member_role.member, self.member)
@@ -97,9 +87,7 @@ class MemberRoleModelTest(TestCase):
 
     def test_member_role_cascade_delete_on_workspace_role(self):
         """Test that member role is deleted when workspace role is deleted"""
-        member_role = MemberRole.objects.create(
-            workspace_role=self.role, member=self.member
-        )
+        member_role = MemberRole.objects.create(workspace_role=self.role, member=self.member)
         member_role_id = member_role.id
 
         self.role.delete()
@@ -109,9 +97,7 @@ class MemberRoleModelTest(TestCase):
 
     def test_member_role_cascade_delete_on_member(self):
         """Test that member role is deleted when member is deleted"""
-        member_role = MemberRole.objects.create(
-            workspace_role=self.role, member=self.member
-        )
+        member_role = MemberRole.objects.create(workspace_role=self.role, member=self.member)
         member_role_id = member_role.id
 
         self.member.delete()
@@ -121,9 +107,7 @@ class MemberRoleModelTest(TestCase):
 
     def test_member_can_have_multiple_roles(self):
         """Test that a member can have multiple roles"""
-        role2 = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="Second Role"
-        )
+        role2 = WorkspaceRole.objects.create(workspace=self.workspace, name="Second Role")
 
         MemberRole.objects.create(workspace_role=self.role, member=self.member)
         MemberRole.objects.create(workspace_role=role2, member=self.member)
@@ -137,9 +121,7 @@ class MemberPermissionsModelTest(TestCase):
 
     def setUp(self):
         """Create a user, workspace, and member for use in each permissions test."""
-        self.user = User.objects.create_user(
-            email="test@example.com", password="password123"
-        )
+        self.user = User.objects.create_user(email="test@example.com", password="password123")
         self.workspace = Workspace.objects.create(created_by=self.user, owner=self.user)
         self.member = WorkspaceMember.objects.create(
             workspace=self.workspace, user=self.user, added_by=self.user
@@ -147,9 +129,7 @@ class MemberPermissionsModelTest(TestCase):
 
     def test_member_permissions_creation_with_defaults(self):
         """Test member permissions creation with default values"""
-        permissions = MemberPermissions.objects.create(
-            workspace=self.workspace, member=self.member
-        )
+        permissions = MemberPermissions.objects.create(workspace=self.workspace, member=self.member)
 
         self.assertEqual(permissions.workspace, self.workspace)
         self.assertEqual(permissions.member, self.member)
@@ -222,15 +202,11 @@ class MemberPermissionsModelTest(TestCase):
 
         # Trying to create another permissions object for the same member should fail
         with self.assertRaises(IntegrityError):
-            MemberPermissions.objects.create(
-                workspace=self.workspace, member=self.member
-            )
+            MemberPermissions.objects.create(workspace=self.workspace, member=self.member)
 
     def test_member_permissions_cascade_delete_on_workspace(self):
         """Test that member permissions is deleted when workspace is deleted"""
-        permissions = MemberPermissions.objects.create(
-            workspace=self.workspace, member=self.member
-        )
+        permissions = MemberPermissions.objects.create(workspace=self.workspace, member=self.member)
         permissions_id = permissions.id
 
         self.workspace.delete()
@@ -240,9 +216,7 @@ class MemberPermissionsModelTest(TestCase):
 
     def test_member_permissions_cascade_delete_on_member(self):
         """Test that member permissions is deleted when member is deleted"""
-        permissions = MemberPermissions.objects.create(
-            workspace=self.workspace, member=self.member
-        )
+        permissions = MemberPermissions.objects.create(workspace=self.workspace, member=self.member)
         permissions_id = permissions.id
 
         self.member.delete()

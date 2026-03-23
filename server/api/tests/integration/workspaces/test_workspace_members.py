@@ -73,6 +73,4 @@ class AddMemberTests(APITestCase):
         # Try to add the same user again
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
-        self.assertEqual(
-            response.data["error"], "User is already member of this workspace"
-        )
+        self.assertEqual(response.data["error"], "User is already member of this workspace")

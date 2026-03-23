@@ -40,9 +40,7 @@ class GetWorkspaceTests(APITestCase):
             phone="1234567890",
         )
 
-        self.workspace1 = Workspace.objects.create(
-            owner=self.user, created_by=self.user
-        )
+        self.workspace1 = Workspace.objects.create(owner=self.user, created_by=self.user)
         self.workspace1_member1 = WorkspaceMember.objects.create(
             user=self.user, workspace=self.workspace1, added_by=self.user
         )
@@ -68,9 +66,7 @@ class GetWorkspaceTests(APITestCase):
             manage_time_off=True,
         )
 
-        self.workspace2 = Workspace.objects.create(
-            owner=self.user, created_by=self.user
-        )
+        self.workspace2 = Workspace.objects.create(owner=self.user, created_by=self.user)
         self.workspace2_member1 = WorkspaceMember.objects.create(
             user=self.user, workspace=self.workspace2, added_by=self.user
         )
@@ -201,9 +197,7 @@ class GetWorkspaceMembersTests(APITestCase):
             workspace=self.workspace, name="test role3", pay_rate=10
         )
 
-        self.member_role1 = MemberRole.objects.create(
-            member=self.member, workspace_role=self.role
-        )
+        self.member_role1 = MemberRole.objects.create(member=self.member, workspace_role=self.role)
         self.member2_role1 = MemberRole.objects.create(
             member=self.member2, workspace_role=self.role
         )
@@ -222,15 +216,11 @@ class GetWorkspaceMembersTests(APITestCase):
     def test_as_non_member(self):
         self.client.force_authenticate(user=self.user3)
 
-        response = self.client.post(
-            self.url, {"workspace_id": self.workspace.id}, format="json"
-        )
+        response = self.client.post(self.url, {"workspace_id": self.workspace.id}, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_valid(self):
-        response = self.client.post(
-            self.url, {"workspace_id": self.workspace.id}, format="json"
-        )
+        response = self.client.post(self.url, {"workspace_id": self.workspace.id}, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         result = response.data["members"]

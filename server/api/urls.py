@@ -45,9 +45,7 @@ urlpatterns = [
         UpdatePermissions.as_view(),
         name="update_permissions",
     ),
-    path(
-        "workspace/add-user/", AddWorkspaceMember.as_view(), name="add_workspace_member"
-    ),
+    path("workspace/add-user/", AddWorkspaceMember.as_view(), name="add_workspace_member"),
     path("workspace/create-role/", CreateRole.as_view(), name="create_workspace_role"),
     path(
         "workspace/delete-role",
@@ -59,16 +57,10 @@ urlpatterns = [
         ModifyWorkspaceRole.as_view(),
         name="modify_workspace_role",
     ),
-    path(
-        "workspace/get-roles/", GetWorkspaceRoles.as_view(), name="get_workspace_roles"
-    ),
-    path(
-        "workspace/get-member-roles/", GetMemberRoles.as_view(), name="get_member_roles"
-    ),
+    path("workspace/get-roles/", GetWorkspaceRoles.as_view(), name="get_workspace_roles"),
+    path("workspace/get-member-roles/", GetMemberRoles.as_view(), name="get_member_roles"),
     path("workspace/add-role/", AddMemberRole.as_view(), name="add_member_role"),
-    path(
-        "workspace/remove-role", RemoveMemberRole.as_view(), name="remove_member_role"
-    ),
+    path("workspace/remove-role", RemoveMemberRole.as_view(), name="remove_member_role"),
     path("workspace/create-shift", CreateShift.as_view(), name="create_shift"),
     path("workspace/modify-shift", ModifyShift.as_view(), name="modify_shift"),
     path("workspace/delete-shift", DeleteShift.as_view(), name="delete_shift"),

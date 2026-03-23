@@ -40,9 +40,7 @@ class CreateWorkspace(APIView):
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # create new workspace
-        workspace = Workspace.objects.create(
-            created_by=request.user, owner=request.user
-        )
+        workspace = Workspace.objects.create(created_by=request.user, owner=request.user)
 
         # set name if present
         if not (serializer.data.get("name", None) is None):
@@ -118,9 +116,7 @@ class ModifyWorkspace(APIView):
                 is_owner=True,
             )
         except MemberPermissions.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "You do not have permission modify this workspace."
+            response["error"]["message"] = "You do not have permission modify this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
@@ -140,12 +136,8 @@ class ModifyWorkspace(APIView):
                     member=old_owner_member, workspace=request.data["workspace_id"]
                 )
 
-                if (
-                    new_owner_perms == old_owner_perms
-                ):  # cannot set new owner to current
-                    response["error"][
-                        "message"
-                    ] = "Member is already owner of this workspace."
+                if new_owner_perms == old_owner_perms:  # cannot set new owner to current
+                    response["error"]["message"] = "Member is already owner of this workspace."
                     return Response(response, status=status.HTTP_409_CONFLICT)
 
                 old_owner_perms.is_owner = False
@@ -208,9 +200,7 @@ class AddWorkspaceMember(APIView):
                 manage_workspace_members=True,
             )
         except MemberPermissions.DoesNotExist:
-            response["error"] = (
-                "You do not have permission to add members to this workspace"
-            )
+            response["error"] = "You do not have permission to add members to this workspace"
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         if not (
@@ -287,9 +277,7 @@ class GetWorkspace(APIView):
         else:
             response["membership"] = "employee"
 
-        response["owner_name"] = (
-            workspace.owner.first_name + " " + workspace.owner.last_name
-        )
+        response["owner_name"] = workspace.owner.first_name + " " + workspace.owner.last_name
         response["owner_id"] = workspace.owner.id
         response["name"] = workspace.name
         response["workspace_id"] = workspace.id
@@ -430,9 +418,7 @@ class DeleteWorkspace(APIView):
                 is_owner=True,
             )
         except MemberPermissions.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "You do not have permission modify this workspace."
+            response["error"]["message"] = "You do not have permission modify this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."

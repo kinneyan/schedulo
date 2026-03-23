@@ -224,9 +224,7 @@ class RemoveMemberRoleTests(APITestCase):
             workspace=self.workspace, name="test role3", pay_rate=10
         )
 
-        self.member_role = MemberRole.objects.create(
-            workspace_role=self.role, member=self.member2
-        )
+        self.member_role = MemberRole.objects.create(workspace_role=self.role, member=self.member2)
         self.member_role2 = MemberRole.objects.create(
             workspace_role=self.role2, member=self.member2
         )

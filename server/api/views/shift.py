@@ -41,9 +41,7 @@ class CreateShift(APIView):
         serializer = ShiftSerializer(data=request.data)
         if not serializer.is_valid():
             response["error"]["code"] = 400
-            response["error"][
-                "message"
-            ] = "Invalid request data, start and end time are required."
+            response["error"]["message"] = "Invalid request data, start and end time are required."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify body contains required fields
@@ -63,9 +61,7 @@ class CreateShift(APIView):
 
         # Verify user is part of workspace and has perms to manage schedules
         try:
-            creator_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            creator_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(member=creator_member, manage_schedules=True)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
@@ -78,9 +74,7 @@ class CreateShift(APIView):
 
         # Verify role exists and is part of workspace
         try:
-            role = WorkspaceRole.objects.get(
-                pk=request.data["role_id"], workspace=workspace
-            )
+            role = WorkspaceRole.objects.get(pk=request.data["role_id"], workspace=workspace)
         except WorkspaceRole.DoesNotExist:
             response["error"][
                 "message"
@@ -94,9 +88,7 @@ class CreateShift(APIView):
                     pk=request.data["member_id"], workspace=workspace
                 )
             except WorkspaceMember.DoesNotExist:
-                response["error"][
-                    "message"
-                ] = "Member does not exist or is not part of workspace."
+                response["error"]["message"] = "Member does not exist or is not part of workspace."
                 return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # verify dates are valid
@@ -152,9 +144,7 @@ class ModifyShift(APIView):
         serializer = ModifyShiftSerializer(data=request.data)
         if not serializer.is_valid():
             response["error"]["code"] = 400
-            response["error"][
-                "message"
-            ] = "Invalid request data, start and end time are required."
+            response["error"]["message"] = "Invalid request data, start and end time are required."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # Ensure that shift ID present
@@ -174,9 +164,7 @@ class ModifyShift(APIView):
 
         # Verify user is part of workspace and has perms to manage schedules
         try:
-            creator_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            creator_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(member=creator_member, manage_schedules=True)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
@@ -230,9 +218,7 @@ class ModifyShift(APIView):
                     pk=request.data["member_id"], workspace=workspace
                 )
             except WorkspaceMember.DoesNotExist:
-                response["error"][
-                    "message"
-                ] = "Member does not exist or is not part of workspace."
+                response["error"]["message"] = "Member does not exist or is not part of workspace."
                 return Response(response, status=status.HTTP_404_NOT_FOUND)
 
             shift.member = member
@@ -242,9 +228,7 @@ class ModifyShift(APIView):
         if "role_id" in request.data:
             # Verify role exists and is part of workspace
             try:
-                role = WorkspaceRole.objects.get(
-                    pk=request.data["role_id"], workspace=workspace
-                )
+                role = WorkspaceRole.objects.get(pk=request.data["role_id"], workspace=workspace)
             except WorkspaceRole.DoesNotExist:
                 response["error"][
                     "message"
@@ -293,9 +277,7 @@ class DeleteShift(APIView):
 
         # Verify user is part of workspace and has perms to manage schedules
         try:
-            creator_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            creator_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(member=creator_member, manage_schedules=True)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."

@@ -63,9 +63,7 @@ class Workspace(models.Model):
     created_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="created_workspaces"
     )
-    owner = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="owned_workspaces"
-    )
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owned_workspaces")
     name = models.CharField(max_length=30, default="Unnamed Workspace")
 
 
@@ -74,13 +72,9 @@ class WorkspaceMember(models.Model):
 
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    workspace = models.ForeignKey(
-        Workspace, on_delete=models.CASCADE, related_name="members"
-    )
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name="members")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="workspaces")
-    added_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="added_members"
-    )
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="added_members")
     pay_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True)
 
 
@@ -98,6 +92,4 @@ class GroupMember(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="messagegroups"
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="messagegroups")
