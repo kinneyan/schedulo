@@ -101,9 +101,7 @@ class UpdatePermissions(APIView):
 
             # Verify user belongs to correct workspace
             if member.workspace.id != int(request.data["workspace_id"]):
-                response["error"][
-                    "message"
-                ] = "Member does not belong to provided workspace."
+                response["error"]["message"] = "Member does not belong to provided workspace."
                 return Response(response, status=status.HTTP_404_NOT_FOUND)
 
             # Check if permissions already exist
@@ -124,9 +122,7 @@ class UpdatePermissions(APIView):
 
         # Check if user is owner, cannot update owner permissions as they are fixed (all)
         if permissions.is_owner:
-            response["error"][
-                "message"
-            ] = "Cannot update permissions for workspace owner."
+            response["error"]["message"] = "Cannot update permissions for workspace owner."
             return Response(response, status=status.HTTP_409_CONFLICT)
 
         # Check if user is trying to update owner permissions
@@ -136,9 +132,7 @@ class UpdatePermissions(APIView):
 
         # Update permissions
         if "manage_workspace_members" in request.data:
-            permissions.manage_workspace_members = request.data[
-                "manage_workspace_members"
-            ]
+            permissions.manage_workspace_members = request.data["manage_workspace_members"]
 
         if "manage_workspace_roles" in request.data:
             permissions.manage_workspace_roles = request.data["manage_workspace_roles"]

@@ -117,9 +117,7 @@ class CreateRoleTests(APITestCase):
             "pay_rate": 15.00,
         }
 
-        self.client.force_authenticate(
-            user=self.user2
-        )  # change to send request from user 2
+        self.client.force_authenticate(user=self.user2)  # change to send request from user 2
 
         response = self.client.put(self.url, data, format="json")
 
@@ -133,9 +131,7 @@ class CreateRoleTests(APITestCase):
             "pay_rate": 15.00,
         }
 
-        self.client.force_authenticate(
-            user=self.user3
-        )  # change to send request from user 2
+        self.client.force_authenticate(user=self.user3)  # change to send request from user 2
 
         response = self.client.put(self.url, data, format="json")
 

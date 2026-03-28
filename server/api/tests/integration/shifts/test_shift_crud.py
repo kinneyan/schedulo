@@ -70,9 +70,7 @@ class CreateShiftTests(APITestCase):
             manage_time_off=False,
         )
 
-        self.role = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="test name"
-        )
+        self.role = WorkspaceRole.objects.create(workspace=self.workspace, name="test name")
 
         self.time1 = datetime.now(timezone.utc)
         self.time2 = self.time1 + timedelta(hours=2)
@@ -292,12 +290,8 @@ class ModifyShiftTests(APITestCase):
             manage_time_off=False,
         )
 
-        self.role = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="test name"
-        )
-        self.role2 = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="test name2"
-        )
+        self.role = WorkspaceRole.objects.create(workspace=self.workspace, name="test name")
+        self.role2 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name2")
 
         self.time1 = datetime.now(timezone.utc)
         self.time2 = self.time1 + timedelta(hours=2)
@@ -341,9 +335,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was not modified
         try:
-            Shift.objects.get(
-                pk=self.shift.id, start_time=self.time1, end_time=self.time2
-            )
+            Shift.objects.get(pk=self.shift.id, start_time=self.time1, end_time=self.time2)
         except Shift.DoesNotExist:
             self.assertTrue(False)
 
@@ -355,9 +347,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was not modified
         try:
-            Shift.objects.get(
-                pk=self.shift.id, start_time=self.time1, end_time=self.time2
-            )
+            Shift.objects.get(pk=self.shift.id, start_time=self.time1, end_time=self.time2)
         except Shift.DoesNotExist:
             self.assertTrue(False)
 
@@ -373,9 +363,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was not modified
         try:
-            Shift.objects.get(
-                pk=self.shift.id, start_time=self.time1, end_time=self.time2
-            )
+            Shift.objects.get(pk=self.shift.id, start_time=self.time1, end_time=self.time2)
         except Shift.DoesNotExist:
             self.assertTrue(False)
 
@@ -387,9 +375,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was not modified
         try:
-            Shift.objects.get(
-                pk=self.shift.id, start_time=self.time1, end_time=self.time2
-            )
+            Shift.objects.get(pk=self.shift.id, start_time=self.time1, end_time=self.time2)
         except Shift.DoesNotExist:
             self.assertTrue(False)
 
@@ -401,9 +387,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was not modified
         try:
-            Shift.objects.get(
-                pk=self.shift.id, start_time=self.time1, end_time=self.time2
-            )
+            Shift.objects.get(pk=self.shift.id, start_time=self.time1, end_time=self.time2)
         except Shift.DoesNotExist:
             self.assertTrue(False)
 
@@ -419,9 +403,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was modified
         try:
-            Shift.objects.get(
-                pk=self.shift.id, start_time=self.time4, end_time=self.time3
-            )
+            Shift.objects.get(pk=self.shift.id, start_time=self.time4, end_time=self.time3)
         except Shift.DoesNotExist:
             self.assertTrue(False)
 
@@ -433,9 +415,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was modified
         try:
-            Shift.objects.get(
-                pk=self.shift.id, start_time=self.time4, end_time=self.time2
-            )
+            Shift.objects.get(pk=self.shift.id, start_time=self.time4, end_time=self.time2)
         except Shift.DoesNotExist:
             self.assertTrue(False)
 
@@ -447,9 +427,7 @@ class ModifyShiftTests(APITestCase):
 
         # ensure shift was modified
         try:
-            Shift.objects.get(
-                pk=self.shift.id, start_time=self.time1, end_time=self.time3
-            )
+            Shift.objects.get(pk=self.shift.id, start_time=self.time1, end_time=self.time3)
         except Shift.DoesNotExist:
             self.assertTrue(False)
 
@@ -582,12 +560,8 @@ class DeleteShiftTests(APITestCase):
             manage_time_off=False,
         )
 
-        self.role = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="test name"
-        )
-        self.role2 = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="test name2"
-        )
+        self.role = WorkspaceRole.objects.create(workspace=self.workspace, name="test name")
+        self.role2 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name2")
 
         self.time1 = datetime.now(timezone.utc)
         self.time2 = self.time1 + timedelta(hours=2)

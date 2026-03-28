@@ -89,15 +89,9 @@ class GetShiftsTest(APITestCase):
             manage_time_off=False,
         )
 
-        self.role1 = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="test name1"
-        )
-        self.role2 = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="test name2"
-        )
-        self.role3 = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="test name3"
-        )
+        self.role1 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name1")
+        self.role2 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name2")
+        self.role3 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name3")
 
         self.time1 = datetime(2025, 2, 16, tzinfo=timezone.utc)
         self.time2 = self.time1 + timedelta(hours=2)
@@ -246,9 +240,7 @@ class GetShiftsTest(APITestCase):
 
     def test_within_user_workspaces(self):
         """Verify that shifts from workspaces the requester does not belong to are excluded."""
-        self.workspace2 = Workspace.objects.create(
-            owner=self.user4, created_by=self.user4
-        )
+        self.workspace2 = Workspace.objects.create(owner=self.user4, created_by=self.user4)
 
         self.member4 = WorkspaceMember.objects.create(
             user=self.user4, workspace=self.workspace2, added_by=self.user4
@@ -263,9 +255,7 @@ class GetShiftsTest(APITestCase):
             manage_time_off=True,
         )
 
-        self.role3 = WorkspaceRole.objects.create(
-            workspace=self.workspace2, name="test name3"
-        )
+        self.role3 = WorkspaceRole.objects.create(workspace=self.workspace2, name="test name3")
 
         self.shift5 = Shift.objects.create(
             workspace=self.workspace2,

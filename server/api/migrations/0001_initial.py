@@ -67,9 +67,7 @@ class Migration(migrations.Migration):
                 ("password", models.CharField(max_length=128, verbose_name="password")),
                 (
                     "last_login",
-                    models.DateTimeField(
-                        blank=True, null=True, verbose_name="last login"
-                    ),
+                    models.DateTimeField(blank=True, null=True, verbose_name="last login"),
                 ),
                 (
                     "is_superuser",
@@ -81,15 +79,11 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "first_name",
-                    models.CharField(
-                        blank=True, max_length=150, verbose_name="first name"
-                    ),
+                    models.CharField(blank=True, max_length=150, verbose_name="first name"),
                 ),
                 (
                     "last_name",
-                    models.CharField(
-                        blank=True, max_length=150, verbose_name="last name"
-                    ),
+                    models.CharField(blank=True, max_length=150, verbose_name="last name"),
                 ),
                 (
                     "is_staff",
@@ -219,9 +213,7 @@ class Migration(migrations.Migration):
                 ("date_modified", models.DateTimeField(auto_now=True)),
                 (
                     "conversation_id",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.group"
-                    ),
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="api.group"),
                 ),
                 (
                     "message_id",
@@ -496,9 +488,7 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=30)),
                 (
                     "pay_rate",
-                    models.DecimalField(
-                        blank=True, decimal_places=2, max_digits=5, null=True
-                    ),
+                    models.DecimalField(blank=True, decimal_places=2, max_digits=5, null=True),
                 ),
                 (
                     "workspace_id",
@@ -610,9 +600,7 @@ class Migration(migrations.Migration):
             options={
                 "constraints": [
                     models.CheckConstraint(
-                        condition=models.Q(
-                            ("day_of_week__gte", 0), ("day_of_week__lte", 6)
-                        ),
+                        condition=models.Q(("day_of_week__gte", 0), ("day_of_week__lte", 6)),
                         name="day_of_week_valid",
                     )
                 ],
