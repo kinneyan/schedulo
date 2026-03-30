@@ -13,7 +13,8 @@ export default [
       '.venv',
       '**/*.min.js',
       'eslint.config.js',
-      'vite.config.js'
+      'vite.config.js',
+      'src/components/ui/**',
     ],
   },
   {
@@ -57,6 +58,7 @@ export default [
       'space-infix-ops': ['error', { int32Hint: false }],
       'key-spacing': ['error', { beforeColon: false, afterColon: true }],
       'object-curly-newline': ['error', { multiline: true, consistent: true }],
+      'max-len': ['error', { code: 100, ignoreUrls: true, ignoreStrings: true, ignoreTemplateLiterals: true }],
     },
   },
 ];
