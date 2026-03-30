@@ -54,16 +54,6 @@ class GetUser(APIView):
         members = WorkspaceMember.objects.filter(user=request.user).values_list("workspace")
         results = Workspace.objects.filter(pk__in=members).select_related("owner")
 
-        workspace_list = [
-            {
-                "id": workspace.id,
-                "created_by": workspace.created_by.id,
-                "owner": workspace.owner.id,
-                "name": workspace.name,
-            }
-            for workspace in results
-        ]
-
         response["result"]["workspaces"] = WorkspaceReadSerializer(results, many=True).data
 
         return Response(response, status=status.HTTP_200_OK)
