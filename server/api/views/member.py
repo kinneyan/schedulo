@@ -267,7 +267,7 @@ class MemberRolesView(APIView):
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Get workspace
-        workspace = Workspace.objects.get(id=modify_member.workspace.id)
+        workspace = modify_member.workspace
 
         # Verify user has permissions to manage workspace roles
         try:
