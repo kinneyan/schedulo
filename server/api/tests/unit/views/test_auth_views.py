@@ -20,9 +20,7 @@ class RegisterViewTest(TestCase):
 
     @patch("api.views.auth.RegisterUserSerializer")
     @patch("api.views.auth.User.objects.create_user")
-    def test_register_internal_server_error(
-        self, mock_create_user, mock_register_serializer
-    ):
+    def test_register_internal_server_error(self, mock_create_user, mock_register_serializer):
         """Verify that an unexpected exception during user creation returns 500."""
         mock_register_instance = MagicMock()
         mock_register_instance.is_valid.return_value = True

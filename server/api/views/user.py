@@ -51,9 +51,7 @@ class GetUser(APIView):
         response["result"]["user"] = UserDetailedReadSerializer(request.user).data
 
         # get list of workspaces user is in
-        members = WorkspaceMember.objects.filter(user=request.user).values_list(
-            "workspace"
-        )
+        members = WorkspaceMember.objects.filter(user=request.user).values_list("workspace")
         results = Workspace.objects.filter(pk__in=members).select_related("owner")
 
         workspace_list = [
@@ -66,9 +64,7 @@ class GetUser(APIView):
             for workspace in results
         ]
 
-        response["result"]["workspaces"] = WorkspaceReadSerializer(
-            results, many=True
-        ).data
+        response["result"]["workspaces"] = WorkspaceReadSerializer(results, many=True).data
 
         return Response(response, status=status.HTTP_200_OK)
 
@@ -96,14 +92,10 @@ class GetUser(APIView):
 
         if "password" in request.data:
             if "current_password" not in request.data:
-                response["error"][
-                    "message"
-                ] = "Current password required when changing password."
+                response["error"]["message"] = "Current password required when changing password."
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-            auth = authenticate(
-                email=request.user, password=request.data["current_password"]
-            )
+            auth = authenticate(email=request.user, password=request.data["current_password"])
             if auth == request.user:
                 request.user.set_password(request.data["password"])
                 request.user.save()

@@ -49,9 +49,7 @@ urlpatterns = [
         MemberPermissionsView.as_view(),
         name="member_permissions",
     ),
-    path(
-        "member/<int:member_id>/roles/", MemberRolesView.as_view(), name="member_roles"
-    ),
+    path("member/<int:member_id>/roles/", MemberRolesView.as_view(), name="member_roles"),
     path(
         "member/<int:member_id>/shifts/",
         MemberShiftsView.as_view(),

@@ -67,9 +67,7 @@ class CreateRoleTests(APITestCase):
             manage_time_off=False,
         )
         self.client.force_authenticate(user=self.member.user)
-        self.url = reverse(
-            "workspace_roles", kwargs={"workspace_id": self.workspace.id}
-        )
+        self.url = reverse("workspace_roles", kwargs={"workspace_id": self.workspace.id})
 
     def test_invalid_workspace(self):
         """Verify that a nonexistent workspace_id returns 404."""
@@ -294,9 +292,7 @@ class DeleteRoleTests(APITestCase):
 
     def test_delete_with_children(self):
         """Verify that deleting a role with assigned MemberRoles returns 200 and cascades deletion to MemberRoles."""
-        member_role = MemberRole.objects.create(
-            workspace_role=self.role, member=self.member2
-        )
+        member_role = MemberRole.objects.create(workspace_role=self.role, member=self.member2)
 
         url = reverse("role", kwargs={"role_id": self.role.id})
         response = self.client.delete(url, {}, format="json")
@@ -307,9 +303,7 @@ class DeleteRoleTests(APITestCase):
 
     def test_delete_cross_workspace_isolation(self):
         """Verify that a privileged member of another workspace cannot delete a role in this workspace."""
-        other_workspace = Workspace.objects.create(
-            owner=self.user3, created_by=self.user3
-        )
+        other_workspace = Workspace.objects.create(owner=self.user3, created_by=self.user3)
         other_member = WorkspaceMember.objects.create(
             user=self.user3, workspace=other_workspace, added_by=self.user3
         )
@@ -424,9 +418,7 @@ class ModifyWorkspaceRoleTests(APITestCase):
 
     def test_modify_cross_workspace_isolation(self):
         """Verify that a privileged member of another workspace cannot modify a role in this workspace."""
-        other_workspace = Workspace.objects.create(
-            owner=self.user3, created_by=self.user3
-        )
+        other_workspace = Workspace.objects.create(owner=self.user3, created_by=self.user3)
         other_member = WorkspaceMember.objects.create(
             user=self.user3, workspace=other_workspace, added_by=self.user3
         )
@@ -439,9 +431,7 @@ class ModifyWorkspaceRoleTests(APITestCase):
         self.client.force_authenticate(user=self.user3)
 
         url = reverse("role", kwargs={"role_id": self.role.id})
-        response = self.client.put(
-            url, {"name": "hacked", "pay_rate": 0}, format="json"
-        )
+        response = self.client.put(url, {"name": "hacked", "pay_rate": 0}, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         role = WorkspaceRole.objects.get(id=self.role.id)

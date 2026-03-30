@@ -94,9 +94,7 @@ class GetMemberPermissionsTests(APITestCase):
             result["manage_workspace_members"],
             self.permissions.manage_workspace_members,
         )
-        self.assertEqual(
-            result["manage_workspace_roles"], self.permissions.manage_workspace_roles
-        )
+        self.assertEqual(result["manage_workspace_roles"], self.permissions.manage_workspace_roles)
         self.assertEqual(result["manage_schedules"], self.permissions.manage_schedules)
         self.assertEqual(result["manage_time_off"], self.permissions.manage_time_off)
 
@@ -112,9 +110,7 @@ class GetMemberPermissionsTests(APITestCase):
             result["manage_workspace_members"],
             self.permissions2.manage_workspace_members,
         )
-        self.assertEqual(
-            result["manage_workspace_roles"], self.permissions2.manage_workspace_roles
-        )
+        self.assertEqual(result["manage_workspace_roles"], self.permissions2.manage_workspace_roles)
         self.assertEqual(result["manage_schedules"], self.permissions2.manage_schedules)
         self.assertEqual(result["manage_time_off"], self.permissions2.manage_time_off)
 

@@ -40,9 +40,7 @@ class RoleView(APIView):
         try:
             _ = WorkspaceMember.objects.get(user=request.user, workspace=role.workspace)
         except WorkspaceMember.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "Must be a member of the workspace to get a role."
+            response["error"]["message"] = "Must be a member of the workspace to get a role."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         data = RoleReadSerializer(role).data

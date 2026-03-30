@@ -106,12 +106,8 @@ class GetMemberTests(APITestCase):
         self.assertEqual(result["first_name"], self.user2.first_name)
         self.assertEqual(result["last_name"], self.user2.last_name)
         self.assertEqual(len(result["member_roles"]), 2)
-        self.assertEqual(
-            result["member_roles"][0], {"id": self.role1.id, "name": self.role1.name}
-        )
-        self.assertEqual(
-            result["member_roles"][1], {"id": self.role2.id, "name": self.role2.name}
-        )
+        self.assertEqual(result["member_roles"][0], {"id": self.role1.id, "name": self.role1.name})
+        self.assertEqual(result["member_roles"][1], {"id": self.role2.id, "name": self.role2.name})
 
     def test_get_member_no_roles(self):
         """Verify that a member with no assigned roles returns an empty member_roles list."""

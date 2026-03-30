@@ -11,12 +11,8 @@ class WhiteNoiseSettingsTest(TestCase):
         )
 
     def test_whitenoise_after_security_middleware(self):
-        idx_security = settings.MIDDLEWARE.index(
-            "django.middleware.security.SecurityMiddleware"
-        )
-        idx_whitenoise = settings.MIDDLEWARE.index(
-            "whitenoise.middleware.WhiteNoiseMiddleware"
-        )
+        idx_security = settings.MIDDLEWARE.index("django.middleware.security.SecurityMiddleware")
+        idx_whitenoise = settings.MIDDLEWARE.index("whitenoise.middleware.WhiteNoiseMiddleware")
         self.assertLess(idx_security, idx_whitenoise)
 
     def test_static_root_configured(self):

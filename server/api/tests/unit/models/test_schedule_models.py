@@ -19,16 +19,12 @@ class ShiftModelTest(TestCase):
 
     def setUp(self):
         """Create a user, workspace, member, and role for use in each shift test."""
-        self.user = User.objects.create_user(
-            email="test@example.com", password="password123"
-        )
+        self.user = User.objects.create_user(email="test@example.com", password="password123")
         self.workspace = Workspace.objects.create(created_by=self.user, owner=self.user)
         self.member = WorkspaceMember.objects.create(
             workspace=self.workspace, user=self.user, added_by=self.user
         )
-        self.role = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="Test Role"
-        )
+        self.role = WorkspaceRole.objects.create(workspace=self.workspace, name="Test Role")
 
     def test_shift_creation_with_member(self):
         """Test shift creation with assigned member"""
@@ -74,12 +70,8 @@ class ShiftModelTest(TestCase):
         """Test that shift is deleted when workspace is deleted"""
         shift = Shift.objects.create(
             workspace=self.workspace,
-            start_time=datetime(
-                2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()
-            ),
-            end_time=datetime(
-                2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()
-            ),
+            start_time=datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()),
+            end_time=datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()),
             role=self.role,
             created_by=self.member,
         )
@@ -113,18 +105,12 @@ class ShiftRequestModelTest(TestCase):
             user=self.recipient_user,
             added_by=self.sender_user,
         )
-        self.role = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="Test Role"
-        )
+        self.role = WorkspaceRole.objects.create(workspace=self.workspace, name="Test Role")
         self.sender_shift = Shift.objects.create(
             member=self.sender_member,
             workspace=self.workspace,
-            start_time=datetime(
-                2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()
-            ),
-            end_time=datetime(
-                2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()
-            ),
+            start_time=datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()),
+            end_time=datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()),
             role=self.role,
             created_by=self.sender_member,
         )
@@ -149,12 +135,8 @@ class ShiftRequestModelTest(TestCase):
         recipient_shift = Shift.objects.create(
             member=self.recipient_member,
             workspace=self.workspace,
-            start_time=datetime(
-                2025, 1, 2, 9, 0, tzinfo=timezone.get_default_timezone()
-            ),
-            end_time=datetime(
-                2025, 1, 2, 17, 0, tzinfo=timezone.get_default_timezone()
-            ),
+            start_time=datetime(2025, 1, 2, 9, 0, tzinfo=timezone.get_default_timezone()),
+            end_time=datetime(2025, 1, 2, 17, 0, tzinfo=timezone.get_default_timezone()),
             role=self.role,
             created_by=self.recipient_member,
         )
@@ -174,9 +156,7 @@ class TimeOffRequestModelTest(TestCase):
 
     def setUp(self):
         """Create a user, approver, workspace, and members for use in each time-off test."""
-        self.user = User.objects.create_user(
-            email="test@example.com", password="password123"
-        )
+        self.user = User.objects.create_user(email="test@example.com", password="password123")
         self.approver_user = User.objects.create_user(
             email="approver@example.com", password="password123"
         )
@@ -229,9 +209,7 @@ class UnavailabilityModelTest(TestCase):
 
     def setUp(self):
         """Create a user, workspace, and member for use in each unavailability test."""
-        self.user = User.objects.create_user(
-            email="test@example.com", password="password123"
-        )
+        self.user = User.objects.create_user(email="test@example.com", password="password123")
         self.workspace = Workspace.objects.create(created_by=self.user, owner=self.user)
         self.member = WorkspaceMember.objects.create(
             workspace=self.workspace, user=self.user, added_by=self.user
@@ -242,12 +220,8 @@ class UnavailabilityModelTest(TestCase):
         for day in range(7):  # 0-6 are valid
             unavailability = Unavailability.objects.create(
                 member=self.member,
-                start_time=datetime(
-                    2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()
-                ),
-                end_time=datetime(
-                    2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()
-                ),
+                start_time=datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()),
+                end_time=datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()),
                 day_of_week=day,
             )
 
@@ -259,12 +233,8 @@ class UnavailabilityModelTest(TestCase):
         with self.assertRaises(ValidationError):
             unavailability = Unavailability(
                 member=self.member,
-                start_time=datetime(
-                    2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()
-                ),
-                end_time=datetime(
-                    2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()
-                ),
+                start_time=datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()),
+                end_time=datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()),
                 day_of_week=-1,
             )
             unavailability.full_clean()
@@ -274,12 +244,8 @@ class UnavailabilityModelTest(TestCase):
         with self.assertRaises(ValidationError):
             unavailability = Unavailability(
                 member=self.member,
-                start_time=datetime(
-                    2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()
-                ),
-                end_time=datetime(
-                    2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()
-                ),
+                start_time=datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()),
+                end_time=datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()),
                 day_of_week=7,
             )
             unavailability.full_clean()
@@ -300,12 +266,8 @@ class UnavailabilityModelTest(TestCase):
         """Test that unavailability is deleted when member is deleted"""
         unavailability = Unavailability.objects.create(
             member=self.member,
-            start_time=datetime(
-                2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()
-            ),
-            end_time=datetime(
-                2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()
-            ),
+            start_time=datetime(2025, 1, 1, 9, 0, tzinfo=timezone.get_default_timezone()),
+            end_time=datetime(2025, 1, 1, 17, 0, tzinfo=timezone.get_default_timezone()),
             day_of_week=1,
         )
         unavailability_id = unavailability.id

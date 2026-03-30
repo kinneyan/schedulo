@@ -106,9 +106,7 @@ class ModifyWorkspaceTests(APITestCase):
 
         self.permissions.refresh_from_db()
         perms = MemberPermissions.objects.get(
-            member=WorkspaceMember.objects.get(
-                user=self.user2, workspace=self.workspace
-            ),
+            member=WorkspaceMember.objects.get(user=self.user2, workspace=self.workspace),
             workspace=self.workspace,
         )
 
@@ -142,17 +140,13 @@ class ModifyWorkspaceTests(APITestCase):
         """Verify that a non-owner member cannot transfer workspace ownership."""
 
         self.url = reverse("workspace_parameters", args=[self.workspace.id])
-        self.client.force_authenticate(
-            user=self.user2
-        )  # change to send request from user 2
+        self.client.force_authenticate(user=self.user2)  # change to send request from user 2
 
         # try to change user 3 to owner
         response = self.client.put(self.url, {"new_owner_id": self.user3.id})
 
         perms = MemberPermissions.objects.get(
-            member=WorkspaceMember.objects.get(
-                user=self.user3, workspace=self.workspace
-            ),
+            member=WorkspaceMember.objects.get(user=self.user3, workspace=self.workspace),
             workspace=self.workspace,
         )
 
@@ -219,9 +213,7 @@ class DeleteWorkspaceTests(APITestCase):
             phone="1234567890",
         )
 
-        self.workspace1 = Workspace.objects.create(
-            owner=self.user, created_by=self.user
-        )
+        self.workspace1 = Workspace.objects.create(owner=self.user, created_by=self.user)
         self.workspace1_member1 = WorkspaceMember.objects.create(
             user=self.user, workspace=self.workspace1, added_by=self.user
         )
@@ -247,9 +239,7 @@ class DeleteWorkspaceTests(APITestCase):
             manage_time_off=True,
         )
 
-        self.workspace2 = Workspace.objects.create(
-            owner=self.user, created_by=self.user
-        )
+        self.workspace2 = Workspace.objects.create(owner=self.user, created_by=self.user)
         self.workspace2_member1 = WorkspaceMember.objects.create(
             user=self.user, workspace=self.workspace2, added_by=self.user
         )

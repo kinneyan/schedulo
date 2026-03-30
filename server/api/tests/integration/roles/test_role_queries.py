@@ -67,9 +67,7 @@ class GetRolesTests(APITestCase):
             manage_time_off=False,
         )
         self.client.force_authenticate(user=self.member.user)
-        self.url = reverse(
-            "workspace_roles", kwargs={"workspace_id": self.workspace.id}
-        )
+        self.url = reverse("workspace_roles", kwargs={"workspace_id": self.workspace.id})
 
     def test_invalid_workspace(self):
         """Verify that a nonexistent workspace_id returns 404."""
@@ -116,9 +114,7 @@ class GetRolesTests(APITestCase):
 
     def test_multiple_workspaces(self):
         """Verify that fetching roles for one workspace does not include roles from another workspace."""
-        self.workspace2 = Workspace.objects.create(
-            owner=self.user, created_by=self.user
-        )
+        self.workspace2 = Workspace.objects.create(owner=self.user, created_by=self.user)
 
         self.member5 = WorkspaceMember.objects.create(
             user=self.user, workspace=self.workspace2, added_by=self.user
@@ -133,9 +129,7 @@ class GetRolesTests(APITestCase):
             manage_time_off=True,
         )
 
-        workspace2_url = reverse(
-            "workspace_roles", kwargs={"workspace_id": self.workspace2.id}
-        )
+        workspace2_url = reverse("workspace_roles", kwargs={"workspace_id": self.workspace2.id})
         response = self.client.post(
             workspace2_url,
             {"name": "test name4", "pay_rate": 5.00},

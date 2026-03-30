@@ -50,9 +50,7 @@ class WorkspaceView(APIView):
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # create new workspace
-        workspace = Workspace.objects.create(
-            created_by=request.user, owner=request.user
-        )
+        workspace = Workspace.objects.create(created_by=request.user, owner=request.user)
 
         # set name if present
         if not (serializer.data.get("name", None) is None):
@@ -115,18 +113,14 @@ class WorkspaceView(APIView):
 
         # Verify user is owner
         try:
-            old_owner_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            old_owner_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(
                 workspace=workspace,
                 member=old_owner_member,
                 is_owner=True,
             )
         except MemberPermissions.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "You do not have permission to modify this workspace."
+            response["error"]["message"] = "You do not have permission to modify this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
@@ -146,12 +140,8 @@ class WorkspaceView(APIView):
                     member=old_owner_member, workspace=workspace
                 )
 
-                if (
-                    new_owner_perms == old_owner_perms
-                ):  # cannot set new owner to current
-                    response["error"][
-                        "message"
-                    ] = "Member is already owner of this workspace."
+                if new_owner_perms == old_owner_perms:  # cannot set new owner to current
+                    response["error"]["message"] = "Member is already owner of this workspace."
                     return Response(response, status=status.HTTP_409_CONFLICT)
 
                 old_owner_perms.is_owner = False
@@ -245,18 +235,14 @@ class WorkspaceView(APIView):
 
         # Verify user is owner
         try:
-            owner_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            owner_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(
                 workspace=workspace,
                 member=owner_member,
                 is_owner=True,
             )
         except MemberPermissions.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "You do not have permission to modify this workspace."
+            response["error"]["message"] = "You do not have permission to modify this workspace."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
@@ -298,9 +284,7 @@ class WorkspaceMembersView(APIView):
 
         # Verify user is permitted to add members to workspace
         try:
-            workspace_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            workspace_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(
                 member=workspace_member,
                 workspace=workspace,
@@ -403,9 +387,7 @@ class WorkspaceShiftsView(APIView):
         serializer = ShiftSerializer(data=request.data)
         if not serializer.is_valid():
             response["error"]["code"] = 400
-            response["error"][
-                "message"
-            ] = "Invalid request data, start and end time are required."
+            response["error"]["message"] = "Invalid request data, start and end time are required."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify body contains required fields
@@ -422,9 +404,7 @@ class WorkspaceShiftsView(APIView):
 
         # Verify user is part of workspace and has perms to manage schedules
         try:
-            creator_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            creator_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(member=creator_member, manage_schedules=True)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
@@ -437,9 +417,7 @@ class WorkspaceShiftsView(APIView):
 
         # Verify role exists and is part of workspace
         try:
-            role = WorkspaceRole.objects.get(
-                pk=request.data["role_id"], workspace=workspace
-            )
+            role = WorkspaceRole.objects.get(pk=request.data["role_id"], workspace=workspace)
         except WorkspaceRole.DoesNotExist:
             response["error"][
                 "message"
@@ -453,9 +431,7 @@ class WorkspaceShiftsView(APIView):
                     pk=request.data["member_id"], workspace=workspace
                 )
             except WorkspaceMember.DoesNotExist:
-                response["error"][
-                    "message"
-                ] = "Member does not exist or is not part of workspace."
+                response["error"]["message"] = "Member does not exist or is not part of workspace."
                 return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # verify dates are valid
@@ -592,9 +568,7 @@ class WorkspaceRolesView(APIView):
             response["error"]["message"] = "Workspace does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
-        if not WorkspaceMember.objects.filter(
-            user=request.user, workspace=workspace
-        ).exists():
+        if not WorkspaceMember.objects.filter(user=request.user, workspace=workspace).exists():
             response["error"]["message"] = "You are not a member of this workspace"
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 

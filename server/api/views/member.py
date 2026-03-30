@@ -59,9 +59,7 @@ class MemberView(APIView):
 
         # ensure request is from user in same workspace
         try:
-            _ = WorkspaceMember.objects.get(
-                workspace=member.workspace, user=request.user
-            )
+            _ = WorkspaceMember.objects.get(workspace=member.workspace, user=request.user)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "Must share a workspace to get member."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
@@ -92,17 +90,11 @@ class MemberView(APIView):
 
         # verify request user has perms to view member shifts or is viewing own shifts
         perms = MemberPermissions.objects.get(member=request_member)
-        if (
-            perms.is_owner
-            or perms.manage_workspace_members
-            or member.id == request_member.id
-        ):
+        if perms.is_owner or perms.manage_workspace_members or member.id == request_member.id:
             member.delete()
             return Response(response, status=status.HTTP_200_OK)
         else:
-            response["error"][
-                "message"
-            ] = "You do not have permission delete this member."
+            response["error"]["message"] = "You do not have permission delete this member."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
 
@@ -194,9 +186,7 @@ class MemberPermissionsView(APIView):
 
         try:
             # Check if permissions already exist
-            permissions = MemberPermissions.objects.get(
-                workspace=member.workspace, member=member
-            )
+            permissions = MemberPermissions.objects.get(workspace=member.workspace, member=member)
         except MemberPermissions.DoesNotExist:
             # Create permissions if they do not exist
             permissions = MemberPermissions.objects.create(
@@ -206,9 +196,7 @@ class MemberPermissionsView(APIView):
 
         # Check if user is owner, cannot update owner permissions as they are fixed (all)
         if permissions.is_owner:
-            response["error"][
-                "message"
-            ] = "Cannot update permissions for workspace owner."
+            response["error"]["message"] = "Cannot update permissions for workspace owner."
             return Response(response, status=status.HTTP_409_CONFLICT)
 
         # Check if user is trying to update owner permissions
@@ -218,9 +206,7 @@ class MemberPermissionsView(APIView):
 
         # Update permissions
         if "manage_workspace_members" in request.data:
-            permissions.manage_workspace_members = request.data[
-                "manage_workspace_members"
-            ]
+            permissions.manage_workspace_members = request.data["manage_workspace_members"]
 
         if "manage_workspace_roles" in request.data:
             permissions.manage_workspace_roles = request.data["manage_workspace_roles"]
@@ -271,9 +257,7 @@ class MemberRolesView(APIView):
 
         # Verify user has permissions to manage workspace roles
         try:
-            request_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            request_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(
                 workspace=workspace, member=request_member, manage_workspace_roles=True
             )
@@ -292,9 +276,7 @@ class MemberRolesView(APIView):
                 pk=request.data["workspace_role_id"], workspace=workspace
             )
         except WorkspaceRole.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "Role is not part of this workspace or does not exist."
+            response["error"]["message"] = "Role is not part of this workspace or does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Verify that member does not already have this role
@@ -305,9 +287,7 @@ class MemberRolesView(APIView):
             )
         except MemberRole.DoesNotExist:
             # add role to member if they did not have it
-            MemberRole.objects.create(
-                member=modify_member, workspace_role=workspace_role
-            )
+            MemberRole.objects.create(member=modify_member, workspace_role=workspace_role)
             return Response(response, status=status.HTTP_201_CREATED)
 
         # member already had role
@@ -359,9 +339,7 @@ class MemberRolesView(APIView):
             response["result"] = data["member_roles"]
             return Response(response, status=status.HTTP_200_OK)
         else:
-            response["error"][
-                "message"
-            ] = "You do not have permission to view this members roles."
+            response["error"]["message"] = "You do not have permission to view this members roles."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, member_id):
@@ -394,9 +372,7 @@ class MemberRolesView(APIView):
 
         # Verify user has permissions to manage workspace roles
         try:
-            request_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            request_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(
                 workspace=workspace, member=request_member, manage_workspace_roles=True
             )
@@ -411,13 +387,9 @@ class MemberRolesView(APIView):
 
         # Verify that role exists and is part of workspace
         try:
-            WorkspaceRole.objects.get(
-                id=request.data["workspace_role_id"], workspace=workspace
-            )
+            WorkspaceRole.objects.get(id=request.data["workspace_role_id"], workspace=workspace)
         except WorkspaceRole.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "Role is not part of this workspace or does not exist."
+            response["error"]["message"] = "Role is not part of this workspace or does not exist."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # Verify that member already has this role
@@ -477,7 +449,5 @@ class MemberShiftsView(APIView):
             response["result"] = data
             return Response(response, status=status.HTTP_200_OK)
         else:
-            response["error"][
-                "message"
-            ] = "You do not have permission to view this members shifts."
+            response["error"]["message"] = "You do not have permission to view this members shifts."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
