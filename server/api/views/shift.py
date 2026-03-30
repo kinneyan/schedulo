@@ -230,7 +230,7 @@ class ShiftView(APIView):
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         # delete shift
-        shift = Shift.objects.get(id=shift_id).delete()
+        shift.delete()
         return Response(response, status=status.HTTP_200_OK)
 
 
