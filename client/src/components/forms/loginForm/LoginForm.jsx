@@ -1,7 +1,8 @@
-import Container from "react-bootstrap/Container";
 import PropTypes from "prop-types";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import SubmitButton from "../../buttons/submitButton/SubmitButton";
-import "./index.scss";
 
 /**
  * Presentational login form with email and password fields.
@@ -18,34 +19,45 @@ import "./index.scss";
 const LoginForm = ({email, setEmail, password, setPassword, error, handleSubmit}) =>
 {
     return (
-        <Container id="login-container">
-            <form id="login-form" onSubmit={handleSubmit}>
-                <label id="email-label" htmlFor="email-form">Email</label>
-                <input
-                    type="email"
-                    name="email"
-                    id="email-form"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <label id="password-label" htmlFor="password-form">Password</label>
-                <input
-                    type="password"
-                    name="password"
-                    id="password-form"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <SubmitButton buttonText="Log in" />
-                {error && <div id="error-container">
-                    <p id="error-text">{error}</p>
-                </div>}
-                <hr />
-                <p>Don&#39;t have an account? <a href="register">Sign up</a></p>
-            </form>
-        </Container>
+        <Card className="w-full max-w-xl">
+            <CardHeader>
+                <CardTitle>Log in</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="email-form">Email</Label>
+                        <Input
+                            type="email"
+                            name="email"
+                            id="email-form"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="password-form">Password</Label>
+                        <Input
+                            type="password"
+                            name="password"
+                            id="password-form"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <SubmitButton buttonText="Log in" />
+                    {error && (
+                        <p className="text-destructive text-sm">{error}</p>
+                    )}
+                    <hr className="border-border" />
+                    <p className="text-sm text-center">
+                        Don&#39;t have an account? <a href="register" className="text-primary underline">Sign up</a>
+                    </p>
+                </form>
+            </CardContent>
+        </Card>
     );
 };
 

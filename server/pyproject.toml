@@ -28,20 +28,3 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["server"]
-
-[tool.black]
-line-length = 100
-exclude = '''
-/(
-      \.eggs
-      | build
-      | venv
-      | \.venv
-      | \.git
-      | node_modules
-      | __pycache__
-      | \.vscode
-      | \.vite
-      | dist
-)/
-'''

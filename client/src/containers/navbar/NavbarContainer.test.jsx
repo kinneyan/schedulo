@@ -28,13 +28,12 @@ describe("NavbarContainer", () =>
         vi.clearAllMocks();
     });
 
-    it("shows \"Log in\" in the Account dropdown when no token cookie is present", async () => 
+    it("does not show the Account dropdown when no token cookie is present", () =>
     {
         mockGet.mockReturnValue(undefined);
         renderWithRouter();
 
-        await userEvent.click(screen.getByText("Account"));
-        expect(screen.getByText("Log in")).toBeInTheDocument();
+        expect(screen.queryByText("Account")).not.toBeInTheDocument();
     });
 
     it("shows \"Log out\" in the Account dropdown when a token cookie is present", async () => 

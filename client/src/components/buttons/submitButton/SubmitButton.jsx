@@ -1,7 +1,5 @@
-import Button from "react-bootstrap/Button";
 import PropTypes from "prop-types";
-
-import "./index.scss";
+import {Button} from "@/components/ui/button";
 
 /**
  * Submit button for enclosing forms.
@@ -13,7 +11,7 @@ import "./index.scss";
 const SubmitButton = ({buttonText}) =>
 {
     return (
-        <Button id="button-item" type="submit">{buttonText}</Button>
+        <Button type="submit">{buttonText}</Button>
     );
 };
 

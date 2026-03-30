@@ -1,11 +1,10 @@
-import Container from "react-bootstrap/Container";
-import Navbar from "react-bootstrap/Navbar";
-import Nav from "react-bootstrap/Nav";
-import NavDropdown from "react-bootstrap/NavDropdown";
 import Cookies from "universal-cookie";
 import PropTypes from "prop-types";
-
-import "./index.scss";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 /**
  * Top-level navigation bar with branding, page links, and an account dropdown.
@@ -17,60 +16,39 @@ import "./index.scss";
 const NavigationBar = ({loggedIn}) =>
 {
     /**
-     * Account dropdown content that adapts to the user's authentication state.
-     *
-     * @param {Object} props
-     * @param {boolean} props.loggedIn - Whether the current user is authenticated.
-     * @returns {JSX.Element}
+     * Removes the auth token cookie, effectively logging the user out.
      */
-    const AuthButton = ({loggedIn}) =>
+    const logOut = () =>
     {
-        /**
-         * Removes the auth token cookie, effectively logging the user out.
-         */
-        const logOut = () =>
-        {
-            const cookies = new Cookies();
-            cookies.remove("token");
-        };
-
-        if (!loggedIn)
-        {
-            return <NavDropdown.Item href="/login">Log in</NavDropdown.Item>;
-        }
-
-        return (
-            <div>
-                <NavDropdown.Item href="/dashboard">Dashboard</NavDropdown.Item>
-                <NavDropdown.Item href="/profile">Settings</NavDropdown.Item>
-                <NavDropdown.Item href="/" onClick={logOut}>Log out</NavDropdown.Item>
-            </div>
-        );
+        const cookies = new Cookies();
+        cookies.remove("token");
     };
 
-    AuthButton.propTypes = {
-        loggedIn: PropTypes.bool.isRequired,
-    };
+    const menuItemClass = "block px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground no-underline text-inherit transition-colors";
 
     return (
-        <Navbar fixed="top">
-            <Container fluid className="p-0">
-                <Navbar.Brand href="/">
-                    <img
-                        src="/schedulo.png"
-                        alt="logo"
-                    />
-                    {" "}Schedulo
-                </Navbar.Brand>
-                <Nav id="page-links">
-                    <Nav.Link href="/">Home</Nav.Link>
-                    <Nav.Link href="#">About</Nav.Link>
-                    <NavDropdown title="Account">
-                        <AuthButton loggedIn={loggedIn} />
-                    </NavDropdown>
-                </Nav>
-            </Container>
-        </Navbar>
+        <nav className="fixed top-0 left-0 right-0 z-50 h-[52px] bg-[#2C2C2C] flex items-center px-4">
+            <div className="flex items-center flex-1">
+                <a href="/" className="flex items-center gap-2 text-white font-semibold text-lg no-underline mr-6">
+                    <img src="/schedulo.png" alt="logo" className="h-7 w-7" />
+                    Schedulo
+                </a>
+                <a href="/" className="text-white/80 hover:text-white text-sm mr-4 no-underline transition-colors">Dashboard</a>
+                <a href="/about" className="text-white/80 hover:text-white text-sm no-underline transition-colors">About</a>
+            </div>
+
+            {loggedIn && (
+                <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger className="text-white/80 hover:text-white text-sm transition-colors outline-none">
+                        Account
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <a href="/profile" className={menuItemClass}>Settings</a>
+                        <a href="/" onClick={logOut} className={menuItemClass}>Log out</a>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            )}
+        </nav>
     );
 };
 

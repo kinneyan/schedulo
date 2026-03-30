@@ -1,24 +1,21 @@
-import "./index.scss";
-
-import NavigationBar from "../../components/navbar/NavigationBar";
+import NavbarContainer from "../../containers/navbar/NavbarContainer";
 import CreateWorkspaceContainer from "../../containers/createWorkspace/CreateWorkspaceContainer";
-import withAuth from "../../components/auth/WithAuth";
 
 /**
- * Page that renders the workspace creation form, protected by authentication.
+ * Authenticated page for creating a new workspace.
  *
  * @returns {JSX.Element}
  */
 const CreateWorkspacePage = () =>
 {
     return (
-        <div id="create-workspace-page">
-            <NavigationBar />
-            <div id="create-workspace-form-container">
+        <div>
+            <NavbarContainer />
+            <div className="flex justify-center pt-16 px-4">
                 <CreateWorkspaceContainer />
             </div>
         </div>
     );
 };
 
-export default withAuth(CreateWorkspacePage);
+export default CreateWorkspacePage;
