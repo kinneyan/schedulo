@@ -285,6 +285,10 @@ class WorkspaceMembersView(APIView):
         """
         response = {"error": {}}
 
+        if "added_user_id" not in request.data:
+            response["error"]["message"] = "Added User ID is required."
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
         # ensure workspace exists
         try:
             workspace = Workspace.objects.get(pk=workspace_id)
