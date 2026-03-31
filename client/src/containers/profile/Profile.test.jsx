@@ -21,16 +21,12 @@ const userApiResponse = {
     phone: "123",
 };
 
-beforeEach(() => 
+beforeEach(() =>
 {
     vi.stubGlobal("fetch", vi.fn());
     fetch.mockResolvedValue({
         status: 200,
         json: async () => userApiResponse,
-    });
-    Object.defineProperty(window, "location", {
-        value: {reload: vi.fn()},
-        writable: true,
     });
 });
 
@@ -64,11 +60,10 @@ describe("Profile", () =>
         });
     });
 
-    it("calls window.location.reload on successful profile update", async () => 
+    it("shows a success message on successful profile update", async () =>
     {
         const user = userEvent.setup();
 
-        // Second fetch call (the PUT) returns success
         fetch
             .mockResolvedValueOnce({
                 status: 200,
@@ -81,16 +76,16 @@ describe("Profile", () =>
 
         render(<Profile />);
 
-        await waitFor(() => 
+        await waitFor(() =>
         {
             expect(screen.getByRole("button", {name: /save/i})).toBeInTheDocument();
         });
 
         await user.click(screen.getByRole("button", {name: /save/i}));
 
-        await waitFor(() => 
+        await waitFor(() =>
         {
-            expect(window.location.reload).toHaveBeenCalled();
+            expect(screen.getByText(/changes saved/i)).toBeInTheDocument();
         });
     });
 

@@ -23,7 +23,6 @@ services:
       - ./.env
     environment:
       POSTGRES_HOST: db
-      DJANGO_SETTINGS_MODULE: server.settings.prod
     ports:
       - "80:8000"
     depends_on:

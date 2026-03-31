@@ -91,6 +91,4 @@ class UpdateUserTests(APITestCase):
         # Refresh the user instance to get the updated data
         self.user.refresh_from_db()
 
-        self.assertTrue(
-            self.user.check_password("testpassword")
-        )  # ensure password was not changed
+        self.assertTrue(self.user.check_password("testpassword"))  # ensure password was not changed

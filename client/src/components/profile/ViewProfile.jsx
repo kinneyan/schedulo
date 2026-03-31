@@ -1,8 +1,8 @@
-import {useState} from "react";
-import Form from "react-bootstrap/Form";
 import PropTypes from "prop-types";
-
-import "./index.scss";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import SubmitButton from "../buttons/submitButton/SubmitButton";
 
 /**
@@ -23,13 +23,12 @@ import SubmitButton from "../buttons/submitButton/SubmitButton";
  * @param {string} props.states.newPassword - New password field value.
  * @param {Function} props.states.setNewPassword - State setter for new password.
  * @param {string} [props.states.error] - Error message to display, if any.
+ * @param {boolean} [props.states.success] - Whether the last save succeeded.
  * @param {Function} props.handleSubmit - Form submit handler for saving account changes.
  * @returns {JSX.Element}
  */
 const ViewProfile = ({states, handleSubmit}) =>
 {
-    const [activeTab, setActiveTab] = useState("account");
-
     const {
         fname, setFname,
         lname, setLname,
@@ -38,103 +37,76 @@ const ViewProfile = ({states, handleSubmit}) =>
         oldPassword, setOldPassword,
         newPassword, setNewPassword,
         error,
+        success,
     } = states;
 
     return (
-        <div id="settings-component">
-            <div id="nav-container">
-                <ul id="settings-nav">
-                    <li
-                        className={activeTab === "account" ? "active" : ""}
-                        onClick={() => setActiveTab("account")}
-                    >
-                        <h1>Account Settings</h1>
-                    </li>
-                    <li
-                        className={activeTab === "workspace" ? "active" : ""}
-                        onClick={() => setActiveTab("workspace")}
-                    >
-                        <h1>Workspace Settings</h1>
-                    </li>
-                </ul>
-            </div>
+        <div className="max-w-2xl mx-auto px-4 py-8">
+            <Tabs defaultValue="account">
+                <TabsList className="mb-6">
+                    <TabsTrigger value="account">Account Settings</TabsTrigger>
+                    <TabsTrigger value="workspace">Workspace Settings</TabsTrigger>
+                </TabsList>
 
-            <div id="settings-container">
-                <div id="settings-content">
-                    {activeTab === "account" ? (
-                        <div className="settings-form-container">
-                            <h3>Account Information</h3>
-                            <Form onSubmit={handleSubmit}>
-                                <Form.Group className="fgroup">
-                                    <h4>First Name</h4>
-                                    <Form.Control
-                                        type="text"
-                                        value={fname}
-                                        onChange={(e) => setFname(e.target.value)}
-                                    />
-                                </Form.Group>
-
-                                <Form.Group className="fgroup">
-                                    <h4>Last Name</h4>
-                                    <Form.Control
-                                        type="text"
-                                        value={lname}
-                                        onChange={(e) => setLname(e.target.value)}
-                                    />
-                                </Form.Group>
-
-                                <Form.Group className="fgroup">
-                                    <h4>Email</h4>
-                                    <Form.Control
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                    />
-                                </Form.Group>
-
-                                <Form.Group className="fgroup">
-                                    <h4>Phone</h4>
-                                    <Form.Control
-                                        type="tel"
-                                        value={phone}
-                                        onChange={(e) => setPhone(e.target.value)}
-                                    />
-                                </Form.Group>
-
-                                <h3>Change Password</h3>
-
-                                <Form.Group className="fgroup">
-                                    <h4>Current Password</h4>
-                                    <Form.Control
-                                        type="password"
-                                        value={oldPassword}
-                                        onChange={(e) => setOldPassword(e.target.value)}
-                                    />
-                                </Form.Group>
-
-                                <Form.Group className="fgroup">
-                                    <h4>New Password</h4>
-                                    <Form.Control
-                                        type="password"
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                    />
-                                </Form.Group>
-
-                                <div id="button-item">
-                                    <SubmitButton buttonText="Save" onClick={handleSubmit} />
+                <TabsContent value="account">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Account Information</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-1.5">
+                                        <Label htmlFor="fname">First Name</Label>
+                                        <Input id="fname" type="text" value={fname} onChange={(e) => setFname(e.target.value)} />
+                                    </div>
+                                    <div className="flex flex-col gap-1.5">
+                                        <Label htmlFor="lname">Last Name</Label>
+                                        <Input id="lname" type="text" value={lname} onChange={(e) => setLname(e.target.value)} />
+                                    </div>
                                 </div>
-                            </Form>
-                        </div>
-                    ) : (
-                        <div className="settings-form-container">
-                            <h3>Workspace Settings</h3>
-                            <p>Workspace settings will be implemented later.</p>
-                        </div>
-                    )}
-                </div>
-            </div>
-            {error && <div id="error-container"><p id="error-text">{error.toString()}</p></div>}
+                                <div className="flex flex-col gap-1.5">
+                                    <Label htmlFor="email">Email</Label>
+                                    <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                    <Label htmlFor="phone">Phone</Label>
+                                    <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                                </div>
+
+                                <hr className="border-border my-2" />
+                                <p className="text-sm font-semibold">Change Password</p>
+
+                                <div className="flex flex-col gap-1.5">
+                                    <Label htmlFor="old-password">Current Password</Label>
+                                    <Input id="old-password" type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                    <Label htmlFor="new-password">New Password</Label>
+                                    <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                                </div>
+
+                                <div className="flex items-center gap-4">
+                                    <SubmitButton buttonText="Save" />
+                                    {success && <p className="text-sm text-green-700">Changes saved.</p>}
+                                </div>
+                                {error && <p className="text-destructive text-sm">{error.toString()}</p>}
+                            </form>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="workspace">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Workspace Settings</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-muted-foreground text-sm">Workspace settings will be implemented later.</p>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
         </div>
     );
 };
@@ -154,6 +126,7 @@ ViewProfile.propTypes = {
         newPassword: PropTypes.string.isRequired,
         setNewPassword: PropTypes.func.isRequired,
         error: PropTypes.string,
+        success: PropTypes.bool,
     }).isRequired,
     handleSubmit: PropTypes.func.isRequired,
 };

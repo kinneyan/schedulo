@@ -9,9 +9,7 @@ class Shift(models.Model):
 
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    member = models.ForeignKey(
-        WorkspaceMember, null=True, blank=True, on_delete=models.CASCADE
-    )
+    member = models.ForeignKey(WorkspaceMember, null=True, blank=True, on_delete=models.CASCADE)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
@@ -36,12 +34,8 @@ class ShiftRequest(models.Model):
         on_delete=models.CASCADE,
         related_name="received_shift_requests",
     )
-    sender_shift = models.ForeignKey(
-        Shift, on_delete=models.CASCADE, related_name="shift_requests"
-    )
-    recipient_shift = models.ForeignKey(
-        Shift, on_delete=models.CASCADE, null=True, blank=True
-    )
+    sender_shift = models.ForeignKey(Shift, on_delete=models.CASCADE, related_name="shift_requests")
+    recipient_shift = models.ForeignKey(Shift, on_delete=models.CASCADE, null=True, blank=True)
     accepted = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
 
@@ -74,9 +68,7 @@ class Unavailability(models.Model):
     member = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    day_of_week = models.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(6)]
-    )
+    day_of_week = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(6)])
 
     class Meta:
         """Meta options for Unavailability."""

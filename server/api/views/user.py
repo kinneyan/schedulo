@@ -7,6 +7,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
 from ..models import Workspace, WorkspaceMember
+from ..serializers import UserDetailedReadSerializer, WorkspaceReadSerializer
 
 
 class GetUser(APIView):
@@ -22,31 +23,38 @@ class GetUser(APIView):
         :type request: rest_framework.request.Request
         :return: User profile fields and a list of workspaces the user belongs to.
         :rtype: rest_framework.response.Response
-        """
-        response = {"error": {}}
 
-        response["email"] = request.user.email
-        response["phone"] = request.user.phone
-        response["first_name"] = request.user.first_name
-        response["last_name"] = request.user.last_name
+
+        result: {
+            user: {
+                id: user id
+                first_name: first name
+                last_name: last name
+                phone: phone #
+                email: email
+            }
+            workspaces: [
+                {
+                    id: workspace id
+                    name: workspace name
+                    owner: {
+                        first_name: owner first name
+                        last_name: owner last name
+                    },
+                    ...
+                }
+            ]
+        }
+        """
+        response = {"error": {}, "result": {}}
+
+        response["result"]["user"] = UserDetailedReadSerializer(request.user).data
 
         # get list of workspaces user is in
-        members = WorkspaceMember.objects.filter(user=request.user).values_list(
-            "workspace"
-        )
-        results = Workspace.objects.filter(pk__in=members)
+        members = WorkspaceMember.objects.filter(user=request.user).values_list("workspace")
+        results = Workspace.objects.filter(pk__in=members).select_related("owner")
 
-        workspace_list = [
-            {
-                "id": workspace.id,
-                "created_by": workspace.created_by.id,
-                "owner": workspace.owner.id,
-                "name": workspace.name,
-            }
-            for workspace in results
-        ]
-
-        response["workspaces"] = workspace_list
+        response["result"]["workspaces"] = WorkspaceReadSerializer(results, many=True).data
 
         return Response(response, status=status.HTTP_200_OK)
 
@@ -74,14 +82,10 @@ class GetUser(APIView):
 
         if "password" in request.data:
             if "current_password" not in request.data:
-                response["error"][
-                    "message"
-                ] = "Current password required when changing password."
+                response["error"]["message"] = "Current password required when changing password."
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-            auth = authenticate(
-                email=request.user, password=request.data["current_password"]
-            )
+            auth = authenticate(email=request.user, password=request.data["current_password"])
             if auth == request.user:
                 request.user.set_password(request.data["password"])
                 request.user.save()

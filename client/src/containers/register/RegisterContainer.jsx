@@ -4,7 +4,8 @@ import {Navigate} from "react-router-dom";
 import RegisterForm from "../../components/forms/registerForm/RegisterForm";
 
 /**
- * Stateful container that manages registration form state, API submission, and post-registration redirect.
+ * Stateful container that manages registration form state,
+ * API submission, and post-registration redirect.
  *
  * @returns {JSX.Element}
  */
@@ -36,7 +37,11 @@ const RegisterContainer = () =>
                 const response = await fetch(import.meta.env.VITE_API_URL + "/api/register", {
                     method: "POST",
                     headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({email, password, first_name: firstName, last_name: lastName, phone}),
+                    body: JSON.stringify({
+                        email, password,
+                        first_name: firstName,
+                        last_name: lastName, phone,
+                    }),
                 });
 
                 const data = await response.json();

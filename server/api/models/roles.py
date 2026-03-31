@@ -9,9 +9,7 @@ class WorkspaceRole(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
     name = models.CharField(max_length=30, default="Unnamed Role")
-    pay_rate = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
-    )
+    pay_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
 
 
 class MemberRole(models.Model):
@@ -20,7 +18,9 @@ class MemberRole(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     workspace_role = models.ForeignKey(WorkspaceRole, on_delete=models.CASCADE)
-    member = models.ForeignKey(WorkspaceMember, on_delete=models.CASCADE)
+    member = models.ForeignKey(
+        WorkspaceMember, on_delete=models.CASCADE, related_name="member_roles"
+    )
 
 
 class MemberPermissions(models.Model):

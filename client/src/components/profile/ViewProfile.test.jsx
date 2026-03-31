@@ -60,9 +60,9 @@ describe("ViewProfile", () =>
         expect(screen.getByText("Something went wrong.")).toBeInTheDocument();
     });
 
-    it("does not render an error when states.error is empty", () => 
+    it("does not render an error when states.error is empty", () =>
     {
-        const {container} = renderComponent({error: ""});
-        expect(container.querySelector("#error-container")).not.toBeInTheDocument();
+        renderComponent({error: ""});
+        expect(screen.queryByText("Something went wrong.")).not.toBeInTheDocument();
     });
 });

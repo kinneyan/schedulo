@@ -61,12 +61,12 @@ class GetUserTests(APITestCase):
         """Verify that the authenticated user's profile and workspace memberships are returned."""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["email"], self.user.email)
-        self.assertEqual(response.data["phone"], self.user.phone)
-        self.assertEqual(response.data["first_name"], self.user.first_name)
-        self.assertEqual(response.data["last_name"], self.user.last_name)
+        self.assertEqual(response.data["result"]["user"]["email"], self.user.email)
+        self.assertEqual(response.data["result"]["user"]["phone"], self.user.phone)
+        self.assertEqual(response.data["result"]["user"]["first_name"], self.user.first_name)
+        self.assertEqual(response.data["result"]["user"]["last_name"], self.user.last_name)
 
-        workspaces = response.data["workspaces"]
+        workspaces = response.data["result"]["workspaces"]
         self.assertEqual(len(workspaces), 1)
         self.assertEqual(workspaces[0]["name"], self.workspace.name)
 
@@ -75,10 +75,10 @@ class GetUserTests(APITestCase):
         self.client.force_authenticate(user=self.user2)  # send request as user2
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["email"], self.user2.email)
-        self.assertEqual(response.data["phone"], self.user2.phone)
-        self.assertEqual(response.data["first_name"], self.user2.first_name)
-        self.assertEqual(response.data["last_name"], self.user2.last_name)
+        self.assertEqual(response.data["result"]["user"]["email"], self.user2.email)
+        self.assertEqual(response.data["result"]["user"]["phone"], self.user2.phone)
+        self.assertEqual(response.data["result"]["user"]["first_name"], self.user2.first_name)
+        self.assertEqual(response.data["result"]["user"]["last_name"], self.user2.last_name)
 
-        workspaces = response.data["workspaces"]
+        workspaces = response.data["result"]["workspaces"]
         self.assertEqual(len(workspaces), 0)

@@ -19,7 +19,7 @@ class GetShiftsTest(APITestCase):
 
     def setUp(self):
         """Create users, workspace, members, roles, and a set of shifts for filtering tests."""
-        self.url = reverse("get_shifts")
+        self.url = reverse("shift_filter")
         self.user = User.objects.create_user(
             email="testuser@example.com",
             password="testpassword",
@@ -89,15 +89,9 @@ class GetShiftsTest(APITestCase):
             manage_time_off=False,
         )
 
-        self.role1 = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="test name1"
-        )
-        self.role2 = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="test name2"
-        )
-        self.role3 = WorkspaceRole.objects.create(
-            workspace=self.workspace, name="test name3"
-        )
+        self.role1 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name1")
+        self.role2 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name2")
+        self.role3 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name3")
 
         self.time1 = datetime(2025, 2, 16, tzinfo=timezone.utc)
         self.time2 = self.time1 + timedelta(hours=2)
@@ -151,8 +145,8 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # check that response has correct shifts
-        self.assertEqual(len(response.data["shifts"]), 2)
-        shifts = response.data["shifts"]
+        self.assertEqual(len(response.data["result"]), 2)
+        shifts = response.data["result"]
         self.assertEqual(shifts[0]["id"], self.shift3.id)
         self.assertEqual(shifts[1]["id"], self.shift4.id)
 
@@ -163,8 +157,8 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # check that response has correct shifts
-        self.assertEqual(len(response.data["shifts"]), 1)
-        shifts = response.data["shifts"]
+        self.assertEqual(len(response.data["result"]), 1)
+        shifts = response.data["result"]
         self.assertEqual(shifts[0]["id"], self.shift4.id)
 
     def test_date_range_invalid(self):
@@ -191,8 +185,8 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # check that response has correct shifts
-        self.assertEqual(len(response.data["shifts"]), 1)
-        shifts = response.data["shifts"]
+        self.assertEqual(len(response.data["result"]), 1)
+        shifts = response.data["result"]
         self.assertEqual(shifts[0]["id"], self.shift5.id)
 
     def test_date_range_only_start(self):
@@ -213,8 +207,8 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # check that response has correct shifts
-        self.assertEqual(len(response.data["shifts"]), 1)
-        shifts = response.data["shifts"]
+        self.assertEqual(len(response.data["result"]), 1)
+        shifts = response.data["result"]
         self.assertEqual(shifts[0]["id"], self.shift5.id)
 
     def test_date_range_only_end(self):
@@ -235,8 +229,8 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # check that response has correct shifts
-        self.assertEqual(len(response.data["shifts"]), 5)
-        shifts = response.data["shifts"]
+        self.assertEqual(len(response.data["result"]), 5)
+        shifts = response.data["result"]
         ids = [row["id"] for row in shifts]
         self.assertTrue(self.shift1.id in ids)
         self.assertTrue(self.shift2.id in ids)
@@ -246,9 +240,7 @@ class GetShiftsTest(APITestCase):
 
     def test_within_user_workspaces(self):
         """Verify that shifts from workspaces the requester does not belong to are excluded."""
-        self.workspace2 = Workspace.objects.create(
-            owner=self.user4, created_by=self.user4
-        )
+        self.workspace2 = Workspace.objects.create(owner=self.user4, created_by=self.user4)
 
         self.member4 = WorkspaceMember.objects.create(
             user=self.user4, workspace=self.workspace2, added_by=self.user4
@@ -263,9 +255,7 @@ class GetShiftsTest(APITestCase):
             manage_time_off=True,
         )
 
-        self.role3 = WorkspaceRole.objects.create(
-            workspace=self.workspace2, name="test name3"
-        )
+        self.role3 = WorkspaceRole.objects.create(workspace=self.workspace2, name="test name3")
 
         self.shift5 = Shift.objects.create(
             workspace=self.workspace2,
@@ -281,4 +271,4 @@ class GetShiftsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # check that response has correct shifts
-        self.assertEqual(len(response.data["shifts"]), 0)
+        self.assertEqual(len(response.data["result"]), 0)

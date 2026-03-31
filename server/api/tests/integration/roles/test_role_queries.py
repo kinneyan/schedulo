@@ -17,7 +17,6 @@ class GetRolesTests(APITestCase):
 
     def setUp(self):
         """Create a workspace, owner with manage_workspace_roles permission, and an unprivileged member."""
-        self.url = reverse("create_workspace_role")
         self.user = User.objects.create_user(
             email="testuser@example.com",
             password="testpassword",
@@ -68,38 +67,24 @@ class GetRolesTests(APITestCase):
             manage_time_off=False,
         )
         self.client.force_authenticate(user=self.member.user)
-
-    def test_no_workspace(self):
-        """Verify that omitting workspace_id returns 400."""
-        data = {"name": "test name1", "pay_rate": 15.00}
-
-        self.url = reverse("get_workspace_roles")
-        response = self.client.post(self.url, data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.url = reverse("workspace_roles", kwargs={"workspace_id": self.workspace.id})
 
     def test_invalid_workspace(self):
         """Verify that a nonexistent workspace_id returns 404."""
-        data = {"workspace_id": 999, "name": "test name1", "pay_rate": 15.00}
-
-        self.url = reverse("get_workspace_roles")
-        response = self.client.post(self.url, data, format="json")
+        url = reverse("workspace_roles", kwargs={"workspace_id": 999})
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_single(self):
         """Verify that retrieving roles for a workspace with one role returns that role correctly."""
-        data = {
-            "workspace_id": self.workspace.id,
-            "name": "test name1",
-            "pay_rate": 15.00,
-        }
-        response = self.client.put(self.url, data, format="json")
+        data = {"name": "test name1", "pay_rate": 15.00}
+        response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        self.url = reverse("get_workspace_roles")
-        response = self.client.post(self.url, data, format="json")
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        output = response.data["roles"]
+        output = response.data["result"]
         role = WorkspaceRole.objects.get(id=output[0]["id"])
 
         self.assertEqual(role.name, data["name"])
@@ -107,25 +92,18 @@ class GetRolesTests(APITestCase):
     def test_multiple(self):
         """Verify that retrieving roles for a workspace with multiple roles returns all of them."""
         data = []
-        data.append(
-            {"workspace_id": self.workspace.id, "name": "test name1", "pay_rate": 15.00}
-        )
-        data.append(
-            {"workspace_id": self.workspace.id, "name": "test name2", "pay_rate": 10.00}
-        )
-        data.append(
-            {"workspace_id": self.workspace.id, "name": "test name3", "pay_rate": 18.00}
-        )
+        data.append({"name": "test name1", "pay_rate": 15.00})
+        data.append({"name": "test name2", "pay_rate": 10.00})
+        data.append({"name": "test name3", "pay_rate": 18.00})
 
         for i in range(3):
-            response = self.client.put(self.url, data[i], format="json")
+            response = self.client.post(self.url, data[i], format="json")
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        self.url = reverse("get_workspace_roles")
-        response = self.client.post(self.url, {"workspace_id": self.workspace.id})
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        output = response.data["roles"]
+        output = response.data["result"]
 
         self.assertEqual(len(output), len(data))
 
@@ -136,10 +114,7 @@ class GetRolesTests(APITestCase):
 
     def test_multiple_workspaces(self):
         """Verify that fetching roles for one workspace does not include roles from another workspace."""
-        # add another workspace and role to this workspace
-        self.workspace2 = Workspace.objects.create(
-            owner=self.user, created_by=self.user
-        )
+        self.workspace2 = Workspace.objects.create(owner=self.user, created_by=self.user)
 
         self.member5 = WorkspaceMember.objects.create(
             user=self.user, workspace=self.workspace2, added_by=self.user
@@ -154,36 +129,26 @@ class GetRolesTests(APITestCase):
             manage_time_off=True,
         )
 
-        response = self.client.put(
-            self.url,
-            {
-                "workspace_id": self.workspace2.id,
-                "name": "test name4",
-                "pay_rate": 5.00,
-            },
+        workspace2_url = reverse("workspace_roles", kwargs={"workspace_id": self.workspace2.id})
+        response = self.client.post(
+            workspace2_url,
+            {"name": "test name4", "pay_rate": 5.00},
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         data = []
-        data.append(
-            {"workspace_id": self.workspace.id, "name": "test name1", "pay_rate": 15.00}
-        )
-        data.append(
-            {"workspace_id": self.workspace.id, "name": "test name2", "pay_rate": 10.00}
-        )
-        data.append(
-            {"workspace_id": self.workspace.id, "name": "test name3", "pay_rate": 18.00}
-        )
+        data.append({"name": "test name1", "pay_rate": 15.00})
+        data.append({"name": "test name2", "pay_rate": 10.00})
+        data.append({"name": "test name3", "pay_rate": 18.00})
 
         for i in range(3):
-            response = self.client.put(self.url, data[i], format="json")
+            response = self.client.post(self.url, data[i], format="json")
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        self.url = reverse("get_workspace_roles")
-        response = self.client.post(self.url, {"workspace_id": self.workspace.id})
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        output = response.data["roles"]
+        output = response.data["result"]
 
         self.assertEqual(len(output), len(data))
 
@@ -198,7 +163,6 @@ class GetMemberRoleTests(APITestCase):
 
     def setUp(self):
         """Create a workspace, owner, member, and three workspace roles."""
-        self.url = reverse("get_member_roles")
         self.user = User.objects.create_user(
             email="testuser@example.com",
             password="testpassword",
@@ -260,35 +224,29 @@ class GetMemberRoleTests(APITestCase):
             workspace=self.workspace, name="test role3", pay_rate=10
         )
 
-    def test_no_member_id(self):
-        """Verify that omitting member_id returns 400."""
-        response = self.client.post(self.url, {}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
     def test_invalid_member_id(self):
         """Verify that a nonexistent member_id returns 404."""
-        response = self.client.post(self.url, {"member_id": 999}, format="json")
+        url = reverse("member_roles", kwargs={"member_id": 999})
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_no_roles(self):
         """Verify that fetching roles for a member with no assignments returns an empty list."""
-        response = self.client.post(
-            self.url, {"member_id": self.member2.id}, format="json"
-        )
+        url = reverse("member_roles", kwargs={"member_id": self.member2.id})
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["roles"]), 0)
+        self.assertEqual(len(response.data["result"]), 0)
 
     def test_single(self):
         """Verify that fetching roles for a member with one assignment returns that role."""
         MemberRole.objects.create(workspace_role=self.role, member=self.member2)
 
-        response = self.client.post(
-            self.url, {"member_id": self.member2.id}, format="json"
-        )
+        url = reverse("member_roles", kwargs={"member_id": self.member2.id})
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["roles"]), 1)
+        self.assertEqual(len(response.data["result"]), 1)
 
-        role = WorkspaceRole.objects.get(id=response.data["roles"][0]["id"])
+        role = WorkspaceRole.objects.get(id=response.data["result"][0]["id"])
         self.assertEqual(self.role.id, role.id)
 
     def test_multiple(self):
@@ -297,15 +255,14 @@ class GetMemberRoleTests(APITestCase):
         MemberRole.objects.create(workspace_role=self.role2, member=self.member2)
         MemberRole.objects.create(workspace_role=self.role3, member=self.member2)
 
-        data = {"member_id": self.member2.id}
-
-        response = self.client.post(self.url, data, format="json")
+        url = reverse("member_roles", kwargs={"member_id": self.member2.id})
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["roles"]), 3)
+        self.assertEqual(len(response.data["result"]), 3)
 
-        role = WorkspaceRole.objects.get(id=response.data["roles"][0]["id"])
-        role2 = WorkspaceRole.objects.get(id=response.data["roles"][1]["id"])
-        role3 = WorkspaceRole.objects.get(id=response.data["roles"][2]["id"])
+        role = WorkspaceRole.objects.get(id=response.data["result"][0]["id"])
+        role2 = WorkspaceRole.objects.get(id=response.data["result"][1]["id"])
+        role3 = WorkspaceRole.objects.get(id=response.data["result"][2]["id"])
         self.assertEqual(self.role.id, role.id)
         self.assertEqual(self.role2.id, role2.id)
         self.assertEqual(self.role3.id, role3.id)

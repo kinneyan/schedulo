@@ -6,7 +6,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from datetime import datetime
 from datetime import date
 
-from ..serializers import ShiftSerializer, ModifyShiftSerializer
+from ..serializers import ShiftSerializer, ModifyShiftSerializer, ShiftReadSerializer
 from ..models import (
     Workspace,
     WorkspaceMember,
@@ -18,127 +18,67 @@ from ..models import (
 )
 
 
-class CreateShift(APIView):
-    """API view for creating a new shift in a workspace."""
+class ShiftView(APIView):
+    """API view for shifts."""
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def put(self, request):
-        """Create a new Shift in the given workspace.
+    def get(self, request, shift_id):
+        """Get details for shift in url params
+        returns:
+        result {
+            id: shift id
+            member(can be None): {
+                id: member id
+                first_name: first name
+                last_name: last name
+            }
+            role: {
+                id: role id
+                name: role name
+            }
+            start_time: shift start time
+            end_time: shift end time
+            open: Boolean (if shift has member assigned)
+        }
 
-        Requires manage_schedules permission. Accepted body fields:
-        workspace_id (required), role_id (required), start_time (required),
-        end_time (required), member_id (optional).
-
-        :param request: Authenticated HTTP request with shift details in the body.
-        :type request: rest_framework.request.Request
-        :return: Empty success response on creation, or an error response.
-        :rtype: rest_framework.response.Response
         """
+
         response = {"error": {}}
 
-        serializer = ShiftSerializer(data=request.data)
-        if not serializer.is_valid():
-            response["error"]["code"] = 400
-            response["error"][
-                "message"
-            ] = "Invalid request data, start and end time are required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-        # Verify body contains required fields
-        if "role_id" not in request.data:
-            response["error"]["message"] = "Role ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-        if "workspace_id" not in request.data:
-            response["error"]["message"] = "Workspace ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-        # Verify workspace exists
+        # ensure shift id is valid
         try:
-            workspace = Workspace.objects.get(pk=request.data["workspace_id"])
-        except Workspace.DoesNotExist:
-            response["error"]["message"] = "Workspace does not exist."
+            shift = (
+                Shift.objects.select_related("member__user", "role")
+                .prefetch_related("member__member_roles__workspace_role")
+                .get(pk=shift_id)
+            )
+        except Shift.DoesNotExist:
+            response["error"]["message"] = "Shift could not be found."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        # get workspace from shift
+        workspace = shift.workspace
 
         # Verify user is part of workspace and has perms to manage schedules
         try:
-            creator_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
-            MemberPermissions.objects.get(member=creator_member, manage_schedules=True)
+            _ = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
         except WorkspaceMember.DoesNotExist:
-            response["error"]["message"] = "You are not a member of this workspace."
-            return Response(response, status=status.HTTP_403_FORBIDDEN)
-        except MemberPermissions.DoesNotExist:
             response["error"][
                 "message"
-            ] = "You do not have permissions to manage schedules in this workspace."
+            ] = "You must be a member of the workspace to retrieve shift details."
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
-        # Verify role exists and is part of workspace
-        try:
-            role = WorkspaceRole.objects.get(
-                pk=request.data["role_id"], workspace=workspace
-            )
-        except WorkspaceRole.DoesNotExist:
-            response["error"][
-                "message"
-            ] = "Workspace role does not exist or is not part of workspace."
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        data = ShiftReadSerializer(shift).data
+        response["result"] = data
 
-        # Verify member is valid if present
-        if "member_id" in request.data:
-            try:
-                member = WorkspaceMember.objects.get(
-                    pk=request.data["member_id"], workspace=workspace
-                )
-            except WorkspaceMember.DoesNotExist:
-                response["error"][
-                    "message"
-                ] = "Member does not exist or is not part of workspace."
-                return Response(response, status=status.HTTP_404_NOT_FOUND)
+        return Response(response, status=status.HTTP_200_OK)
 
-        # verify dates are valid
-        start_time = serializer.validated_data["start_time"]
-        end_time = serializer.validated_data["end_time"]
-
-        if start_time > end_time:
-            response["error"]["message"] = "Start time cannot be after end time."
-            return Response(
-                response, status=status.HTTP_400_BAD_REQUEST
-            )  # idk if this is the right status code but wtvr
-
-        # could check if start time is before current time if we want to prevent creating shifts in the past, but i think we should allow that since a workplace might want to do that for recordkeeping or smth
-        shift = Shift.objects.create(
-            workspace=workspace,
-            start_time=start_time,
-            end_time=end_time,
-            created_by=creator_member,
-            role=role,
-            open=True,
-        )
-
-        # Add member to shift if present
-        if "member_id" in request.data:
-            shift.member = member
-            shift.open = False
-            shift.save()
-
-        return Response(response, status=status.HTTP_201_CREATED)
-
-
-class ModifyShift(APIView):
-    """API view for updating fields on an existing shift."""
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
+    def put(self, request, shift_id):
         """Update one or more fields on an existing Shift.
 
-        Requires manage_schedules permission. Accepted body fields: shift_id
-        (required), member_id (optional), role_id (optional), start_time (optional),
+        Requires manage_schedules permission. Accepted body fields: member_id (optional), role_id (optional), start_time (optional),
         end_time (optional).
 
         :param request: Authenticated HTTP request with shift_id and optional
@@ -152,31 +92,22 @@ class ModifyShift(APIView):
         serializer = ModifyShiftSerializer(data=request.data)
         if not serializer.is_valid():
             response["error"]["code"] = 400
-            response["error"][
-                "message"
-            ] = "Invalid request data, start and end time are required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-        # Ensure that shift ID present
-        if "shift_id" not in request.data:
-            response["error"]["message"] = "Shift ID is required."
+            response["error"]["message"] = "Invalid request data, start or end time invalid."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # ensure shift id is valid
         try:
-            shift = Shift.objects.get(pk=request.data["shift_id"])
+            shift = Shift.objects.get(pk=shift_id)
         except Shift.DoesNotExist:
             response["error"]["message"] = "Shift could not be found."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # get workspace from shift
-        workspace = Workspace.objects.get(pk=shift.workspace.id)
+        workspace = shift.workspace
 
         # Verify user is part of workspace and has perms to manage schedules
         try:
-            creator_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            creator_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(member=creator_member, manage_schedules=True)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
@@ -230,9 +161,7 @@ class ModifyShift(APIView):
                     pk=request.data["member_id"], workspace=workspace
                 )
             except WorkspaceMember.DoesNotExist:
-                response["error"][
-                    "message"
-                ] = "Member does not exist or is not part of workspace."
+                response["error"]["message"] = "Member does not exist or is not part of workspace."
                 return Response(response, status=status.HTTP_404_NOT_FOUND)
 
             shift.member = member
@@ -242,9 +171,7 @@ class ModifyShift(APIView):
         if "role_id" in request.data:
             # Verify role exists and is part of workspace
             try:
-                role = WorkspaceRole.objects.get(
-                    pk=request.data["role_id"], workspace=workspace
-                )
+                role = WorkspaceRole.objects.get(pk=request.data["role_id"], workspace=workspace)
             except WorkspaceRole.DoesNotExist:
                 response["error"][
                     "message"
@@ -256,14 +183,7 @@ class ModifyShift(APIView):
 
         return Response(response, status=status.HTTP_200_OK)
 
-
-class DeleteShift(APIView):
-    """API view for deleting an existing shift."""
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def delete(self, request):
+    def delete(self, request, shift_id):
         """Delete a Shift by ID.
 
         Requires manage_schedules permission. Accepted body fields:
@@ -276,26 +196,19 @@ class DeleteShift(APIView):
         """
         response = {"error": {}}
 
-        # Ensure that shift ID present
-        if "shift_id" not in request.data:
-            response["error"]["message"] = "Shift ID is required."
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
         # ensure shift id is valid
         try:
-            shift = Shift.objects.get(pk=request.data["shift_id"])
+            shift = Shift.objects.get(pk=shift_id)
         except Shift.DoesNotExist:
             response["error"]["message"] = "Shift could not be found."
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         # get workspace from shift
-        workspace = Workspace.objects.get(pk=shift.workspace.id)
+        workspace = shift.workspace
 
         # Verify user is part of workspace and has perms to manage schedules
         try:
-            creator_member = WorkspaceMember.objects.get(
-                user=request.user, workspace=workspace
-            )
+            creator_member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
             MemberPermissions.objects.get(member=creator_member, manage_schedules=True)
         except WorkspaceMember.DoesNotExist:
             response["error"]["message"] = "You are not a member of this workspace."
@@ -307,11 +220,11 @@ class DeleteShift(APIView):
             return Response(response, status=status.HTTP_403_FORBIDDEN)
 
         # delete shift
-        shift = Shift.objects.get(id=request.data["shift_id"]).delete()
+        shift.delete()
         return Response(response, status=status.HTTP_200_OK)
 
 
-class GetShifts(APIView):
+class ShiftFilterView(APIView):
     """API view for querying shifts across the authenticated user's workspaces."""
 
     authentication_classes = [JWTAuthentication]
@@ -373,22 +286,13 @@ class GetShifts(APIView):
         )
 
         # search by filters
-        results = Shift.objects.filter(**filters)
+        results = (
+            Shift.objects.filter(**filters)
+            .select_related("member__user", "role")
+            .prefetch_related("member__member_roles__workspace_role")
+        )
 
-        shift_list = [
-            {
-                "id": shift.id,
-                "member_id": getattr(shift.member_id, "id", None),
-                "role_id": shift.role.id,
-                "workspace_id": shift.workspace.id,
-                "open": shift.open,
-                "created_by_id": shift.created_by.id,
-                "start_time": shift.start_time,
-                "end_time": shift.end_time,
-            }
-            for shift in results
-        ]
-
-        response["shifts"] = shift_list
+        data = ShiftReadSerializer(results, many=True).data
+        response["result"] = data
 
         return Response(response, status=status.HTTP_200_OK)

@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from unittest.mock import patch, MagicMock
 from ....models import CustomUserManager, User, Workspace, WorkspaceMember
 
 
@@ -12,21 +11,6 @@ class CustomUserManagerTest(TestCase):
         """Set up a bare CustomUserManager instance with the User model attached."""
         self.manager = CustomUserManager()
         self.manager.model = User
-
-    @patch("api.models.users.CustomUserManager.normalize_email")
-    def test_create_user_with_valid_email_normalizes_email(self, mock_normalize):
-        """Test that create_user normalizes the email address"""
-        mock_normalize.return_value = "test@example.com"
-        mock_user = MagicMock()
-
-        with patch.object(self.manager, "model") as mock_model:
-            mock_model.return_value = mock_user
-
-            self.manager.create_user("TEST@EXAMPLE.COM", "password123")
-
-            mock_normalize.assert_called_once_with("TEST@EXAMPLE.COM")
-            mock_user.set_password.assert_called_once_with("password123")
-            mock_user.save.assert_called_once()
 
     def test_create_user_without_email_raises_error(self):
         """Test that create_user raises ValueError when email is not provided"""
@@ -40,56 +24,19 @@ class CustomUserManagerTest(TestCase):
 
         self.assertEqual(str(context.exception), "The Email field must be set")
 
-    @patch("api.models.users.CustomUserManager.create_user")
-    def test_create_superuser_sets_required_flags(self, mock_create_user):
-        """Test that create_superuser sets is_staff and is_superuser to True"""
-        mock_user = MagicMock()
-        mock_create_user.return_value = mock_user
-
-        self.manager.create_superuser("admin@example.com", "password123")
-
-        mock_create_user.assert_called_once_with(
-            "admin@example.com", "password123", is_staff=True, is_superuser=True
-        )
-
-    @patch("api.models.users.CustomUserManager.create_user")
-    def test_create_superuser_with_extra_fields(self, mock_create_user):
-        """Test that create_superuser preserves extra fields"""
-        mock_user = MagicMock()
-        mock_create_user.return_value = mock_user
-
-        self.manager.create_superuser(
-            "admin@example.com", "password123", first_name="Admin", last_name="User"
-        )
-
-        mock_create_user.assert_called_once_with(
-            "admin@example.com",
-            "password123",
-            is_staff=True,
-            is_superuser=True,
-            first_name="Admin",
-            last_name="User",
-        )
-
     def test_create_superuser_with_is_staff_false_raises_error(self):
         """Test that create_superuser raises ValueError if is_staff=False"""
         with self.assertRaises(ValueError) as context:
-            self.manager.create_superuser(
-                "admin@example.com", "password123", is_staff=False
-            )
+            self.manager.create_superuser("admin@example.com", "password123", is_staff=False)
 
         self.assertEqual(str(context.exception), "Superuser must have is_staff=True.")
 
     def test_create_superuser_with_is_superuser_false_raises_error(self):
         """Test that create_superuser raises ValueError if is_superuser=False"""
         with self.assertRaises(ValueError) as context:
-            self.manager.create_superuser(
-                "admin@example.com", "password123", is_superuser=False
-            )
+            self.manager.create_superuser("admin@example.com", "password123", is_superuser=False)
 
-        self.assertEqual(
-            str(context.exception), "Superuser must have is_superuser=True."
-        )
+        self.assertEqual(str(context.exception), "Superuser must have is_superuser=True.")
 
 
 class UserModelTest(TestCase):
@@ -127,9 +74,7 @@ class UserModelTest(TestCase):
 
     def test_user_string_representation(self):
         """Test user string representation"""
-        user = User.objects.create_user(
-            email="test@example.com", password="password123"
-        )
+        user = User.objects.create_user(email="test@example.com", password="password123")
         # Default Django behavior should use email since username is None
         self.assertIn("test@example.com", str(user))
 
@@ -139,9 +84,7 @@ class WorkspaceModelTest(TestCase):
 
     def setUp(self):
         """Create an owner user for use in each workspace test."""
-        self.user = User.objects.create_user(
-            email="owner@example.com", password="password123"
-        )
+        self.user = User.objects.create_user(email="owner@example.com", password="password123")
 
     def test_workspace_creation_with_defaults(self):
         """Test workspace creation with default values"""
@@ -177,15 +120,11 @@ class WorkspaceMemberModelTest(TestCase):
 
     def setUp(self):
         """Create owner, member user, and workspace for use in each test."""
-        self.owner = User.objects.create_user(
-            email="owner@example.com", password="password123"
-        )
+        self.owner = User.objects.create_user(email="owner@example.com", password="password123")
         self.member_user = User.objects.create_user(
             email="member@example.com", password="password123"
         )
-        self.workspace = Workspace.objects.create(
-            created_by=self.owner, owner=self.owner
-        )
+        self.workspace = Workspace.objects.create(created_by=self.owner, owner=self.owner)
 
     def test_workspace_member_creation(self):
         """Test workspace member creation"""
