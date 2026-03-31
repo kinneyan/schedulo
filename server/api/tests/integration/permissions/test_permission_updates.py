@@ -9,7 +9,6 @@ class UpdatePermissionsTests(APITestCase):
 
     def setUp(self):
         """Create a workspace, owner, member, and initial permissions."""
-        self.url = reverse("update_permissions")
         self.user = User.objects.create_user(
             email="testuser@example.com",
             password="testpassword",
@@ -38,22 +37,12 @@ class UpdatePermissionsTests(APITestCase):
             manage_time_off=False,
         )
         self.client.force_authenticate(user=self.member.user)
-
-    def test_missing_workspace_id(self):
-        """Verify that omitting workspace_id returns a 400 error."""
-        response = self.client.put(self.url, {"member_id": self.member.id})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data["error"]["message"], "Workspace ID is required.")
-
-    def test_missing_member_id(self):
-        """Verify that omitting member_id returns a 400 error."""
-        response = self.client.put(self.url, {"workspace_id": self.workspace.id})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data["error"]["message"], "Member ID is required.")
+        self.url = reverse("member_permissions", kwargs={"member_id": self.member.id})
 
     def test_member_not_found(self):
         """Verify that a non-existent member_id returns a 404 error."""
-        response = self.client.put(self.url, {"workspace_id": self.workspace.id, "member_id": 999})
+        url = reverse("member_permissions", kwargs={"member_id": 999})
+        response = self.client.put(url, {})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
             response.data["error"]["message"], "Could not find member with provided ID."
@@ -61,9 +50,7 @@ class UpdatePermissionsTests(APITestCase):
 
     def test_create_new_permissions(self):
         """Verify that a permissions record is created when one does not yet exist."""
-        response = self.client.put(
-            self.url, {"workspace_id": self.workspace.id, "member_id": self.member.id}
-        )
+        response = self.client.put(self.url, {})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(
             MemberPermissions.objects.filter(
@@ -77,11 +64,7 @@ class UpdatePermissionsTests(APITestCase):
         self.permissions.save()
         response = self.client.put(
             self.url,
-            {
-                "workspace_id": self.workspace.id,
-                "member_id": self.member.id,
-                "manage_workspace_members": True,
-            },
+            {"manage_workspace_members": True},
         )
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
         self.assertEqual(
@@ -92,8 +75,6 @@ class UpdatePermissionsTests(APITestCase):
     def test_successfully_update_permissions(self):
         """Verify that all permission flags are correctly updated on success."""
         data = {
-            "workspace_id": self.workspace.id,
-            "member_id": self.member.id,
             "manage_workspace_members": True,
             "manage_workspace_roles": True,
             "manage_schedules": True,
@@ -108,19 +89,38 @@ class UpdatePermissionsTests(APITestCase):
         self.assertTrue(self.permissions.manage_time_off)
 
     def test_member_not_in_workspace(self):
-        """Verify that a member from a different workspace returns a 404 error."""
-        # Create a new workspace and a member in that workspace
+        """Verify that updating permissions for a member in a different workspace returns 403."""
         new_workspace = Workspace.objects.create(owner=self.user, created_by=self.user)
         new_member = WorkspaceMember.objects.create(
             user=self.user2, workspace=new_workspace, added_by=self.user
         )
 
-        # Try to update permissions for the new member in the original workspace
-        response = self.client.put(
-            self.url, {"workspace_id": self.workspace.id, "member_id": new_member.id}
+        url = reverse("member_permissions", kwargs={"member_id": new_member.id})
+        response = self.client.put(url, {})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_cross_workspace_isolation(self):
+        """Verify that a privileged member of another workspace cannot update permissions in this workspace."""
+        user3 = User.objects.create_user(
+            email="testuser3@example.com",
+            password="testpassword",
+            first_name="Test3",
+            last_name="User3",
+            phone="1234567890",
         )
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(
-            response.data["error"]["message"],
-            "Member does not belong to provided workspace.",
+        other_workspace = Workspace.objects.create(owner=user3, created_by=user3)
+        other_member = WorkspaceMember.objects.create(
+            user=user3, workspace=other_workspace, added_by=user3
         )
+        MemberPermissions.objects.create(
+            workspace=other_workspace,
+            member=other_member,
+            is_owner=True,
+            manage_workspace_members=True,
+        )
+        self.client.force_authenticate(user=user3)
+
+        response = self.client.put(self.url, {"manage_workspace_roles": True})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.permissions.refresh_from_db()
+        self.assertFalse(self.permissions.manage_workspace_roles)

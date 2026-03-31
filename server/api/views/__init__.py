@@ -1,21 +1,12 @@
 from .auth import Login, Register
 from .user import GetUser
-from .permissions import GetPermissions, UpdatePermissions
 from .workspace import (
-    CreateWorkspace,
-    AddWorkspaceMember,
-    ModifyWorkspace,
-    GetWorkspace,
-    DeleteWorkspace,
-    GetWorkspaceMembers,
+    WorkspaceView,
+    WorkspaceMembersView,
+    WorkspaceShiftsView,
+    WorkspaceRolesView,
 )
-from .role import (
-    CreateRole,
-    GetWorkspaceRoles,
-    AddMemberRole,
-    RemoveMemberRole,
-    DeleteWorkspaceRole,
-    GetMemberRoles,
-    ModifyWorkspaceRole,
-)
-from .shift import CreateShift, ModifyShift, DeleteShift, GetShifts
+
+from .member import MemberView, MemberPermissionsView, MemberRolesView, MemberShiftsView
+from .shift import ShiftView, ShiftFilterView
+from .role import RoleView

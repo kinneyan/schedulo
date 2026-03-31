@@ -9,11 +9,16 @@ from .integration.workspaces.test_workspace_crud import (
     ModifyWorkspaceTests,
     DeleteWorkspaceTests,
 )
-from .integration.workspaces.test_workspace_queries import GetWorkspaceTests
+from .integration.workspaces.test_workspace_queries import (
+    GetWorkspaceTests,
+    GetWorkspaceMembersTests,
+    GetWorkspaceShiftsTests,
+)
 from .integration.roles.test_role_crud import (
     CreateRoleTests,
     DeleteRoleTests,
     ModifyWorkspaceRoleTests,
+    GetRoleTests,
 )
 from .integration.roles.test_role_queries import GetRolesTests, GetMemberRoleTests
 from .integration.roles.test_member_roles import (
@@ -24,8 +29,14 @@ from .integration.shifts.test_shift_crud import (
     CreateShiftTests,
     ModifyShiftTests,
     DeleteShiftTests,
+    GetShiftTests,
 )
 from .integration.shifts.test_shift_queries import GetShiftsTest
+from .integration.members.test_member_crud import GetMemberTests, DeleteMemberTests
+from .integration.members.test_member_queries import (
+    GetMemberPermissionsTests,
+    GetMemberShiftsTests,
+)
 
 # Import from unit tests
 from .unit.models.test_user_models import (
@@ -50,12 +61,4 @@ from .unit.serializers.test_user_serializers import (
     RegisterUserSerializerTest,
 )
 from .unit.serializers.test_role_serializers import RoleSerializerTest
-from .unit.views.test_auth_views import (
-    LoginViewTest,
-    RegisterViewTest,
-)
-from .unit.views.test_role_views import (
-    CreateRoleViewTest,
-    DeleteWorkspaceRoleViewTest,
-    ModifyWorkspaceRoleViewTest,
-)
+from .unit.views.test_auth_views import RegisterViewTest
