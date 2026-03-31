@@ -10,4 +10,4 @@ from .role import RoleSerializer, MemberRoleReadSerializer, RoleReadSerializer
 from .shift import ShiftSerializer, ModifyShiftSerializer, ShiftReadSerializer
 from .member import MemberReadSerializer, MemberDetailedReadSerializer
 from .permissions import PermissionsReadSerializer
-from .shiftRequest import ShiftRequestSerializer
+from .shiftRequest import ShiftRequestSerializer, ShiftRequestResponseSerializer

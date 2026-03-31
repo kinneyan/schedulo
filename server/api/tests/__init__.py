@@ -32,7 +32,10 @@ from .integration.shifts.test_shift_crud import (
     GetShiftTests,
 )
 from .integration.shifts.test_shift_queries import GetShiftsTest
-from .integration.shiftRequests.test_shift_request_crud import CreateShiftRequestTests
+from .integration.shiftRequests.test_shift_request_crud import (
+    CreateShiftRequestTests,
+    ShiftRequestRespondTests,
+)
 
 from .integration.members.test_member_crud import GetMemberTests, DeleteMemberTests
 from .integration.members.test_member_queries import (

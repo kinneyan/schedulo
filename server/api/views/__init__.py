@@ -7,7 +7,13 @@ from .workspace import (
     WorkspaceRolesView,
 )
 
-from .member import MemberView, MemberPermissionsView, MemberRolesView, MemberShiftsView
+from .member import (
+    MemberView,
+    MemberPermissionsView,
+    MemberRolesView,
+    MemberShiftsView,
+    MemberShiftRequestView,
+)
 from .shift import ShiftView, ShiftFilterView
 from .role import RoleView
-from .shiftRequest import CreateShiftRequest
+from .shiftRequest import ShiftRequestRespondView

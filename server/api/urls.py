@@ -12,10 +12,11 @@ from .views import (
     MemberPermissionsView,
     MemberRolesView,
     MemberShiftsView,
+    MemberShiftRequestView,
     ShiftView,
     ShiftFilterView,
     RoleView,
-    CreateShiftRequest,
+    ShiftRequestRespondView,
 )
 
 urlpatterns = [
@@ -56,8 +57,17 @@ urlpatterns = [
         MemberShiftsView.as_view(),
         name="member_shifts",
     ),
+    path(
+        "member/<int:member_id>/shift-request/",
+        MemberShiftRequestView.as_view(),
+        name="member_shift_request",
+    ),
     path("shift/<int:shift_id>/", ShiftView.as_view(), name="shift"),
     path("shift/filter/", ShiftFilterView.as_view(), name="shift_filter"),
     path("role/<int:role_id>/", RoleView.as_view(), name="role"),
-    path("workspace/shift-request/create", CreateShiftRequest.as_view(), name="create_shift_request"),
+    path(
+        "shift-request/<int:shift_request_id>/respond/",
+        ShiftRequestRespondView.as_view(),
+        name="shift_request_respond",
+    ),
 ]

@@ -23,6 +23,13 @@ class Shift(models.Model):
 class ShiftRequest(models.Model):
     """A request from one member to swap shifts with another member."""
 
+    class Status(models.TextChoices):
+        """Enum for accpeted/approved status"""
+
+        ACCEPTED = "accepted"
+        PENDING = "pending"
+        DECLINED = "declined"
+
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, null=True)
@@ -36,8 +43,16 @@ class ShiftRequest(models.Model):
     )
     sender_shift = models.ForeignKey(Shift, on_delete=models.CASCADE, related_name="shift_requests")
     recipient_shift = models.ForeignKey(Shift, on_delete=models.CASCADE, null=True, blank=True)
-    accepted = models.BooleanField(default=False)
-    approved = models.BooleanField(default=False)
+    accepted = models.CharField(
+        max_length=10,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+    approved = models.CharField(
+        max_length=10,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
 
 
 class TimeOffRequest(models.Model):

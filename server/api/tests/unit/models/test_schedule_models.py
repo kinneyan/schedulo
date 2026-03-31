@@ -127,8 +127,8 @@ class ShiftRequestModelTest(TestCase):
         self.assertEqual(shift_request.recipient, self.recipient_member)
         self.assertEqual(shift_request.sender_shift, self.sender_shift)
         self.assertIsNone(shift_request.recipient_shift)
-        self.assertFalse(shift_request.accepted)
-        self.assertFalse(shift_request.approved)
+        self.assertEqual(shift_request.accepted, ShiftRequest.Status.PENDING)
+        self.assertEqual(shift_request.approved, ShiftRequest.Status.PENDING)
 
     def test_shift_request_with_recipient_shift(self):
         """Test shift request with recipient shift (swap)"""
