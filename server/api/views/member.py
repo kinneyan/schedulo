@@ -565,9 +565,11 @@ class MemberShiftRequestView(APIView):
                     recipient_shift.start_time + timedelta(seconds=1),
                     datetime.max.replace(tzinfo=timezone.utc),
                 ),
-            ).exclude(pk=sender_shift.id)    
+            ).exclude(pk=sender_shift.id)
 
-            if len(shifts) != 0: # if any shifts are returned by the filter then there is an overlap
+            if (
+                len(shifts) != 0
+            ):  # if any shifts are returned by the filter then there is an overlap
                 response["error"][
                     "message"
                 ] = "Recipient shift would overlap with one of sender's shifts."

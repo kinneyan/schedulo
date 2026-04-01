@@ -649,3 +649,364 @@ class ShiftRequestRespondTests(APITestCase):
 
         shift_request.refresh_from_db()
         self.assertEqual(shift_request.accepted, ShiftRequest.Status.DECLINED)
+
+
+class ShiftRequestApproveTests(APITestCase):
+    """Integration tests for the shift request approve endpoint."""
+
+    def setUp(self):
+        """Create users, workspace, members, roles, and a set of shifts."""
+        self.user = User.objects.create_user(
+            email="testuser@example.com",
+            password="testpassword",
+            first_name="Test",
+            last_name="User",
+            phone="1234567890",
+        )
+        self.user2 = User.objects.create_user(
+            email="testuser2@example.com",
+            password="testpassword",
+            first_name="Test2",
+            last_name="User2",
+            phone="1234567890",
+        )
+        self.user3 = User.objects.create_user(
+            email="testuser3@example.com",
+            password="testpassword",
+            first_name="Test3",
+            last_name="User3",
+            phone="1234567890",
+        )
+        self.user4 = User.objects.create_user(
+            email="testuser4@example.com",
+            password="testpassword",
+            first_name="Test4",
+            last_name="User4",
+            phone="1234567890",
+        )
+
+        self.workspace = Workspace.objects.create(owner=self.user, created_by=self.user)
+
+        self.member = WorkspaceMember.objects.create(
+            user=self.user, workspace=self.workspace, added_by=self.user
+        )
+        self.permissions = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member,
+            is_owner=True,
+            manage_workspace_members=True,
+            manage_workspace_roles=True,
+            manage_schedules=True,
+            manage_time_off=True,
+        )
+
+        self.member2 = WorkspaceMember.objects.create(
+            user=self.user2, workspace=self.workspace, added_by=self.user
+        )
+        self.permissions2 = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member2,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
+        )
+
+        self.member3 = WorkspaceMember.objects.create(
+            user=self.user3, workspace=self.workspace, added_by=self.user
+        )
+        self.permissions3 = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member3,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
+        )
+
+        self.member4 = WorkspaceMember.objects.create(
+            user=self.user4, workspace=self.workspace, added_by=self.user
+        )
+        self.permissions4 = MemberPermissions.objects.create(
+            workspace=self.workspace,
+            member=self.member4,
+            is_owner=False,
+            manage_workspace_members=False,
+            manage_workspace_roles=False,
+            manage_schedules=False,
+            manage_time_off=False,
+        )
+
+        self.role1 = WorkspaceRole.objects.create(workspace=self.workspace, name="test name1")
+
+        self.time1 = datetime(2025, 2, 16, tzinfo=timezone.utc)
+        self.time2 = self.time1 + timedelta(hours=2)
+        self.time3 = self.time1 + timedelta(hours=4)
+        self.time4 = self.time1 - timedelta(hours=2)
+
+        # sender shift: time1 -> time2
+        self.shift1 = Shift.objects.create(
+            workspace=self.workspace,
+            start_time=self.time1,
+            end_time=self.time2,
+            role=self.role1,
+            created_by=self.member,
+            open=False,
+            member=self.member2,
+        )
+        # recipient shift: time2 -> time3 (adjacent to shift1, no overlap)
+        self.shift2 = Shift.objects.create(
+            workspace=self.workspace,
+            start_time=self.time2,
+            end_time=self.time3,
+            role=self.role1,
+            created_by=self.member,
+            open=False,
+            member=self.member3,
+        )
+        # overlapping shift for recipient: time1 -> time3 (overlaps with shift1)
+        self.shift3 = Shift.objects.create(
+            workspace=self.workspace,
+            start_time=self.time1,
+            end_time=self.time3,
+            role=self.role1,
+            created_by=self.member,
+            open=False,
+            member=self.member4,
+        )
+
+        self.client.force_authenticate(user=self.user)
+
+    def test_missing_accept(self):
+        """Verify that a request without accept field returns 400."""
+        shift_request = ShiftRequest.objects.create(
+            workspace=self.workspace,
+            sender=self.member2,
+            recipient=self.member3,
+            sender_shift=self.shift1,
+            accepted=ShiftRequest.Status.ACCEPTED,
+        )
+        url = reverse("shift_request_approve", kwargs={"shift_request_id": shift_request.id})
+        response = self.client.post(url, {}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_accept(self):
+        """Verify that a request with an invalid accept value returns 400."""
+        shift_request = ShiftRequest.objects.create(
+            workspace=self.workspace,
+            sender=self.member2,
+            recipient=self.member3,
+            sender_shift=self.shift1,
+            accepted=ShiftRequest.Status.ACCEPTED,
+        )
+        url = reverse("shift_request_approve", kwargs={"shift_request_id": shift_request.id})
+        response = self.client.post(url, {"accept": "notbool"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_shift_request_id(self):
+        """Verify that a nonexistent shift_request_id returns 404."""
+        url = reverse("shift_request_approve", kwargs={"shift_request_id": 999})
+        response = self.client.post(url, {"accept": True}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_approve_as_non_member(self):
+        """Verify that a user who is not a workspace member receives 403."""
+        shift_request = ShiftRequest.objects.create(
+            workspace=self.workspace,
+            sender=self.member2,
+            recipient=self.member3,
+            sender_shift=self.shift1,
+            accepted=ShiftRequest.Status.ACCEPTED,
+        )
+        outside_user = User.objects.create_user(
+            email="outside@example.com",
+            password="testpassword",
+            first_name="Outside",
+            last_name="User",
+            phone="1234567890",
+        )
+        self.client.force_authenticate(user=outside_user)
+        url = reverse("shift_request_approve", kwargs={"shift_request_id": shift_request.id})
+        response = self.client.post(url, {"accept": True}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_approve_without_permissions(self):
+        """Verify that a member without manage_schedules or is_owner permission receives 403."""
+        shift_request = ShiftRequest.objects.create(
+            workspace=self.workspace,
+            sender=self.member2,
+            recipient=self.member3,
+            sender_shift=self.shift1,
+            accepted=ShiftRequest.Status.ACCEPTED,
+        )
+        self.client.force_authenticate(user=self.member2.user)
+        url = reverse("shift_request_approve", kwargs={"shift_request_id": shift_request.id})
+        response = self.client.post(url, {"accept": True}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        shift_request.refresh_from_db()
+        self.assertEqual(shift_request.approved, ShiftRequest.Status.PENDING)
+
+    def test_approve_not_yet_accepted(self):
+        """Verify that a shift request that has not been accepted by the recipient cannot be approved."""
+        shift_request = ShiftRequest.objects.create(
+            workspace=self.workspace,
+            sender=self.member2,
+            recipient=self.member3,
+            sender_shift=self.shift1,
+            accepted=ShiftRequest.Status.PENDING,
+        )
+        url = reverse("shift_request_approve", kwargs={"shift_request_id": shift_request.id})
+        response = self.client.post(url, {"accept": True}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        shift_request.refresh_from_db()
+        self.assertEqual(shift_request.approved, ShiftRequest.Status.PENDING)
+
+    def test_approve_already_approved(self):
+        """Verify that a shift request that has already been approved cannot be approved again."""
+        shift_request = ShiftRequest.objects.create(
+            workspace=self.workspace,
+            sender=self.member2,
+            recipient=self.member3,
+            sender_shift=self.shift1,
+            accepted=ShiftRequest.Status.ACCEPTED,
+            approved=ShiftRequest.Status.ACCEPTED,
+        )
+        url = reverse("shift_request_approve", kwargs={"shift_request_id": shift_request.id})
+        response = self.client.post(url, {"accept": True}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        shift_request.refresh_from_db()
+        self.assertEqual(shift_request.approved, ShiftRequest.Status.ACCEPTED)
+
+    def test_approve_already_declined(self):
+        """Verify that a shift request that has already been declined cannot be approved."""
+        shift_request = ShiftRequest.objects.create(
+            workspace=self.workspace,
+            sender=self.member2,
+            recipient=self.member3,
+            sender_shift=self.shift1,
+            accepted=ShiftRequest.Status.ACCEPTED,
+            approved=ShiftRequest.Status.DECLINED,
+        )
+        url = reverse("shift_request_approve", kwargs={"shift_request_id": shift_request.id})
+        response = self.client.post(url, {"accept": True}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        shift_request.refresh_from_db()
+        self.assertEqual(shift_request.approved, ShiftRequest.Status.DECLINED)
+
+    def test_approve_sender_shift_overlaps_recipient_shift(self):
+        """Verify that approval is rejected when the sender shift overlaps with an existing recipient shift."""
+        shift_request = ShiftRequest.objects.create(
+            workspace=self.workspace,
+            sender=self.member2,
+            recipient=self.member4,
+            sender_shift=self.shift1,
+            accepted=ShiftRequest.Status.ACCEPTED,
+        )
+        url = reverse("shift_request_approve", kwargs={"shift_request_id": shift_request.id})
+        response = self.client.post(url, {"accept": True}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data["error"]["message"],
+            "Sender shift would conflict with one of recipient's shifts.",
+        )
+
+        shift_request.refresh_from_db()
+        self.assertEqual(shift_request.approved, ShiftRequest.Status.PENDING)
+
+    def test_approve_recipient_shift_overlaps_sender_shift(self):
+        """Verify that approval is rejected when the recipient shift overlaps with an existing sender shift."""
+        # give member2 a shift that overlaps with shift2
+        overlapping_shift = Shift.objects.create(
+            workspace=self.workspace,
+            start_time=self.time1,
+            end_time=self.time3,
+            role=self.role1,
+            created_by=self.member,
+            open=False,
+            member=self.member2,
+        )
+        shift_request = ShiftRequest.objects.create(
+            workspace=self.workspace,
+            sender=self.member2,
+            recipient=self.member3,
+            sender_shift=self.shift1,
+            recipient_shift=self.shift2,
+            accepted=ShiftRequest.Status.ACCEPTED,
+        )
+        url = reverse("shift_request_approve", kwargs={"shift_request_id": shift_request.id})
+        response = self.client.post(url, {"accept": True}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data["error"]["message"],
+            "Recipient shift would conflict with one of sender's shifts.",
+        )
+
+        shift_request.refresh_from_db()
+        self.assertEqual(shift_request.approved, ShiftRequest.Status.PENDING)
+
+    def test_valid_approve_no_recipient_shift(self):
+        """Verify that a valid approval without a recipient shift assigns the sender shift to the recipient."""
+        shift_request = ShiftRequest.objects.create(
+            workspace=self.workspace,
+            sender=self.member2,
+            recipient=self.member3,
+            sender_shift=self.shift1,
+            accepted=ShiftRequest.Status.ACCEPTED,
+        )
+        url = reverse("shift_request_approve", kwargs={"shift_request_id": shift_request.id})
+        response = self.client.post(url, {"accept": True}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        shift_request.refresh_from_db()
+        self.assertEqual(shift_request.approved, ShiftRequest.Status.ACCEPTED)
+
+        self.shift1.refresh_from_db()
+        self.assertEqual(self.shift1.member, self.member3)
+
+    def test_valid_approve_with_recipient_shift(self):
+        """Verify that a valid approval with a recipient shift swaps both shifts between members."""
+        shift_request = ShiftRequest.objects.create(
+            workspace=self.workspace,
+            sender=self.member2,
+            recipient=self.member3,
+            sender_shift=self.shift1,
+            recipient_shift=self.shift2,
+            accepted=ShiftRequest.Status.ACCEPTED,
+        )
+        url = reverse("shift_request_approve", kwargs={"shift_request_id": shift_request.id})
+        response = self.client.post(url, {"accept": True}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        shift_request.refresh_from_db()
+        self.assertEqual(shift_request.approved, ShiftRequest.Status.ACCEPTED)
+
+        self.shift1.refresh_from_db()
+        self.assertEqual(self.shift1.member, self.member3)
+
+        self.shift2.refresh_from_db()
+        self.assertEqual(self.shift2.member, self.member2)
+
+    def test_valid_decline(self):
+        """Verify that a valid decline sets approved status to declined without swapping shifts."""
+        shift_request = ShiftRequest.objects.create(
+            workspace=self.workspace,
+            sender=self.member2,
+            recipient=self.member3,
+            sender_shift=self.shift1,
+            accepted=ShiftRequest.Status.ACCEPTED,
+        )
+        url = reverse("shift_request_approve", kwargs={"shift_request_id": shift_request.id})
+        response = self.client.post(url, {"accept": False}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        shift_request.refresh_from_db()
+        self.assertEqual(shift_request.approved, ShiftRequest.Status.DECLINED)
+
+        self.shift1.refresh_from_db()
+        self.assertEqual(self.shift1.member, self.member2)

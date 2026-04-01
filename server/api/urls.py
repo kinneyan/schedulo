@@ -17,6 +17,7 @@ from .views import (
     ShiftFilterView,
     RoleView,
     ShiftRequestRespondView,
+    ShiftRequestApproveView,
 )
 
 urlpatterns = [
@@ -69,5 +70,10 @@ urlpatterns = [
         "shift-request/<int:shift_request_id>/respond/",
         ShiftRequestRespondView.as_view(),
         name="shift_request_respond",
+    ),
+    path(
+        "shift-request/<int:shift_request_id>/approve/",
+        ShiftRequestApproveView.as_view(),
+        name="shift_request_approve",
     ),
 ]

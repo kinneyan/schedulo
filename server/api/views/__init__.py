@@ -16,4 +16,4 @@ from .member import (
 )
 from .shift import ShiftView, ShiftFilterView
 from .role import RoleView
-from .shiftRequest import ShiftRequestRespondView
+from .shiftRequest import ShiftRequestRespondView, ShiftRequestApproveView
