@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from datetime import datetime, timedelta, date, timezone
 
 from ..serializers import (
     MemberReadSerializer,
@@ -552,7 +553,25 @@ class MemberShiftRequestView(APIView):
             response["error"]["message"] = "Recipient does not hold the recipient shift."
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-        # TODO: Ensure recipient shift does not overlap with any sender shifts
+        # Ensure recipient shift does not overlap with any sender shifts
+        if recipient_shift_present:
+            shifts = Shift.objects.filter(
+                member=sender,
+                start_time__range=(
+                    datetime.min.replace(tzinfo=timezone.utc),
+                    recipient_shift.end_time - timedelta(seconds=1),
+                ),
+                end_time__range=(
+                    recipient_shift.start_time + timedelta(seconds=1),
+                    datetime.max.replace(tzinfo=timezone.utc),
+                ),
+            ).exclude(pk=sender_shift.id)    
+
+            if len(shifts) != 0: # if any shifts are returned by the filter then there is an overlap
+                response["error"][
+                    "message"
+                ] = "Recipient shift would overlap with one of sender's shifts."
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         shift_request = ShiftRequest.objects.create(
             workspace=workspace,

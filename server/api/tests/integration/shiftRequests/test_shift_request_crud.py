@@ -276,6 +276,29 @@ class CreateShiftRequestTests(APITestCase):
         self.assertEqual(shift_request.accepted, ShiftRequest.Status.PENDING)
         self.assertEqual(shift_request.approved, ShiftRequest.Status.PENDING)
 
+    def test_recipient_shift_overlaps_with_sender_shift(self):
+        """Verify that a request is rejected when the recipient shift overlaps with one of the sender's existing shifts."""
+        self.overlap_shift = Shift.objects.create(
+            workspace=self.workspace,
+            start_time=self.time2,
+            end_time=self.time3,
+            role=self.role1,
+            created_by=self.member,
+            open=False,
+            member=self.member,
+        )
+        data = {
+            "sender_shift_id": self.shift1.id,
+            "recipient_id": self.member3.id,
+            "recipient_shift_id": self.shift3.id,
+        }
+        response = self.client.post(self.url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data["error"]["message"],
+            "Recipient shift would overlap with one of sender's shifts.",
+        )
+
 
 class ShiftRequestRespondTests(APITestCase):
     """Integration tests for the shift request respond endpoint."""
